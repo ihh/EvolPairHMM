@@ -1,0 +1,191 @@
+\documentclass{article}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Evolutionary Pair HMM}
+\author{Ian Holmes}
+
+\begin{document}
+%\maketitle
+
+\section{Statistical alignment}
+
+\subsection{Instantaneous evolutionary model}
+
+A sequence $S(t)$ evolves by
+substitutions (rate matrix $Q$),
+deletions (rate $\mu$ per site, extension probability $y$),
+and
+insertions (rate $\lambda$, extension $x$,
+characters drawn from $Q$'s stationary distribution $\pi$).
+
+\includegraphics[height=6em]{InstantHMM.pdf}
+
+
+\subsection{Pair hidden Markov model with time-varying parameters}
+A finite-state approximation to the finite-time transition probability distribution
+$P(S(t)|S(0))$
+
+\includegraphics[height=12em]{PairHMM.pdf}
+
+At $t=0$: $a(0)=1$, $f(0)=1-x$, $g(0)=x$, $p(0)=1-y$, $r(0)=y$, and $b(0)=c(0)=h(0)=q(0)=0$.
+
+For $t>0$, % following Holmes (2020)
+\begin{eqnarray*}
+\begin{bmatrix}
+a & b & c \\
+f & g & h \\
+p & q & r 
+\end{bmatrix}
+& = &
+\begin{bmatrix}
+T_{MM} & T_{MI} & 1-T_{MM}-T_{MI} \\
+T_{IM}/W_I & (W_I-T_{MI}-T_{DI})/W_I & (T_{MI}+T_{DI}-T_{IM})/W_I \\
+(1-T_{MM}-T_{IM})/W_D & T_{DI}/W_D & (W_D+T_{MM}+T_{IM}-T_{DI}-1)/W_D 
+\end{bmatrix}
+\\
+W_I(t) & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
+W_D(t) & = & \exp\left(\frac{\mu t}{1-y}\right)-1 \\
+T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
+\\
+  \frac{d}{dt} T_{MM}(t) & = &
+  \mu \frac{b f (1-y)}{1 - g y}-(\lambda +\mu )a
+  \nonumber \\
+  \frac{d}{dt} T_{MI}(t) & = &
+  -\mu \frac{b (1-g)}{1 - g y} + \lambda (1-b)
+  \nonumber \\
+  \frac{d}{dt} T_{IM}(t) & = &
+  \lambda a - \mu \frac{f (1-g) (b (1-r)+c q)}{(1 - g y) (f (1-r)+h p)}
+  \nonumber \\
+  \frac{d}{dt} T_{DI}(t) & = &
+  \mu \frac{(1-g) (b (1-r-h q)+c g q)}{(1-g y) (f (1-r)+h p)}
+\end{eqnarray*}
+
+The $T_{ij}(t)$ may be approximated by Runge-Kutta,
+e.g. using the Dormand-Prince method.
+
+The substitution matrix for the M state of the Pair HMM is
+the matrix exponential $\exp(Qt)$, for which a Pad\'{e} approximant
+or other power series expansion can be used.
+To allow substitution rate heterogeneity
+with a finite number of discrete rate categories
+(e.g. deciles of a gamma distribution),
+or another mixture of substitution processes,
+replace $\exp(Qt)$ with the appropriate sum over components.
+
+\subsection{Alignment unspecified}
+
+There is a prefix list (or tree) of sequences.
+Node 1 corresponds to the empty sequence.
+Nodes $N>1$ correspond to nonempty sequences $S_N$.
+Character $\alpha_N$ is the last character of $S_N$.
+The parent node $\beta_N$ corresponds to the longest prefix of $S_N$:
+removing $\alpha_N$ from $S_N$ leaves $S_{\beta_N}$.
+
+Let $F(i,j,t) = \begin{bmatrix} F_M & F_I & F_D \end{bmatrix}$
+be the per-state Forward likelihoods for sequences $S_i,S_j$.
+
+We seek $F^\ast(i,j,t) = P(S(t)=S_j|S(0)=S_i)$.
+The Forward recursions are, for $i>1$ and $j>1$
+\begin{eqnarray*}
+F(1,1,t) & = & \begin{bmatrix} 1 & 0 & 0 \end{bmatrix}
+\\
+F(1,j,t) & = &
+F(1,\beta_j,t) U_I(\alpha_j,t)
+\\
+F(i,1,t) & = &
+F(\beta_i,1,t) U_D(\alpha_i,t)
+\\
+F(i,j,t) & = &
+F(\beta_i,\beta_j,t) U_M(\alpha_i,\alpha_j,t)
++ F(\beta_i,j,t) U_I(\alpha_i,t)
++ F(i,\beta_j,t) U_D(\alpha_j,t)
+\\
+F^\ast(i,j,t) & = & F(i,j,t) \begin{bmatrix}
+a(t) \\
+f(t) \\
+p(t) \end{bmatrix}
+\\
+U_M(\alpha_i,\alpha_j,t) & = &
+\begin{bmatrix}
+a(t) & 0 & 0 \\
+f(t) & 0 & 0 \\
+p(t) & 0 & 0 
+\end{bmatrix}
+\exp(Qt)_{\alpha_i \alpha_j}
+\\
+U_I(\alpha_j,t) & = &
+\begin{bmatrix}
+0 & b(t) & 0 \\
+0 & g(t) & 0 \\
+0 & q(t) & 0 
+\end{bmatrix}
+\pi_{\alpha_j}
+\\
+U_D(\alpha_i,t) & = &
+\begin{bmatrix}
+0 & 0 & c(t) \\
+0 & 0 & h(t) \\
+0 & 0 & r(t) 
+\end{bmatrix}
+\end{eqnarray*}
+
+The time complexity to compute the Forward likelihood is $O(L^2)$,
+where $L$ is the sequence length.
+
+\subsection{Alignment specified}
+
+The pairwise alignment of ancestor $i$ and descendant $j$ can be summarized by two lists:
+\begin{itemize}
+    \item The list $A_M$ of pairs of aligned characters $(\alpha,\alpha')$ from ancestor $S(0)$ and descendant $S(t)$;
+    \item The list $A_{ID}$ of pairs of unaligned gap sequences $(\gamma,\gamma')$ that were deleted and inserted in between.
+\end{itemize}
+
+The alignment probability, computable in time $O(L)$ (and in practice very fast), is
+\[
+P(A_M,A_{ID},S(t)|S(0)) =
+\prod_{(\alpha,\alpha') \in A_M} \exp(Qt)_{\alpha \alpha'}
+\prod_{(\gamma,\gamma') \in A_{ID}} G(|\gamma|,|\gamma'|,t)
+\prod_{\alpha'\in \gamma'} \pi_{\alpha'}
+\]
+
+where $G(i,j,t)$ is the probability that between the next pair of aligned characters in $S(0)$ and $S(t)$,
+there were $i$ characters deleted from $S(0)$ 
+and $j$ characters inserted into $S(t)$,
+with no homology
+\begin{eqnarray*}
+G(0,0,t) & = & a \\
+G(i,0,t) & = & cr^{i-1}p \\
+G(0,j,t) & = & bg^{j-1}f \\
+G(i,j,t) & = &
+g^{j-1} r^{i-1}
+\sum_{k=0}^{\min(i,j)}
+\left(\frac{hq}{gr}\right)^k
+\left[
+\binom{i}{k} \binom{j-1}{k} brf
++ \binom{i-1}{k} \binom{j-1}{k} (bhp+cqf)
++ \binom{i-1}{k} \binom{j}{k} cgp
+\right]
+\end{eqnarray*}
+% The unobserved index $k$ counts zig-zags on the Pair HMM state path
+% ($D \to I \to D$ or $I \to D \to I$).
+
+\subsection{Multiple sequences}
+
+Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences. A choice may be faced as to whether to sum out ancestral sequences (alignment specified) or ancestral alignments (alignment unspecified).
+
+
+
+\end{document}
