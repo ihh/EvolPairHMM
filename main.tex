@@ -35,8 +35,8 @@ characters drawn from $Q$'s stationary distribution $\pi$).
 
 
 \subsection{Pair hidden Markov model with time-varying parameters}
-A finite-state approximation to the finite-time transition probability distribution
-$P(S(t)|S(0))$
+Starts and ends in the M state.
+Path likelihood approximates $P(S(t)|S(0))$
 
 \includegraphics[height=12em]{PairHMM.pdf}
 
@@ -79,11 +79,6 @@ e.g. using the Dormand-Prince method.
 The substitution matrix for the M state of the Pair HMM is
 the matrix exponential $\exp(Qt)$, for which a Pad\'{e} approximant
 or other power series expansion can be used.
-To allow substitution rate heterogeneity
-with a finite number of discrete rate categories
-(e.g. deciles of a gamma distribution),
-or another mixture of substitution processes,
-replace $\exp(Qt)$ with the appropriate sum over components.
 
 \subsection{Alignment unspecified}
 
@@ -182,9 +177,16 @@ g^{j-1} r^{i-1}
 % The unobserved index $k$ counts zig-zags on the Pair HMM state path
 % ($D \to I \to D$ or $I \to D \to I$).
 
-\subsection{Multiple sequences}
+\subsection{Generalizations}
 
-Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences. A choice may be faced as to whether to sum out ancestral sequences (alignment specified) or ancestral alignments (alignment unspecified).
+Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences.
+Upgrade $\exp(Qt)$ to Felsenstein pruning.
+
+To allow substitution rate heterogeneity
+with a finite number of discrete rate categories
+(e.g. deciles of a gamma distribution),
+or another mixture of substitution processes,
+replace $\exp(Qt)$ with the appropriate sum over components.
 
 
 
