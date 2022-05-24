@@ -110,7 +110,7 @@ $\gamma = 1 - \frac{\mu \beta}{\lambda (1 - \alpha)}$.
 
 \subsection{Alignment unspecified}
 
-There is a prefix list (or tree) of sequences.
+Suppose a prefix list (or tree) of sequences.
 Node 1 corresponds to the empty sequence.
 Nodes $N>1$ correspond to nonempty sequences $S_N$.
 Character $\omega_N$ is the last character of $S_N$.
@@ -212,7 +212,7 @@ Upgrade $\exp(Qt)$ to Felsenstein pruning \cite{Felsenstein81}.
 
 For the alignment-unspecified form, use automata composition to obtain $N$-sequence HMMs \cite{SilvestreRyanEtAl2020}.
 The resulting Forward algorithm is $O(L^N)$.
-Discard all but a few representative sample paths through $F$ to optimize performance \cite{WestessonEtAl2012}
+To ameliorate this, discard all but a few representative sample paths \cite{WestessonEtAl2012},
 or use MCMC \cite{RedelingsSuchard2007}.
 
 To allow substitution rate heterogeneity
@@ -220,8 +220,10 @@ with a finite number of discrete rate categories
 (e.g. deciles of a gamma distribution),
 or another mixture of substitution processes,
 replace $\exp(Qt)$ with the appropriate sum over components.
-This can be extended to models that partition the alignment into regions, like phylo-grammars \cite{WestessonHolmes2012}
+
+One can also use models that partition the alignment into regions, like phylo-HMMs \cite{WestessonHolmes2012}
 or hierarchical forms of TKF91 \cite{Holmes2004}.
+This technique is well-known for substitution heterogeneity \cite{Yang95}, and has been tried for indel profiling too \cite{SatijaEtAl2010}.
 
 \bibliographystyle{plain}
 \bibliography{references}
