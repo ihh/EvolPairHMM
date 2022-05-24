@@ -77,11 +77,11 @@ T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
 \end{eqnarray*}
 
 The $T_{ij}(t)$ may be approximated by Runge-Kutta methods,
-e.g. \cite{DormandPrince1980}.
+e.g. Dormand-Prince. % \cite{DormandPrince1980}
 
 The substitution matrix for the M state of the Pair HMM is
 the matrix exponential $\exp(Qt)$, for which a Pad\'{e} approximant
-or other power series expansion can be used \cite{MolerVanLoan2003}.
+or other power series expansion can be used. % \cite{MolerVanLoan2003}
 
 \subsection{Exactly-solved special case}
 
@@ -207,8 +207,8 @@ g^{j-1} r^{i-1}
 
 \subsection{Generalizations}
 
-Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences.
-Upgrade $\exp(Qt)$ to Felsenstein pruning \cite{Felsenstein81}.
+Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences on a phylogeny.
+Upgrade $\exp(Qt)$ to Felsenstein pruning. % \cite{Felsenstein81}.
 
 For the alignment-unspecified form, use automata composition to obtain $N$-sequence HMMs \cite{SilvestreRyanEtAl2020}.
 The resulting Forward algorithm is $O(L^N)$.
@@ -220,12 +220,10 @@ with a finite number of discrete rate categories
 (e.g. deciles of a gamma distribution),
 or another mixture of substitution processes,
 replace $\exp(Qt)$ with the appropriate sum over components.
+One can also partition the alignment into regions, as in phylo-grammars \cite{KlostermanEtAl2006}
+or hierarchical variants of TKF91 \cite{Holmes2004}.
 
-One can also use models that partition the alignment into regions, like phylo-HMMs \cite{WestessonHolmes2012}
-or hierarchical forms of TKF91 \cite{Holmes2004}.
-This technique is well-known for substitution heterogeneity \cite{Yang95}, and has been tried for indel profiling too \cite{SatijaEtAl2010}.
-
-\bibliographystyle{plain}
+\bibliographystyle{unsrt}
 \bibliography{references}
 
 
