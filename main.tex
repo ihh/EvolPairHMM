@@ -80,14 +80,39 @@ The substitution matrix for the M state of the Pair HMM is
 the matrix exponential $\exp(Qt)$, for which a Pad\'{e} approximant
 or other power series expansion can be used.
 
+\subsection{Exactly-solved special case}
+
+When $x=y=0$ the model is TKF91
+with solution
+$
+\begin{bmatrix}
+a & b & c \\
+f & g & h \\
+p & q & r 
+\end{bmatrix}
+=
+\begin{bmatrix}
+(1-\beta)\alpha & \beta & (1-\beta)(1-\alpha) \\
+(1-\beta)\alpha & \beta & (1-\beta)(1-\alpha) \\
+(1-\gamma)\alpha & \gamma & (1-\gamma)(1-\alpha)
+\end{bmatrix}
+$
+where
+$\alpha = \exp(-\mu t)$,
+$\beta = \frac{\lambda \left( \exp(-\lambda t) - \exp(-\mu t) \right)}{\mu \exp(-\lambda t) - \lambda \exp(-\mu t)}$
+and
+$\gamma = 1 - \frac{\mu \beta}{\lambda (1 - \alpha)}$.
+
+
+
 \subsection{Alignment unspecified}
 
 There is a prefix list (or tree) of sequences.
 Node 1 corresponds to the empty sequence.
 Nodes $N>1$ correspond to nonempty sequences $S_N$.
-Character $\alpha_N$ is the last character of $S_N$.
-The parent node $\beta_N$ corresponds to the longest prefix of $S_N$:
-removing $\alpha_N$ from $S_N$ leaves $S_{\beta_N}$.
+Character $\omega_N$ is the last character of $S_N$.
+The parent node $\psi_N$ corresponds to the longest prefix of $S_N$:
+removing $\omega_N$ from $S_N$ leaves $S_{\psi_N}$.
 
 Let $F(i,j,t) = \begin{bmatrix} F_M & F_I & F_D \end{bmatrix}$
 be the per-state Forward likelihoods for sequences $S_i,S_j$.
@@ -98,38 +123,38 @@ The Forward recursions are, for $i>1$ and $j>1$
 F(1,1,t) & = & \begin{bmatrix} 1 & 0 & 0 \end{bmatrix}
 \\
 F(1,j,t) & = &
-F(1,\beta_j,t) U_I(\alpha_j,t)
+F(1,\psi_j,t) U_I(\omega_j,t)
 \\
 F(i,1,t) & = &
-F(\beta_i,1,t) U_D(\alpha_i,t)
+F(\psi_i,1,t) U_D(\omega_i,t)
 \\
 F(i,j,t) & = &
-F(\beta_i,\beta_j,t) U_M(\alpha_i,\alpha_j,t)
-+ F(\beta_i,j,t) U_I(\alpha_i,t)
-+ F(i,\beta_j,t) U_D(\alpha_j,t)
+F(\psi_i,\psi_j,t) U_M(\omega_i,\omega_j,t)
++ F(\psi_i,j,t) U_I(\omega_i,t)
++ F(i,\psi_j,t) U_D(\omega_j,t)
 \\
 F^\ast(i,j,t) & = & F(i,j,t) \begin{bmatrix}
 a(t) \\
 f(t) \\
 p(t) \end{bmatrix}
 \\
-U_M(\alpha_i,\alpha_j,t) & = &
+U_M(\omega_i,\omega_j,t) & = &
 \begin{bmatrix}
 a(t) & 0 & 0 \\
 f(t) & 0 & 0 \\
 p(t) & 0 & 0 
 \end{bmatrix}
-\exp(Qt)_{\alpha_i \alpha_j}
+\exp(Qt)_{\omega_i \omega_j}
 \\
-U_I(\alpha_j,t) & = &
+U_I(\omega_j,t) & = &
 \begin{bmatrix}
 0 & b(t) & 0 \\
 0 & g(t) & 0 \\
 0 & q(t) & 0 
 \end{bmatrix}
-\pi_{\alpha_j}
+\pi_{\omega_j}
 \\
-U_D(\alpha_i,t) & = &
+U_D(\omega_i,t) & = &
 \begin{bmatrix}
 0 & 0 & c(t) \\
 0 & 0 & h(t) \\
@@ -144,16 +169,16 @@ where $L$ is the sequence length.
 
 The pairwise alignment of ancestor $i$ and descendant $j$ can be summarized by two lists:
 \begin{itemize}
-    \item The list $A_M$ of pairs of aligned characters $(\alpha,\alpha')$ from ancestor $S(0)$ and descendant $S(t)$;
-    \item The list $A_{ID}$ of pairs of unaligned gap sequences $(\gamma,\gamma')$ that were deleted and inserted in between.
+    \item The list $A_M$ of pairs of aligned characters $(\omega,\omega')$ from ancestor $S(0)$ and descendant $S(t)$;
+    \item The list $A_{ID}$ of pairs of unaligned gap sequences $(\delta,\delta')$ that were deleted and inserted in between.
 \end{itemize}
 
 The alignment probability, computable in time $O(L)$ (and in practice very fast), is
 \[
 P(A_M,A_{ID},S(t)|S(0)) =
-\prod_{(\alpha,\alpha') \in A_M} \exp(Qt)_{\alpha \alpha'}
-\prod_{(\gamma,\gamma') \in A_{ID}} G(|\gamma|,|\gamma'|,t)
-\prod_{\alpha'\in \gamma'} \pi_{\alpha'}
+\prod_{(\omega,\omega') \in A_M} \exp(Qt)_{\omega \omega'}
+\prod_{(\delta,\delta') \in A_{ID}} G(|\delta|,|\delta'|,t)
+\prod_{\omega'\in \delta'} \pi_{\omega'}
 \]
 
 where $G(i,j,t)$ is the probability that between the next pair of aligned characters in $S(0)$ and $S(t)$,
@@ -181,6 +206,7 @@ g^{j-1} r^{i-1}
 
 Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences.
 Upgrade $\exp(Qt)$ to Felsenstein pruning.
+For the alignment-unspecified form, use automata composition to obtain multi-sequence HMMs.
 
 To allow substitution rate heterogeneity
 with a finite number of discrete rate categories
