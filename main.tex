@@ -235,29 +235,32 @@ We formulate a grammar over {\em links}, {\em tokens}, {\em zones}, and {\em blo
 With ($N_l,N_k,N_z,N_b$) types of link, token, zone, and block,
 the grammar has $O(N_l(N_k + N_z + N_b) + N_l^2 N_b)$ rules and parameters.
 
-A link of type $i$ can be a token, a zone, or a block:
+A link of type $i$ can resolve to a token, zone, or block:
 \begin{itemize}
 \item
-The probability that it is a token of type $k$ is $(1-\rho_i) (1-\eta_i) \sigma_{ik}$.
+The probability that it resolves to a token of type $k$ is $\sigma_{ik}$.
 \item
-The probability that it is a zone of type $j$ is $(1-\rho_i) \eta_i \tau_{ij}$.
+The probability that it resolves to a zone of type $j$ is $\tau_{ij}$.
 \item
-The probability that it is a block of type $j$ is $\rho_i \upsilon_{ij}$.
+The probability that it resolves to a block of type $j$ is $\upsilon_{ij}$.
 \end{itemize}
+These must sum to one, $\sum_k^{N_k}\sigma_{ik} + \sum_j^{N_z}\tau_{ij} + \sum_j^{N_b}\upsilon_{ij} = 1 \forall i$.
 
 A token of type $k$ has rate matrix $Q^{(k)}$ with stationary distribution $\pi^{(k)}$.
 
 In a zone of type $i$, the indel rates are $(\lambda_i,\mu_i)$
 and the distribution over link types $j$ is $\phi_{ij}$.
+The stationary distribution is an IID sequence of links, of geometrically-distributed length.
 
-A block of type $i$ generates link types $j,k$ with probability $\kappa_{ijk}$.
+A block of type $i$ resolves to a pair of links of types $j,k$ with probability $\kappa_{ijk}$.
+With rate $\rho_i$, both links are resampled from their stationary distributions, conditional on their types (which remain fixed).
 
 The equilibrium distribution over parse trees is a stochastic context-free grammar (SCFG)
 \[
 \begin{array}{rclll}
-  L_i & \to & \omega_k & & (1-\rho_i) (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \\
-      & | & Z_j & & (1-\rho_i) \eta_i \tau_{ij} \\
-      & | & B_j & & \rho_i \upsilon_{ij} \\
+  L_i & \to & \omega_k & & \sigma_{ik} \pi^{(k)}_{\omega} \\
+      & | & Z_j & & \tau_{ij} \\
+      & | & B_j & & \upsilon_{ij} \\
   Z_i & \to & L_j & Z_i & (\lambda_i/\mu_i) \phi_{ij} \\
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
   B_i & \to & L_j & L_k & \kappa_{ijk}
@@ -268,22 +271,24 @@ The joint distribution $P(S(0),S(t))$ is the Inside likelihood of a Pair SCFG
 
 \begin{tabular}{ll}
 $\begin{array}{rclll}
-  L_i & \to & \omega_k & \omega'_k & (1-\rho_i) (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \exp(Q^{(k)} t)_{\omega \omega'} \\
-      & | & Z_j & & (1-\rho_i) \eta_i \tau_{ij} \\
-      & | & B_j & & \rho_i \upsilon_{ij} \\
-  L^x_i & \to & \omega_k & & (1-\rho_i) (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \\
-      & | & Z^x_j & & (1-\rho_i) \eta_i \tau_{ij} \\
-      & | & B^x_j & & \rho_i \upsilon_{ij} \\
-  L^y_i & \to & \omega'_k & & (1-\rho_i) (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega'} \\
-      & | & Z^y_j & & (1-\rho_i) \eta_i \tau_{ij} \\
-      & | & B^y_j & & \rho_i \upsilon_{ij} \\
+  L_i & \to & \omega_k & \omega'_k & \sigma_{ik} \pi^{(k)}_{\omega} \exp(Q^{(k)} t)_{\omega \omega'} \\
+      & | & Z_j & & \tau_{ij} \\
+      & | & B_j & & \upsilon_{ij} \\
+  L^x_i & \to & \omega_k & & \sigma_{ik} \pi^{(k)}_{\omega} \\
+      & | & Z^x_j & & \tau_{ij} \\
+      & | & B^x_j & & \upsilon_{ij} \\
+  L^y_i & \to & \omega'_k & & \sigma_{ik} \pi^{(k)}_{\omega'} \\
+      & | & Z^y_j & & \tau_{ij} \\
+      & | & B^y_j & & \upsilon_{ij} \\
+  L^{xy}_i & \to & L^x_i & L^y_i & 1 \\
   Z_i & \to & M_i & & 1 \\
   Z^x_i & \to & L^x_j & Z^x_i & (\lambda_i/\mu_i) \phi_{ij} \\
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
   Z^y_i & \to & L^y_j & Z^y_i & (\lambda_i/\mu_i) \phi_{ij} \\
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
 \end{array}$ & $\begin{array}{rclll}
-  B_i & \to & L_j & L_k & \kappa_{ijk} \\
+  B_i & \to & L_j & L_k & \kappa_{ijk} \exp(-\rho_i t) \\
+      & | & L^{xy}_j & L^{xy}_k & \kappa_{ijk} (1 - \exp(-\rho_i t)) \\
   B^x_i & \to & L^x_j & L^x_k & \kappa_{ijk} \\
   B^y_i & \to & L^y_j & L^y_k & \kappa_{ijk} \\
   M_i & \to & L_j & M_i & (\lambda_i/\mu_i) a_i \phi_{ij} \\
