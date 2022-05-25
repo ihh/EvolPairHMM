@@ -9,3 +9,5 @@ open: main.pdf.open
 	bibtex $*
 	pdflatex $*.tex
 	pdflatex $*.tex
+
+.SECONDARY:
