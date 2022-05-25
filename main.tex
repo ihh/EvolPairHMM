@@ -37,6 +37,8 @@ characters drawn from $Q$'s stationary distribution $\pi$).
 
 At equilibrium, sequence length $\sim$ Geometric($\lambda/\mu$). Composition is $\pi$.
 
+If the model is required to be reversible then $\lambda y(1-x) = \mu x(1-y)$.
+
 \subsection{Pair hidden Markov model with time-varying parameters}
 Derived in \cite{Holmes2020}.
 Path likelihood approximates $P(S(t)|S(0))$
@@ -232,6 +234,7 @@ Suppose there are different types of evolutionary sequence.
 In a sequence of type $i$, the evolutionary parameters are $(\lambda_i,\mu_i)$.
 The probability that a random element in this sequence is another recursively nested subsequence is $\eta_i$.
 If so, the probability that the nested subsequence is of type $j$ is $\tau_{ij}$.
+
 If the element is not a subsequence, the probability that it is a point substitution site of type $k$ is $\sigma_{ik}$.
 The rate matrix for such a site is $Q^{(k)}$ with stationary distribution $\pi^{(k)}$.
 
