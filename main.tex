@@ -24,7 +24,7 @@
 
 \section{Statistical alignment}
 
-\subsection{Instantaneous evolutionary model}
+\subsection{General geometric indel model (GGI)}
 
 A sequence $S(t)$ evolves by
 substitutions (rate matrix $Q$),
@@ -39,9 +39,9 @@ At equilibrium, sequence length $\sim$ Geometric($\lambda/\mu$). Composition is 
 
 If the model is required to be reversible then $\lambda y(1-x) = \mu x(1-y)$.
 
-\subsection{Pair hidden Markov model with time-varying parameters}
+\subsection{Conditional Pair HMM (transducer) with time-varying parameters}
 Derived in \cite{Holmes2020}.
-Path likelihood approximates $P(S(t)|S(0))$
+A Pair HMM whose state path likelihood approximates $P(S(t)|S(0))$
 
 \includegraphics[height=12em]{PairHMM.pdf}
 
@@ -85,7 +85,7 @@ The substitution matrix for the M state of the Pair HMM is
 the matrix exponential $\exp(Qt)$, for which a Pad\'{e} approximant
 or other power series expansion can be used. % \cite{MolerVanLoan2003}
 
-\subsection{Exactly-solved special case}
+\subsection{Exactly-solved special case (TKF91)}
 
 When $x=y=0$ the model is TKF91 \cite{ThorneEtAl91}
 with solution
@@ -207,7 +207,7 @@ g^{j-1} r^{i-1}
 % The unobserved index $k$ counts zig-zags on the Pair HMM state path
 % ($D \to I \to D$ or $I \to D \to I$).
 
-\subsection{Generalizations}
+\subsection{Phylogenetic alignment}
 
 Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences on a phylogeny.
 Upgrade $\exp(Qt)$ to Felsenstein pruning. % \cite{Felsenstein81}.
@@ -217,57 +217,70 @@ The resulting Forward algorithm is $O(L^N)$.
 To ameliorate this, discard all but a few representative sample paths \cite{WestessonEtAl2012},
 or use MCMC \cite{RedelingsSuchard2007}.
 
-% To allow substitution rate heterogeneity
-% with a finite number of discrete rate categories
-% (e.g. deciles of a gamma distribution),
-% or another mixture of substitution processes,
-% replace $\exp(Qt)$ with the appropriate sum over components.
-% One can also partition the alignment into regions, as in phylo-grammars \cite{KlostermanEtAl2006}
-% or hierarchical variants of TKF91 \cite{Holmes2004}.
 
-\section{Hierarchical model}
+\section{Hierarchical geometric indel model (HGI)}
 
-Consider a version of the model where each element in the sequence can either be a point substitution site, or a nested sequence.
-This generates a structure like a parse tree.
+Consider a version of the model where some of the elements of the evolving sequence can themselves be evolving subsequences, recursively nested inside the parent,
+potentially with different evolutionary parameters: e.g. a low-indel hydrophobic region.
+This induces a recursive structure, like a parse tree.
 
-Suppose there are different types of evolutionary sequence.
-In a sequence of type $i$, the evolutionary parameters are $(\lambda_i,\mu_i)$.
-The probability that a random element in this sequence is another recursively nested subsequence is $\eta_i$.
-If so, the probability that the nested subsequence is of type $j$ is $\tau_{ij}$.
+The grammar is over {\em characters}, {\em links}, and {\em zones}:
+\begin{itemize}
+\item A character ($\omega_k, \omega'_k$) is an evolving observed residue ($\omega, \omega'$) with a fixed hidden type ($k$).
+\item A link ($L,L^x,L^y$) is an element of a sequence. It's either a character or a nested zone.
+\item A zone ($Z,Z^x,Z^y$) is an evolving sequence of links.
+\end{itemize}
 
-If the element is not a subsequence, the probability that it is a point substitution site of type $k$ is $\sigma_{ik}$.
-The rate matrix for such a site is $Q^{(k)}$ with stationary distribution $\pi^{(k)}$.
+There are $N_z$ types of zone and $N_k$ types of character.
 
-The equilibrium distribution is a stochastic context-free grammar (SCFG),
-and the joint distribution over alignments is a Pair SCFG
+In a zone of type $i$, the indel rates are $(\lambda_i,\mu_i)$.
+The probability that a random link in this zone is another recursively nested zone is $\eta_i$.
+If so, the probability that the nested zone is of type $j$ is $\tau_{ij}$.
 
+If the link is not a nested zone, the probability that it is a character of type $k$ is $\sigma_{ik}$.
+The rate matrix for type $k$ is $Q^{(k)}$ and the stationary distribution is $\pi^{(k)}$.
+
+The equilibrium distribution over parse trees is a stochastic context-free grammar (SCFG)
 \[
 \begin{array}{rclll}
-  M_i & \to & A_i & M_i & (\lambda_i/\mu_i) a_i \\
-      & | & Y_i & I_i & b_i \\
-      & | & X_i & D_i & (\lambda_i/\mu_i) c_i \\
-      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-b_i) \\
-  I_i & \to & A_i & M_i & (\lambda_i/\mu_i) f_i \\
-      & | & Y_i & I_i & g_i \\
-      & | & X_i & D_i & (\lambda_i/\mu_i) h_i \\
-      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-g_i) \\
-  D_i & \to & A_i & M_i & (\lambda_i/\mu_i) p_i \\
-      & | & Y_i & I_i & q_i \\
-      & | & X_i & D_i & (\lambda_i/\mu_i) r_i \\
-      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-q_i) \\
-  A_i & \to & \omega_k & \omega'_k & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \exp(Q^{(k)} t)_{\omega \omega'} \\
-      & | & M_j & & \eta_i \tau_{ij} \\
-  X_i & \to & \omega_k & & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \\
-      & | & D^\ast_j & & \eta_i \tau_{ij} \\
-  Y_i & \to & \omega'_k & & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega'} \\
-      & | & I^\ast_j & & \eta_i \tau_{ij} \\
-  D^\ast_i & \to & X_i & D^\ast_i & \lambda_i/\mu_i \\
+  Z_i & \to & L_i & Z_i & \lambda_i/\mu_i \\
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
-  I^\ast_i & \to & Y_i & I^\ast_i & \lambda_i/\mu_i \\
-        & | & \epsilon & & 1 - \lambda_i/\mu_i
+  L_i & \to & \omega_k & & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \\
+      & | & Z_j & & \eta_i \tau_{ij}
 \end{array}
 \]
-  
+
+The joint distribution $P(S(0),S(t))$ is the Inside likelihood of a Pair SCFG
+
+\begin{tabular}{ll}
+$\begin{array}{rclll}
+  Z_i & \to & M_i & & 1 \\
+  Z^x_i & \to & L^x_i & Z^x_i & \lambda_i/\mu_i \\
+        & | & \epsilon & & 1 - \lambda_i/\mu_i \\
+  Z^y_i & \to & L^y_i & Z^y_i & \lambda_i/\mu_i \\
+        & | & \epsilon & & 1 - \lambda_i/\mu_i \\
+  L_i & \to & \omega_k & \omega'_k & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \exp(Q^{(k)} t)_{\omega \omega'} \\
+      & | & Z_j & & \eta_i \tau_{ij} \\
+  L^x_i & \to & \omega_k & & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \\
+      & | & Z^x_j & & \eta_i \tau_{ij} \\
+  L^y_i & \to & \omega'_k & & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega'} \\
+      & | & Z^y_j & & \eta_i \tau_{ij}
+\end{array}$ & $\begin{array}{rclll}
+  M_i & \to & L_i & M_i & (\lambda_i/\mu_i) a_i \\
+      & | & L^y_i & I_i & b_i \\
+      & | & L^x_i & D_i & (\lambda_i/\mu_i) c_i \\
+      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-b_i) \\
+  I_i & \to & L_i & M_i & (\lambda_i/\mu_i) f_i \\
+      & | & L^y_i & I_i & g_i \\
+      & | & L^x_i & D_i & (\lambda_i/\mu_i) h_i \\
+      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-g_i) \\
+  D_i & \to & L_i & M_i & (\lambda_i/\mu_i) p_i \\
+      & | & L^y_i & I_i & q_i \\
+      & | & L^x_i & D_i & (\lambda_i/\mu_i) r_i \\
+      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-q_i)
+\end{array}$
+\end{tabular}
+
 \bibliographystyle{unsrt}
 \bibliography{references}
 
