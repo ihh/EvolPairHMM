@@ -35,10 +35,10 @@ characters drawn from $Q$'s stationary distribution $\pi$).
 
 \includegraphics[height=6em]{InstantHMM.pdf}
 
+At equilibrium, sequence length $\sim$ Geometric($\lambda/\mu$). Composition is $\pi$.
 
 \subsection{Pair hidden Markov model with time-varying parameters}
 Derived in \cite{Holmes2020}.
-Starts and ends in the M state.
 Path likelihood approximates $P(S(t)|S(0))$
 
 \includegraphics[height=12em]{PairHMM.pdf}
@@ -137,9 +137,9 @@ F(\psi_i,\psi_j,t) U_M(\omega_i,\omega_j,t)
 + F(\psi_i,j,t) U_D(\omega_i,t)
 \\
 F^\ast(i,j,t) & = & F(i,j,t) \begin{bmatrix}
-a(t) \\
-f(t) \\
-p(t) \end{bmatrix}
+1-b(t) \\
+1-g(t) \\
+1-q(t) \end{bmatrix}
 \\
 U_M(\omega_i,\omega_j,t) & = &
 \begin{bmatrix}
@@ -215,14 +215,56 @@ The resulting Forward algorithm is $O(L^N)$.
 To ameliorate this, discard all but a few representative sample paths \cite{WestessonEtAl2012},
 or use MCMC \cite{RedelingsSuchard2007}.
 
-To allow substitution rate heterogeneity
-with a finite number of discrete rate categories
-(e.g. deciles of a gamma distribution),
-or another mixture of substitution processes,
-replace $\exp(Qt)$ with the appropriate sum over components.
-One can also partition the alignment into regions, as in phylo-grammars \cite{KlostermanEtAl2006}
-or hierarchical variants of TKF91 \cite{Holmes2004}.
+% To allow substitution rate heterogeneity
+% with a finite number of discrete rate categories
+% (e.g. deciles of a gamma distribution),
+% or another mixture of substitution processes,
+% replace $\exp(Qt)$ with the appropriate sum over components.
+% One can also partition the alignment into regions, as in phylo-grammars \cite{KlostermanEtAl2006}
+% or hierarchical variants of TKF91 \cite{Holmes2004}.
 
+\section{Hierarchical model}
+
+Consider a version of the model where each element in the sequence can either be a point substitution site, or a nested sequence.
+This generates a structure like a parse tree.
+
+Suppose there are different types of evolutionary sequence.
+In a sequence of type $i$, the evolutionary parameters are $(\lambda_i,\mu_i)$.
+The probability that a random element in this sequence is another recursively nested subsequence is $\eta_i$.
+If so, the probability that the nested subsequence is of type $j$ is $\tau_{ij}$.
+If the element is not a subsequence, the probability that it is a point substitution site of type $k$ is $\sigma_{ik}$.
+The rate matrix for such a site is $Q^{(k)}$ with stationary distribution $\pi^{(k)}$.
+
+The equilibrium distribution is a stochastic context-free grammar (SCFG),
+and the joint distribution over alignments is a Pair SCFG
+
+\[
+\begin{array}{rclll}
+  M_i & \to & A_i & M_i & (\lambda_i/\mu_i) a_i \\
+      & | & Y_i & I_i & b_i \\
+      & | & X_i & D_i & (\lambda_i/\mu_i) c_i \\
+      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-b_i) \\
+  I_i & \to & A_i & M_i & (\lambda_i/\mu_i) f_i \\
+      & | & Y_i & I_i & g_i \\
+      & | & X_i & D_i & (\lambda_i/\mu_i) h_i \\
+      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-g_i) \\
+  D_i & \to & A_i & M_i & (\lambda_i/\mu_i) p_i \\
+      & | & Y_i & I_i & q_i \\
+      & | & X_i & D_i & (\lambda_i/\mu_i) r_i \\
+      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-q_i) \\
+  A_i & \to & \omega_k & \omega'_k & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \exp(Q^{(k)} t)_{\omega \omega'} \\
+      & | & M_j & & \eta_i \tau_{ij} \\
+  X_i & \to & \omega_k & & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega} \\
+      & | & D^\ast_j & & \eta_i \tau_{ij} \\
+  Y_i & \to & \omega'_k & & (1-\eta_i) \sigma_{ik} \pi^{(k)}_{\omega'} \\
+      & | & I^\ast_j & & \eta_i \tau_{ij} \\
+  D^\ast_i & \to & X_i & D^\ast_i & \lambda_i/\mu_i \\
+        & | & \epsilon & & 1 - \lambda_i/\mu_i \\
+  I^\ast_i & \to & Y_i & I^\ast_i & \lambda_i/\mu_i \\
+        & | & \epsilon & & 1 - \lambda_i/\mu_i
+\end{array}
+\]
+  
 \bibliographystyle{unsrt}
 \bibliography{references}
 
