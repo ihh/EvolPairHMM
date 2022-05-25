@@ -252,8 +252,8 @@ In a zone of type $i$, the indel rates are $(\lambda_i,\mu_i)$
 and the distribution over link types $j$ is $\phi_{ij}$.
 The stationary distribution is an IID sequence of links, of geometrically-distributed length.
 
-A block of type $i$ resolves to a pair of links of types $j,k$ with probability $\kappa_{ijk}$.
-With rate $\rho_i$, both links are resampled from their stationary distributions, conditional on their types (which remain fixed).
+A block of type $i$ resolves to a pair of links of types $j,k$ with probability $\kappa_{ijk}$,
+resampled at rate $\rho_i$.
 
 The equilibrium distribution over parse trees is a stochastic context-free grammar (SCFG)
 \[
@@ -269,8 +269,13 @@ The equilibrium distribution over parse trees is a stochastic context-free gramm
 
 The joint distribution $P(S(0),S(t))$ is the Inside likelihood of a Pair SCFG
 
-\begin{tabular}{ll}
-$\begin{array}{rclll}
+%\begin{tabular}{ll}
+%$\begin{array}{rclll}
+%\end{array}$ & $\begin{array}{rclll}
+%\end{array}$
+%\end{tabular}
+\[
+\begin{array}{rclll}
   L_i & \to & \omega_k & \omega'_k & \sigma_{ik} \pi^{(k)}_{\omega} \exp(Q^{(k)} t)_{\omega \omega'} \\
       & | & Z_j & & \tau_{ij} \\
       & | & B_j & & \upsilon_{ij} \\
@@ -280,18 +285,16 @@ $\begin{array}{rclll}
   L^y_i & \to & \omega'_k & & \sigma_{ik} \pi^{(k)}_{\omega'} \\
       & | & Z^y_j & & \tau_{ij} \\
       & | & B^y_j & & \upsilon_{ij} \\
-  L^{xy}_i & \to & L^x_i & L^y_i & 1 \\
   Z_i & \to & M_i & & 1 \\
   Z^x_i & \to & L^x_j & Z^x_i & (\lambda_i/\mu_i) \phi_{ij} \\
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
   Z^y_i & \to & L^y_j & Z^y_i & (\lambda_i/\mu_i) \phi_{ij} \\
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
-\end{array}$ & $\begin{array}{rclll}
   B_i & \to & L_j & L_k & \kappa_{ijk} \exp(-\rho_i t) \\
-      & | & L^{xy}_j & L^{xy}_k & \kappa_{ijk} (1 - \exp(-\rho_i t)) \\
+      & | & B^x_i & B^y_i & 1 - \exp(-\rho_i t) \\
   B^x_i & \to & L^x_j & L^x_k & \kappa_{ijk} \\
   B^y_i & \to & L^y_j & L^y_k & \kappa_{ijk} \\
-  M_i & \to & L_j & M_i & (\lambda_i/\mu_i) a_i \phi_{ij} \\
+M_i & \to & L_j & M_i & (\lambda_i/\mu_i) a_i \phi_{ij} \\
       & | & L^y_j & I_i & b_i \phi_{ij} \\
       & | & L^x_j & D_i & (\lambda_i/\mu_i) c_i \phi_{ij} \\
       & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-b_i) \\
@@ -303,8 +306,8 @@ $\begin{array}{rclll}
       & | & L^y_j & I_i & q_i \phi_{ij} \\
       & | & L^x_j & D_i & (\lambda_i/\mu_i) r_i \phi_{ij} \\
       & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-q_i) \\
-\end{array}$
-\end{tabular}
+\end{array}
+\]
 
 \bibliographystyle{unsrt}
 \bibliography{references}
