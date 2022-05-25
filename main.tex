@@ -220,11 +220,10 @@ or use MCMC \cite{RedelingsSuchard2007}.
 
 \section{Hierarchical geometric indel model (HGI)}
 
-Consider a version of the model where some of the elements of the evolving sequence can themselves be evolving subsequences, recursively nested inside the parent,
-potentially with different evolutionary parameters: e.g. a low-indel hydrophobic region.
-This induces a recursive structure, like a parse tree.
+We seek a model where the sequence can be partitioned into different zones (e.g. a low-indel hydrophobic region).
+We also want to describe how the arrangement of zones itself evolves.
 
-The grammar is over {\em characters}, {\em links}, and {\em zones}:
+We hypothesize a grammar over {\em characters}, {\em links}, and {\em zones}:
 \begin{itemize}
 \item A character ($\omega_k, \omega'_k$) is an evolving observed residue ($\omega, \omega'$) with a fixed hidden type ($k$).
 \item A link ($L,L^x,L^y$) is an element of a sequence. It's either a character or a nested zone.
