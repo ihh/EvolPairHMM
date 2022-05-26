@@ -220,15 +220,15 @@ or use MCMC \cite{RedelingsSuchard2007}.
 
 \section{Grammatically structured indel model (GSI)}
 
-Consider a stochastic context-free grammar $G$
+Consider a stochastic context-free grammar ${\cal G}$
 with nonterminals ${\cal W}$ and terminals $\Omega$.
 
 Let $\Upsilon$ be the set of parse trees for this grammar
 and let $X,Y \in {\cal W}\cup\Omega$ denote grammar symbols.
 
 We describe a continuous-time Markov chain (CTMC) with $\Upsilon$ as a state space.
-By construction, $G$ gives the equilibrium distribution over $\Upsilon$.
-We also describe a pair grammar $G_t$ that computes matrix exponentials of this CTMC's rate matrix.
+By construction, ${\cal G}$ gives the equilibrium distribution over $\Upsilon$.
+We also describe a pair grammar ${\cal G}_t$ that computes matrix exponentials of this CTMC's rate matrix.
 
 \subsection{Rate matrix}
 
@@ -255,36 +255,37 @@ or it can expand to a sequence of such symbols.
 
 \subsection{Pair grammar}
 
-We construct the pair grammar $G_t$ over two sequences $(1,2)$
-by first creating copies $G^1$ and $G^2$ of the original grammar $G$,
-but each generating just terminals in $(\Omega_1,\Omega_2)$ respectively.
+We construct the pair grammar ${\cal G}_t$ whose Inside likelihood is the joint probability $P(S(0),S(t))$
+by first creating copies ${\cal G}_1$ and ${\cal G}_2$ of the original grammar ${\cal G}$,
+each copy having nonterminals $({\cal W}_1,{\cal W}_2)$ and terminals $(\Omega_1,\Omega_2)$ respectively.
+(Suffix 1 denotes ancestor $S(0)$ and suffix 2 descendant $S(t)$.)
 
-Next, we create a copy $G_t$ of $G$ with implicit rules $\omega_t \to \omega^1 \omega^2$.
+Next, we create a copy ${\cal G}_t$ of ${\cal G}$ with implicit rules $\omega_t \to \omega_1 \omega_2$.
 
-In $G_t$, the substitution rules $W \to X$ are replaced by
+In ${\cal G}_t$, the substitution rules $W \to X$ of ${\cal G}$ are replaced by rules
 
 \[
 \begin{array}{rclll}
   W_t & \to & X_t & & \pi^{(W)}_X \exp(Q^{(W)}_{XX} t) \\
-      & | & X^1 & Y^2 & \pi^{(W)}_X (\exp(Q^{(W)} t)_{XY} - \delta_{XY} \exp(Q^{(W)}_{XX} t)) \\
+      & | & X_1 & Y_2 & \pi^{(W)}_X (\exp(Q^{(W)} t)_{XY} - \delta_{XY} \exp(Q^{(W)}_{XX} t)) \\
 \end{array}
 \]
 
-Also in $G_t$, the indel rules $W \to X W|\epsilon$ are replaced by
+Also in ${\cal G}_t$, the indel rules $W \to X W$ and $W\to\epsilon$ of ${\cal G}$ are replaced by rules
 
 \[
 \begin{array}{rclll}
   W_t & \to & X_t & W_t & (\lambda_W/\mu_W) a_W \pi^{(W)}_X  \\
-      & | & X^2 & W^I & b_W \pi^{(W)}_X \\
-      & | & X^1 & W^D & (\lambda_W/\mu_W) c_W \pi^{(W)}_X \\
+      & | & X_2 & W_I & b_W \pi^{(W)}_X \\
+      & | & X_1 & W_D & (\lambda_W/\mu_W) c_W \pi^{(W)}_X \\
       & | & \epsilon & & (1 - \lambda_W/\mu_W) (1-b_W) \\
-  W^I & \to & X_t & W_t & (\lambda_W/\mu_W) f_W \pi^{(W)}_X \\
-      & | & X^2 & W^I & g_W \pi^{(W)}_X \\
-      & | & X^1 & W^D & (\lambda_W/\mu_W) h_W \pi^{(W)}_X \\
+  W_I & \to & X_t & W_t & (\lambda_W/\mu_W) f_W \pi^{(W)}_X \\
+      & | & X_2 & W_I & g_W \pi^{(W)}_X \\
+      & | & X_1 & W_D & (\lambda_W/\mu_W) h_W \pi^{(W)}_X \\
       & | & \epsilon & & (1 - \lambda_W/\mu_W) (1-g_W) \\
-  W^D & \to & X_t & W_t & (\lambda_W/\mu_W) p_W \pi^{(W)}_X \\
-      & | & X^2 & W^I & q_W \pi^{(W)}_X \\
-      & | & X^1 & W^D & (\lambda_W/\mu_W) r_W \pi^{(W)}_X \\
+  W_D & \to & X_t & W_t & (\lambda_W/\mu_W) p_W \pi^{(W)}_X \\
+      & | & X_2 & W_I & q_W \pi^{(W)}_X \\
+      & | & X_1 & W_D & (\lambda_W/\mu_W) r_W \pi^{(W)}_X \\
       & | & \epsilon & & (1 - \lambda_W/\mu_W) (1-q_W) \\
 \end{array}
 \]
