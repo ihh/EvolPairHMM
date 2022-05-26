@@ -225,25 +225,26 @@ We also want to describe how the arrangement of regions itself evolves.
 
 \subsection{Syntactic elements}
 
-We formulate a grammar over {\em links}, {\em tokens}, {\em zones}, and {\em blocks}:
+We formulate a grammar over {\em links}, {\em tokens}, {\em zones}, and {\em blocks}.
+
+A link ($L,L^x,L^y$) is an element of a sequence. It can be a token, a zone, or a block:
 \begin{itemize}
-\item A link ($L,L^x,L^y$) is an element of a sequence. It's either a token, a zone, or a block.
 \item A token ($\omega_k$) is a state variable consisting of an evolving observed part ($\omega$) and a fixed hidden type ($k$).
   The observed part is a character or word from a biochemical alphabet ($\omega$); for example, a codon or amino acid.
   The hidden type ($k$) may represent a latent rate category.
-\item A zone ($Z,Z^x,Z^y$) is an evolving sequence of zero or more links, with its own indel rate profile.
-\item A block is an ordered pair of exactly two links.
+\item A zone ($Z,Z^x,Z^y$) is a sequence of zero or more links, evolving by indels and substitution.
+\item A block is an ordered pair of links.
 \end{itemize}
 
-The role of tokens is to explain the substitutions in an alignment.
-Zones explain the indels, and blocks the syntax.
-Links are the universal grammar symbol that can be a placeholder for all three.
+Tokens explain the substitutions in an alignment;
+zones explain the indels;
+and blocks the syntax.
 
 \subsection{Parameters}
 
-There are ($N_l,N_k,N_z$) types of link, token, and zone.
+There are ($N_l,N_k$) types of link and token.
 
-\subsubsection{Link parameters}
+\subsubsection{Link parameters describe the grammar}
 
 A link of type $i$ can resolve to a token, zone, or block:
 \begin{itemize}
@@ -254,19 +255,18 @@ The probability that it resolves to a zone of type $j$ is $\tau_{ij}$.
 \item
 The probability that it resolves to a block of link types $j,k$ is $\upsilon_{ijk}$.
 \end{itemize}
-These must sum to one: $\sum_k^{N_k}\sigma_{ik} + \sum_j^{N_z}\tau_{ij} + \sum_{j,k}^{N_l}\upsilon_{ijk} = 1$.
+These must sum to one: $\sum_k^{N_k}\sigma_{ik} + \sum_j^{N_l}\tau_{ij} + \sum_{j,k}^{N_l}\upsilon_{ijk} = 1$.
 
-\subsubsection{Token parameters}
+\subsubsection{Token parameters describe the substitution model}
 
 A token of type $k$ has rate matrix $Q^{(k)}$ with stationary distribution $\pi^{(k)}$.
 
-\subsubsection{Zone parameters}
+\subsubsection{Zone parameters describe the indel model}
 
-In a zone of type $i$, the indel parameters are $(\lambda_i,\mu_i,x_i,y_i)$
-and the distribution over link types $j$ is $\phi_{ij}$.
+In a zone of type $i$, the indel parameters are $(\lambda_i,\mu_i,x_i,y_i)$.
 
-A zone evolves like a GGI model, with respect to links.
-The stationary distribution is an IID sequence of links, of geometrically-distributed length.
+A zone evolves like a GGI model, with respect to links of type $i$.
+The stationary distribution is an IID sequence of links, whose length is geometrically distributed with parameter $\lambda_i/\mu_i$.
 
 \subsection{Stochastic grammar: single sequence}
 
@@ -276,7 +276,7 @@ The equilibrium distribution over parse trees is a stochastic context-free gramm
   L_i & \to & \omega_k & & \sigma_{ik} \pi^{(k)}_{\omega} \\
       & | & Z_j & & \tau_{ij} \\
       & | & L_j & L_k & \upsilon_{ijk} \\
-  Z_i & \to & L_j & Z_i & (\lambda_i/\mu_i) \phi_{ij} \\
+  Z_i & \to & L_i & Z_i & \lambda_i/\mu_i \\
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
 \end{array}
 \]
@@ -285,40 +285,47 @@ The equilibrium distribution over parse trees is a stochastic context-free gramm
 
 The joint distribution $P(S(0),S(t))$ is the Inside likelihood of a Pair SCFG
 
-%\begin{tabular}{ll}
-%$\begin{array}{rclll}
-%\end{array}$ & $\begin{array}{rclll}
-%\end{array}$
-%\end{tabular}
-\[
-\begin{array}{rclll}
+\begin{tabular}{ll}
+$\begin{array}{rclll}
   L_i & \to & \omega_k & \omega'_k & \sigma_{ik} \pi^{(k)}_{\omega} \exp(Q^{(k)} t)_{\omega \omega'} \\
       & | & M_j & & \tau_{ij} \\
       & | & L_j & L_k & \upsilon_{ijk} \\
-  L^x_i & \to & \omega_k & & \sigma_{ik} \pi^{(k)}_{\omega} \\
-      & | & Z^x_j & & \tau_{ij} \\
-      & | & L^x_j & L^x_k & \upsilon_{ijk} \\
-  L^y_i & \to & \omega'_k & & \sigma_{ik} \pi^{(k)}_{\omega'} \\
-      & | & Z^y_j & & \tau_{ij} \\
-      & | & L^y_j & L^y_k & \upsilon_{ijk} \\
-  Z^x_i & \to & L^x_j & Z^x_i & (\lambda_i/\mu_i) \phi_{ij} \\
-        & | & \epsilon & & 1 - \lambda_i/\mu_i \\
-  Z^y_i & \to & L^y_j & Z^y_i & (\lambda_i/\mu_i) \phi_{ij} \\
-        & | & \epsilon & & 1 - \lambda_i/\mu_i \\
-M_i & \to & L_j & M_i & (\lambda_i/\mu_i) a_i \phi_{ij} \\
-      & | & L^y_j & I_i & b_i \phi_{ij} \\
-      & | & L^x_j & D_i & (\lambda_i/\mu_i) c_i \phi_{ij} \\
-      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-b_i) \\
+& & & & \\
+  \end{array}$ & $\begin{array}{rclll}
   I_i & \to & L_j & M_i & (\lambda_i/\mu_i) f_i \phi_{ij} \\
       & | & L^y_j & I_i & g_i \phi_{ij} \\
       & | & L^x_j & D_i & (\lambda_i/\mu_i) h_i \phi_{ij} \\
       & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-g_i) \\
+  \end{array}$
+  \\
+$\begin{array}{rclll}
+    M_i & \to & L_j & M_i & (\lambda_i/\mu_i) a_i \phi_{ij} \\
+      & | & L^y_j & I_i & b_i \phi_{ij} \\
+      & | & L^x_j & D_i & (\lambda_i/\mu_i) c_i \phi_{ij} \\
+      & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-b_i) \\
+\end{array}$ & $\begin{array}{rclll}
   D_i & \to & L_j & M_i & (\lambda_i/\mu_i) p_i \phi_{ij} \\
       & | & L^y_j & I_i & q_i \phi_{ij} \\
       & | & L^x_j & D_i & (\lambda_i/\mu_i) r_i \phi_{ij} \\
       & | & \epsilon & & (1 - \lambda_i/\mu_i) (1-q_i) \\
-\end{array}
-\]
+  \end{array}$
+  \\
+$\begin{array}{rclll}
+  L^x_i & \to & \omega_k & & \sigma_{ik} \pi^{(k)}_{\omega} \\
+      & | & Z^x_j & & \tau_{ij} \\
+      & | & L^x_j & L^x_k & \upsilon_{ijk} \\
+  Z^x_i & \to & L^x_j & Z^x_i & (\lambda_i/\mu_i) \phi_{ij} \\
+        & | & \epsilon & & 1 - \lambda_i/\mu_i \\
+\end{array}$ & $\begin{array}{rclll}
+  L^y_i & \to & \omega'_k & & \sigma_{ik} \pi^{(k)}_{\omega'} \\
+      & | & Z^y_j & & \tau_{ij} \\
+      & | & L^y_j & L^y_k & \upsilon_{ijk} \\
+  Z^y_i & \to & L^y_j & Z^y_i & (\lambda_i/\mu_i) \phi_{ij} \\
+        & | & \epsilon & & 1 - \lambda_i/\mu_i \\
+\end{array}$
+\end{tabular}
+
+with parallel subgrammars for insertions and deletions.
 
 \bibliographystyle{unsrt}
 \bibliography{references}
