@@ -31,7 +31,7 @@ substitutions (rate matrix $Q$),
 deletions (rate $\mu$ per site, extension probability $y$),
 and
 insertions (rate $\lambda$, extension $x$,
-characters drawn from $Q$'s stationary distribution $\pi$).
+characters $\sim Q$'s stationary distribution $\pi$).
 
 \includegraphics[width=\textwidth]{InstantHMM.pdf}
 
@@ -122,7 +122,7 @@ removing $\omega_N$ from $S_N$ leaves $S_{\psi_N}$.
 Let $F(i,j,t) = \begin{bmatrix} F_M & F_I & F_D \end{bmatrix}$
 be the per-state Forward likelihoods for sequences $S_i,S_j$.
 
-We seek $F^\ast(i,j,t) = P(S(t)=S_j|S(0)=S_i)$.
+We seek $F^\dagger(i,j,t) = P(S(t)=S_j|S(0)=S_i)$.
 The Forward recursions are, for $i>1$ and $j>1$
 \begin{eqnarray*}
 F(1,1,t) & = & \begin{bmatrix} 1 & 0 & 0 \end{bmatrix}
@@ -138,7 +138,7 @@ F(\psi_i,\psi_j,t) U_M(\omega_i,\omega_j,t)
 + F(i,\psi_j,t) U_I(\omega_j,t)
 + F(\psi_i,j,t) U_D(\omega_i,t)
 \\
-F^\ast(i,j,t) & = & F(i,j,t) \begin{bmatrix}
+F^\dagger(i,j,t) & = & F(i,j,t) \begin{bmatrix}
 1-b(t) \\
 1-g(t) \\
 1-q(t) \end{bmatrix}
@@ -220,53 +220,32 @@ or use MCMC \cite{RedelingsSuchard2007}.
 
 \section{Grammatically structured indel model (GSI)}
 
-We seek a model where the sequence can be partitioned into different regions (e.g. a low-indel hydrophobic region).
-We also want to describe how the arrangement of regions itself evolves.
+Consider a stochastic context-free grammar $G$
+with nonterminals ${\cal W}$ and terminals $\Omega$.
 
-\subsection{Syntactic elements}
+Let $\Upsilon$ be the set of parse trees for this grammar.
+We construct a continuous-time Markov chain (CTMC) with $\Upsilon$ as a state space,
+and a pair grammar $G_2$ that computes matrix exponentials for this CTMC.
 
-We formulate a grammar over {\em links}, {\em tokens}, {\em zones}, and {\em blocks}.
+Let some subset of nonterminals ${\cal W}_S \subseteq {\cal W}$ be designated as swap symbols.
+These can only have outgoing rules of the form $W \to X$ where $X \in \Omega^\ast \cup {\cal W}$.
+The rule expansion $W \to X$ that is used to expand a nonterminal $W$ to a target $X$
+is a state variable that evolves according to a finite-state CTMC with rate matrix $Q^W$
+whose stationary distribution $\pi^{(W)}_X$ is the rule probability $P(W \to X|G)$.
+Any subsequent grammatical expansion of $X$ further down the parse tree is also part of the state variable,
+but it is resampled instantaneously whenever the rule expansion $W \to X$ changes,
+and does not influence the rate of this change.
 
-A link ($L,L^x,L^y$) is an element of a sequence. It can be a token, a zone, or a block:
-\begin{itemize}
-\item A token ($\omega_k$) is a state variable consisting of an evolving observed part ($\omega$) and a fixed hidden type ($k$).
-  The observed part is a character or word from a biochemical alphabet ($\omega$); for example, a codon or amino acid.
-  The hidden type ($k$) may represent a latent rate category.
-\item A zone ($Z,Z^x,Z^y$) is a sequence of zero or more links, evolving by indels and substitution.
-\item A block is an ordered pair of links.
-\end{itemize}
-
-Tokens explain the substitutions in an alignment;
-zones explain the indels;
-and blocks the syntax.
-
-\subsection{Parameters}
-
-There are ($N_l,N_k$) types of link and token.
-
-\subsubsection{Link parameters describe the grammar}
-
-A link of type $i$ can resolve to a token, zone, or block:
-\begin{itemize}
-\item
-The probability that it resolves to a token of type $k$ is $\sigma_{ik}$.
-\item
-The probability that it resolves to a zone of type $j$ is $\tau_{ij}$.
-\item
-The probability that it resolves to a block of link types $j,k$ is $\upsilon_{ijk}$.
-\end{itemize}
-These must sum to one: $\sum_k^{N_k}\sigma_{ik} + \sum_j^{N_l}\tau_{ij} + \sum_{j,k}^{N_l}\upsilon_{ijk} = 1$.
-
-\subsubsection{Token parameters describe the substitution model}
-
-A token of type $k$ has rate matrix $Q^{(k)}$ with stationary distribution $\pi^{(k)}$.
-
-\subsubsection{Zone parameters describe the indel model}
-
-In a zone of type $i$, the indel parameters are $(\lambda_i,\mu_i,x_i,y_i)$.
-
-A zone evolves like a GGI model, with respect to links of type $i$.
-The stationary distribution is an IID sequence of links, whose length is geometrically distributed with parameter $\lambda_i/\mu_i$.
+Let some other subset of nonterminals ${\cal W}_I \subseteq {\cal W}$ be designated as list symbols.
+These can only have outgoing rules of the form $W \to X W | \epsilon$ where $X \in \Omega^\ast \cup {\cal W}$.
+The sequence of $X$'s that such rules expand to forms a state variable
+that evolves over time as a self-contained GGI model
+with parameters $(\lambda_W, \mu_W, x_W, y_W)$
+where $\pi^{(W)}_X \propto P(W \to X|G)$ is the distribution over elements in the list
+and $\lambda_W / \mu_W = 1 - P(W \to \epsilon|G)$ is the geometric parameter of the list length distribution.
+This GGI model does not itself have a substitution model built into it,
+but the elements of the list can themselves be state variables;
+for example, $X$ can itself be a swap or list symbol.
 
 \subsection{Stochastic grammar: single sequence}
 
