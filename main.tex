@@ -258,14 +258,15 @@ A token of type $k$ has rate matrix $Q^{(k)}$ with stationary distribution $\pi^
 
 \subsubsection{Zone parameters}
 
-In a zone of type $i$, the indel rates are $(\lambda_i,\mu_i)$
+In a zone of type $i$, the indel parameters are $(\lambda_i,\mu_i,x_i,y_i)$
 and the distribution over link types $j$ is $\phi_{ij}$.
+
+A zone evolves like a GGI model, with respect to links.
 The stationary distribution is an IID sequence of links, of geometrically-distributed length.
 
 \subsubsection{Block parameters}
 
-A block of type $i$ resolves to a pair of links of types $j,k$ with probability $\kappa_{ijk}$,
-resampled at rate $\rho_i$.
+A block of type $i$ resolves to a pair of links of types $j,k$ with probability $\kappa_{ijk}$.
 
 \subsection{Stochastic grammar: single sequence}
 
@@ -306,8 +307,7 @@ The joint distribution $P(S(0),S(t))$ is the Inside likelihood of a Pair SCFG
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
   Z^y_i & \to & L^y_j & Z^y_i & (\lambda_i/\mu_i) \phi_{ij} \\
         & | & \epsilon & & 1 - \lambda_i/\mu_i \\
-  B_i & \to & L_j & L_k & \kappa_{ijk} \exp(-\rho_i t) \\
-      & | & B^x_i & B^y_i & 1 - \exp(-\rho_i t) \\
+  B_i & \to & L_j & L_k & \kappa_{ijk} \\
   B^x_i & \to & L^x_j & L^x_k & \kappa_{ijk} \\
   B^y_i & \to & L^y_j & L^y_k & \kappa_{ijk} \\
 M_i & \to & L_j & M_i & (\lambda_i/\mu_i) a_i \phi_{ij} \\
