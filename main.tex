@@ -232,7 +232,7 @@ We also describe a pair grammar $G_t$ that computes matrix exponentials of this 
 
 \subsection{Rate matrix}
 
-Let some subset of nonterminals ${\cal W}_S \subseteq {\cal W}$ be designated as {\em substitution states}.
+Let some subset of nonterminals be designated as {\em substitution states}.
 All outgoing rules from these symbols must be of the form $W \to X$.
 The rule expansion that is used in the parse tree evolves like a continous-time Markov chain.
 It changes from $W \to X$ to $W \to Y$ with rate $Q^{(W)}_{XY}$.
@@ -241,7 +241,7 @@ is resampled instantaneously whenever the rule expansion changes,
 and does not influence the rate of this change.
 The stationary distribution $\pi^{(W)}_X$ of the rate matrix $Q^{(W)}$ is the rule probability $P(W \to X|G)$.
 
-Let some other subset of nonterminals ${\cal W}_I \subseteq {\cal W}$ be designated as {\em indel states}.
+Let some other subset of nonterminals be designated as {\em indel states}.
 All outgoing rules from these symbols must be of the form $W \to X W$ or $W \to \epsilon$.
 Such rules expand to become a sequence of $X$'s in the parse tree.
 This sequence evolves over time as a self-contained geometric general indel model.
@@ -261,7 +261,7 @@ but each generating just terminals in $(\Omega_1,\Omega_2)$ respectively.
 
 Next, we create a copy $G_t$ of $G$ with implicit rules $\omega_t \to \omega^1 \omega^2$.
 
-In $G_t$, the substitution rules $W \to X$ for $W \in {\cal W}_S$ are replaced by
+In $G_t$, the substitution rules $W \to X$ are replaced by
 
 \[
 \begin{array}{rclll}
@@ -270,7 +270,7 @@ In $G_t$, the substitution rules $W \to X$ for $W \in {\cal W}_S$ are replaced b
 \end{array}
 \]
 
-Also in $G_t$, the indel rules $W \to X W|\epsilon$ for $W \in {\cal W}_I$ are replaced by
+Also in $G_t$, the indel rules $W \to X W|\epsilon$ are replaced by
 
 \[
 \begin{array}{rclll}
