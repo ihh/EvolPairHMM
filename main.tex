@@ -234,11 +234,10 @@ We also describe a pair grammar ${\cal G}_t$ that computes matrix exponentials o
 
 Let some subset of nonterminals be designated as {\em substitution states}.
 All outgoing rules from these symbols must be of the form $W \to X$.
-The rule expansion that is used in the parse tree evolves like a continous-time Markov chain.
-It changes from $W \to X$ to $W \to Y$ with rate $Q^{(W)}_{XY}$.
-Any subsequent grammatical expansion of $X$ further down the parse tree
-is resampled instantaneously whenever the rule expansion changes,
-and does not influence the rate of this change.
+The rule expansion used in the parse tree evolves as a continuous-time Markov chain,
+changing from $W \to X$ to $W \to Y$ with rate $Q^{(W)}_{XY}$.
+Any recursive grammatical expansion of $X$ further down the parse tree
+is resampled instantaneously whenever the rule expansion changes.
 The stationary distribution $\pi^{(W)}_X$ of the rate matrix $Q^{(W)}$ is the rule probability $P(W \to X|G)$.
 
 Let some other subset of nonterminals be designated as {\em indel states}.
@@ -246,8 +245,8 @@ All outgoing rules from these symbols must be of the form $W \to X W$ or $W \to 
 Such rules expand to become a sequence of $X$'s in the parse tree.
 This sequence evolves over time as a self-contained geometric general indel model.
 The parameters of this model are $(\lambda_W, \mu_W, x_W, y_W)$
-where $\pi^{(W)}_X \propto P(W \to X|G)$ is the distribution over elements in the list
-and $\lambda_W / \mu_W = 1 - P(W \to \epsilon|G)$ is the geometric parameter of the list length distribution.
+where $\pi^{(W)}_X = P(W \to X|G) / (\lambda_W / \mu_W)$ is the distribution over elements in the list
+and $\lambda_W / \mu_W = 1 - P(W \to \epsilon|G)$ is the geometric parameter of the list length distribution at equilibrium.
 This GGI model does not itself have a substitution model built into it,
 but the elements of the list can themselves be state variables;
 for example, $X$ can itself be a substitution or indel state,
