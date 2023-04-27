@@ -65,18 +65,23 @@ E_{XY} =
 
 Suppose that the transition matrix is a function of some model parameter $\lambda$ and time $t$.
 
-Let ${\bf U}(\lambda+\delta_\lambda,t+\delta_t)$ be the transition matrix at time $t+\delta_t$ and parameter value $\lambda+\delta_\lambda$.
+Let ${\bf U}(\lambda,t,\delta_t)$ be the transition matrix at time $t$, infinitesimal time increment $\delta_t$, and parameter value $\lambda$.
+In general this is first-order in $\delta_t$, so it has the form
+\[
+  {\bf U}(\lambda,t,\delta_t) = {\bf U}_0(\lambda,t) + {\bf U}_t(\lambda,t) \delta_t
+  \]
 
-Let $E_{XY}(\lambda+\delta_\lambda,t+\delta_t)$ be the corresponding expected number of $X \to Y$ transitions.
+  
+Let $E_{XY}(\lambda,t,\delta_t)$ be the corresponding expected number of $X \to Y$ transitions.
 
 We are interested in
 \begin{eqnarray*}
-\frac{\partial}{\partial t}E_{XY} & = & \lim_{\delta_t \to 0} \frac{E_{XY}(\lambda,t+\delta_t) - E_{XY}(\lambda,t)}{\delta_t} \\
+\frac{\partial}{\partial t}E_{XY} & = & \lim_{\delta_t \to 0} \frac{E_{XY}(\lambda,t,\delta_t) - E_{XY}(\lambda,t,0)}{\delta_t} \\
 \frac{\partial^2}{\partial \lambda \partial t}E_{XY} & = & \lim_{\delta_\lambda \to 0} \lim_{\delta_t \to 0}
-\frac{\left(E_{XY}(\lambda+\delta \lambda,t+\delta_t) - E_{XY}(\lambda+\delta \lambda,t)\right) - \left(E_{XY}(\lambda,t+\delta_t) - E_{XY}(\lambda,t)\right)}{\delta_\lambda \delta_t}
+\frac{\left(E_{XY}(\lambda+\delta_\lambda,t,\delta_t) - E_{XY}(\lambda+\delta_\lambda,t,0)\right) - \left(E_{XY}(\lambda,t,\delta_t) - E_{XY}(\lambda,t,0)\right)}{\delta_\lambda \delta_t}
 \end{eqnarray*}
 
-Expand ${\bf U}$ to first order in $\delta_\lambda$ and $\delta_t$
+Expand ${\bf U}$ to first order in both $\delta_\lambda$ and $\delta_t$
 \newcommand\tlambdaexpansion[2]{  {#2}_0^{#1}
   + {#2}_\lambda^{#1} \delta_\lambda
   + {#2}_t^{#1} \delta_t
@@ -84,12 +89,12 @@ Expand ${\bf U}$ to first order in $\delta_\lambda$ and $\delta_t$
 \newcommand\uexpansion{\tlambdaexpansion{}{\bf U}}
 \newcommand\vexpansion[1]{\tlambdaexpansion{#1}{\bf V}}
 \[
-  {\bf U}(\lambda+\delta_\lambda,t+\delta_t) = \uexpansion + O(\delta_\lambda^2) + O(\delta_t^2)
+  {\bf U}(\lambda+\delta_\lambda,t,\delta_t) = \uexpansion + O(\delta_\lambda^2) % + O(\delta_t^2)
 \]
-where ${\bf U}_0={\bf U}(\lambda,t)$,
-${\bf U}_\lambda=\frac{\partial {\bf U}}{\partial \lambda}$,
-${\bf U}_t=\frac{\partial {\bf U}}{\partial t}$,
-${\bf U}_{\lambda t}=\frac{\partial^2 {\bf U}}{\partial \lambda \partial t}$.
+where ${\bf U}_0={\bf U}(\lambda,t,0)$,
+${\bf U}_t=\frac{1}{\delta_t} \left( {\bf U}(\lambda,t,\delta_t) - {\bf U}(\lambda,t,0) \right)$,
+${\bf U}_\lambda=\frac{\partial}{\partial \lambda} {\bf U}_0$,
+${\bf U}_{\lambda t}=\frac{\partial}{\partial \lambda}  {\bf U}_t$.
 
 We can now expand the matrix inverses.
 In general, for ${\bf J} \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N}, {\bf J}^{M \nrightarrow} \}$,
@@ -156,7 +161,7 @@ For convenience define
 W_{a,b,c,d} =
 \left( {\bf V}^{\nrightarrow M}_a \left( {\bf J}^{X \to Y} \circ \left( {\bf V}^{\rightarrow N}_b {\bf U}_c \right) \right) {\bf V}^{M \nrightarrow}_d \right)_{11}
 \]
-Examining the coefficients of $\delta t$ and $\delta \lambda \delta t$, we see that
+Examining the coefficients of $\delta_t$ and $\delta_\lambda \delta_t$, we see that
 
 \begin{eqnarray*}
   \frac{\partial}{\partial t}E_{XY} & = &
@@ -176,21 +181,35 @@ Examining the coefficients of $\delta t$ and $\delta \lambda \delta t$, we see t
 
 \includegraphics[width=\textwidth]{PairInstant.pdf}
 
-\begin{eqnarray*}
-  \lefteqn{{\bf U} =} \\
-  &&
+\[
+ {\bf U}_0 =
   \left( \begin{array}{ccccccccc}
-a (1-(\lambda+\mu) \delta_t) & \lambda \delta_t & b (1-(\lambda+\mu) \delta_t) & 0 & a \mu \delta_t & c & 0 & 0 & b \mu \delta_t \\
+a & 0 & b & 0 & 0 & c & 0 & 0 & 0 \\
 a (1-x) & x & b (1-x) & 0 & 0 & 0 & 0 & c & 0 \\
-f (1-(\lambda+\mu) \delta_t) & 0 & g (1-(\lambda+\mu) \delta_t) & \lambda \delta_t & f \mu \delta_t & h & 0 & 0 & g \mu \delta_t \\
+f & 0 & g & 0 & 0 & h & 0 & 0 & 0 \\
 f (1-x) & 0 & g (1-x) & x & 0 & 0 & 0 & h & 0 \\
 a (1-y) & 0 & b (1-y) & 0 & a y & 0 & c & 0 & b y \\
-p (1-(\lambda+\mu) \delta_t) & 0 & q (1-(\lambda+\mu) \delta_t) & 0 & p \mu \delta_t & r & 0 & 0 & q \mu \delta_t \\
+p & 0 & q & 0 & 0 & r & 0 & 0 & 0 \\
 p (1-y) & 0 & q (1-y) & 0 & p y & 0 & r & 0 & q y \\
 p (1-x) & 0 & q (1-x) & 0 & 0 & 0 & 0 & r & 0 \\
 f (1-y) & 0 & g (1-y) & 0 & f y & 0 & h & 0 & g y    
   \end{array} \right)
-\end{eqnarray*}
+\]
+
+\[
+ {\bf U}_t =
+  \left( \begin{array}{ccccccccc}
+-a (\lambda+\mu) & \lambda & -b (\lambda+\mu) & 0 & a \mu & 0 & 0 & 0 & b \mu \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+-f (\lambda+\mu) & 0 & -g (\lambda+\mu) & \lambda & f \mu & 0 & 0 & 0 & g \mu \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+-p (\lambda+\mu) & 0 & -q (\lambda+\mu) & 0 & p \mu & 0 & 0 & 0 & q \mu \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+  \end{array} \right)
+  \]
 
 \subsection{General geometric indel model (GGI)}
 
