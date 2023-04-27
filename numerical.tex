@@ -10,6 +10,7 @@
 
 % Useful packages
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
@@ -26,12 +27,20 @@
 
 \subsection{Expected transition count}
 
-Let ${\bf J}^{(X \to Y)}$ be the indicator matrix for $X \to Y$ transitions;
-that is, $J_{ij}$ is 1 if $i \to j$ is a transition of type $X \to Y$,
-and 0 otherwise.
+Define some indicator matrices
+${\bf J}^{X \to Y}$,
+${\bf J}^{\nrightarrow M}$,
+${\bf J}^{\rightarrow N}$,
+${\bf J}^{M \nrightarrow}$
 
-Let ${\bf U}$ be the transition matrix
-and ${\bf U}^{(X \to Y)} = {\bf J}^{(X \to Y)} \circ {\bf U}$ where $\circ$ is elementwise product.
+\begin{eqnarray*}
+  J^{X \to Y}_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \in \sigma_X$ and $j \in \sigma_Y$} \\ 0 & \mbox{if $i \notin \sigma_X$ or $j \notin \sigma_Y$} \end{array} \right. \\
+  J^{\nrightarrow M}_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \notin \sigma_M$} \\ 0 & \mbox{if $j \in \sigma_M$} \end{array} \right. \\
+  J^{\rightarrow N}_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \in \sigma_N$} \\ 0 & \mbox{if $j \notin \sigma_N$} \end{array} \right. \\
+  J^{M \nrightarrow}_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \notin \sigma_M$} \\ 0 & \mbox{if $i \in \sigma_N$} \end{array} \right.
+\end{eqnarray*}
+
+Let ${\bf U}$ be the transition matrix.
 
 The expected number of transitions of type $X \to Y$
 in a path that begins and ends in state 1
@@ -40,15 +49,15 @@ is
 \[
 E_{XY} =
 \left(
-\left( {\bf 1} - {\bf U}^{(MIDN \to IDN)} \right)^{-1}
+\left( {\bf I} - {\bf J}^{\nrightarrow M} \circ {\bf U} \right)^{-1}
 \left(
-     {\bf J}^{(X \to Y)} \circ
+     {\bf J}^{X \to Y} \circ
      \left(
-     \left( {\bf 1} - {\bf U}^{(MIDN \to N)} \right)^{-1}
+     \left( {\bf I} - {\bf J}^{\rightarrow N} \circ {\bf U} \right)^{-1}
           {\bf U}
      \right)
 \right)
-\left( {\bf 1} - {\bf U}^{(IDN \to MIDN)} \right)^{-1}
+\left( {\bf I} - {\bf J}^{M \nrightarrow} \circ {\bf U} \right)^{-1}
 \right)_{11}
 \]
 
@@ -56,10 +65,92 @@ E_{XY} =
 
 Suppose that the transition matrix is a function of some model parameter $\lambda$ and time $t$.
 
-Let ${\bf U}(\delta_\lambda,\delta_t)$ be the transition matrix at time $t+\delta_t$ and parameter $\lambda+\delta_\lambda$.
+Let ${\bf U}(\lambda+\delta_\lambda,t+\delta_t)$ be the transition matrix at time $t+\delta_t$ and parameter value $\lambda+\delta_\lambda$.
 
-Let $E_{XY}(\delta_\lambda,\delta_t)$ be the corresponding expected number of $X \to Y$ transitions at $(t+\delta_t,\lambda+\delta_\lambda)$.
+Let $E_{XY}(\lambda+\delta_\lambda,t+\delta_t)$ be the corresponding expected number of $X \to Y$ transitions.
 
+We are interested in
+\begin{eqnarray*}
+\frac{\partial}{\partial t}E_{XY} & = & \lim_{\delta_t \to 0} \frac{E_{XY}(\lambda,t+\delta_t) - E_{XY}(\lambda,t)}{\delta_t} \\
+\frac{\partial^2}{\partial \lambda \partial t}E_{XY} & = & \lim_{\delta_\lambda \to 0} \lim_{\delta_t \to 0}
+\frac{\left(E_{XY}(\lambda+\delta \lambda,t+\delta_t) - E_{XY}(\lambda+\delta \lambda,t)\right) - \left(E_{XY}(\lambda,t+\delta_t) - E_{XY}(\lambda,t)\right)}{\delta_\lambda \delta_t}
+\end{eqnarray*}
+
+Expand ${\bf U}$ to first order in $\delta_\lambda$ and $\delta_t$
+\newcommand\tlambdaexpansion[2]{  {#2}_0^{#1}
+  + {#2}_\lambda^{#1} \delta_\lambda
+  + {#2}_t^{#1} \delta_t
+  + {#2}_{\lambda t}^{#1} \delta_\lambda \delta_t }
+\newcommand\uexpansion{\tlambdaexpansion{}{\bf U}}
+\newcommand\vexpansion[1]{\tlambdaexpansion{#1}{\bf V}}
+\[
+  {\bf U}(\lambda+\delta_\lambda,t+\delta_t) = \uexpansion + O(\delta_\lambda^2) + O(\delta_t^2)
+\]
+where ${\bf U}_0={\bf U}(\lambda,t)$,
+${\bf U}_\lambda=\frac{\partial {\bf U}}{\partial \lambda}$,
+${\bf U}_t=\frac{\partial {\bf U}}{\partial t}$,
+${\bf U}_{\lambda t}=\frac{\partial^2 {\bf U}}{\partial \lambda \partial t}$.
+
+We can now expand the matrix inverses.
+In general, for ${\bf J} \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N}, {\bf J}^{M \nrightarrow} \}$,
+\begin{eqnarray*}
+  \left( {\bf I} - {\bf J} \circ {\bf U} \right)^{-1}
+%  & = &
+%  \left( {\bf I} - {\bf J} \circ {\bf U}_0
+%  - {\bf J} \circ {\bf U}_\lambda \delta_\lambda
+%  - {\bf J} \circ {\bf U}_t \delta_t
+%  - {\bf J} \circ {\bf U}_{\lambda t} \delta_\lambda \delta_t
+%  + O(\delta_\lambda^2) + O(\delta_t^2)
+%  \right)^{-1} \\
+%  & = &
+%  \left(
+%  \left( {\bf I} - {\bf J} \circ {\bf U}_0 \right)
+%  \left( {\bf I}
+%  - {\bf V}_0 \left( {\bf J} \circ {\bf U}_\lambda \delta_\lambda
+%  + {\bf J} \circ {\bf U}_t \delta_t
+%  + {\bf J} \circ {\bf U}_{\lambda t} \delta_\lambda \delta_t
+%  \right) \right)
+%  + O(\delta_\lambda^2) + O(\delta_t^2)
+%  \right)^{-1} \\
+%  & = &
+%  \left(
+%  \left( {\bf I}
+%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_\lambda \delta_\lambda
+%  + {\bf J} \circ {\bf U}_t \delta_t
+%  + {\bf J} \circ {\bf U}_{\lambda t} \delta_\lambda \delta_t
+%  \right)
+%  \right) \right)
+%  {\bf V}_0
+%  + O(\delta_\lambda^2) + O(\delta_t^2) \\
+%  & = &
+%  {\bf V}_0
+%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_\lambda \right) {\bf V}_0 \delta_\lambda
+%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_t \right) {\bf V}_0 \delta_t
+%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\lambda t} \right) {\bf V}_0 \delta_\lambda \delta_t
+%  + O(\delta_\lambda^2) + O(\delta_t^2) \\
+  & = & \vexpansion{} + O(\delta_\lambda^2) + O(\delta_t^2) \\
+{\bf V}_0 & = & ({\bf I} - {\bf J} \circ {\bf U}_0)^{-1} \\
+{\bf V}_\lambda & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_\lambda \right) {\bf V}_0 \\
+{\bf V}_t & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_t \right) {\bf V}_0 \\
+{\bf V}_{\lambda t} & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\lambda t} \right) {\bf V}_0
+\end{eqnarray*}
+
+
+Thus
+\begin{eqnarray*}
+E_{XY} & = &
+\left(
+\left( \vexpansion{\nrightarrow M} \right)
+\right. \\ & & \quad \times
+\left(
+     {\bf J}^{X \to Y} \circ
+     \left( \vexpansion{\rightarrow N} \right)
+     \left( \uexpansion \right)
+\right)
+ \\ & & \quad \left. \times
+ \left( \vexpansion{M \nrightarrow} \right)
+\right)_{11}  + O(\delta_\lambda^2) + O(\delta_t^2)
+\end{eqnarray*}
 
 
 \subsection{General geometric indel model (GGI)}
