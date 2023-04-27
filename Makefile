@@ -1,5 +1,5 @@
 
-open: main.pdf.open
+open: numerical.pdf.open
 
 %.pdf.open: %.pdf
 	open $<

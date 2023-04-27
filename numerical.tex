@@ -24,7 +24,7 @@
 
 \section{Statistical alignment}
 
-\subsection{Abstract model}
+\subsection{Expected transition count}
 
 Let ${\bf J}^{(X \to Y)}$ be the indicator matrix for $X \to Y$ transitions;
 that is, $J_{ij}$ is 1 if $i \to j$ is a transition of type $X \to Y$,
@@ -38,7 +38,7 @@ in a path that begins and ends in state 1
 is
 
 \[
-\mbox{E}[T_{XY}] =
+E_{XY} =
 \left(
 \left( {\bf 1} - {\bf U}^{(MIDN \to IDN)} \right)^{-1}
 \left(
@@ -51,6 +51,16 @@ is
 \left( {\bf 1} - {\bf U}^{(IDN \to MIDN)} \right)^{-1}
 \right)_{11}
 \]
+
+\subsection{Rate of change of expected transition count}
+
+Suppose that the transition matrix is a function of some model parameter $\lambda$ and time $t$.
+
+Let ${\bf U}(\delta_\lambda,\delta_t)$ be the transition matrix at time $t+\delta_t$ and parameter $\lambda+\delta_\lambda$.
+
+Let $E_{XY}(\delta_\lambda,\delta_t)$ be the corresponding expected number of $X \to Y$ transitions at $(t+\delta_t,\lambda+\delta_\lambda)$.
+
+
 
 \subsection{General geometric indel model (GGI)}
 
