@@ -26,16 +26,40 @@
 
 \subsection{Abstract model}
 
+Let ${\bf J}^{(X \to Y)}$ be the indicator matrix for $X \to Y$ transitions;
+that is, $J_{ij}$ is 1 if $i \to j$ is a transition of type $X \to Y$,
+and 0 otherwise.
 
+Let ${\bf U}$ be the transition matrix
+and ${\bf U}^{(X \to Y)} = {\bf J}^{(X \to Y)} \circ {\bf U}$ where $\circ$ is elementwise product.
+
+The expected number of transitions of type $X \to Y$
+in a path that begins and ends in state 1
+is
+
+\[
+\mbox{E}[T_{XY}] =
+\left(
+\left( {\bf 1} - {\bf U}^{(MIDN \to IDN)} \right)^{-1}
+\left(
+     {\bf J}^{(X \to Y)} \circ
+     \left(
+     \left( {\bf 1} - {\bf U}^{(MIDN \to N)} \right)^{-1}
+          {\bf U}
+     \right)
+\right)
+\left( {\bf 1} - {\bf U}^{(IDN \to MIDN)} \right)^{-1}
+\right)_{11}
+\]
 
 \subsection{General geometric indel model (GGI)}
 
 A sequence $S(t)$ evolves by
-substitutions (rate matrix $Q$),
+substitutions (rate matrix ${\bf Q}$),
 deletions (rate $\mu$ per site, extension probability $y$),
 and
 insertions (rate $\lambda$, extension $x$,
-characters $\sim Q$'s stationary distribution $\pi$).
+characters $\sim {\bf Q}$'s stationary distribution $\pi$).
 
 \includegraphics[width=\textwidth]{InstantHMM.pdf}
 
@@ -61,12 +85,12 @@ p & q & r
 & = &
 \begin{bmatrix}
 T_{MM} & T_{MI} & 1-T_{MM}-T_{MI} \\
-T_{IM}/S_I & (S_I-T_{MI}-T_{DI})/S_I & (T_{MI}+T_{DI}-T_{IM})/S_I \\
-(1-T_{MM}-T_{IM})/S_D & T_{DI}/S_D & (S_D+T_{MM}+T_{IM}-T_{DI}-1)/S_D 
+T_{IM}/W_I & (W_I-T_{MI}-T_{DI})/W_I & (T_{MI}+T_{DI}-T_{IM})/W_I \\
+(1-T_{MM}-T_{IM})/W_D & T_{DI}/W_D & (W_D+T_{MM}+T_{IM}-T_{DI}-1)/W_D 
 \end{bmatrix}
 \\
-S_I(t) & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
-S_D(t) & = & \exp\left(\frac{\mu t}{1-y}\right)-1 \\
+W_I(t) & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
+W_D(t) & = & \exp\left(\frac{\mu t}{1-y}\right)-1 \\
 T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
 \\
   \frac{d}{dt} T_{MM}(t) & = &
@@ -86,7 +110,7 @@ The $T_{ij}(t)$ may be approximated by Runge-Kutta methods,
 e.g. Dormand-Prince. % \cite{DormandPrince1980}
 
 The substitution matrix for the M state of the Pair HMM is
-the matrix exponential $\exp(Qt)$, for which a Pad\'{e} approximant
+the matrix exponential $\exp({\bf Q}t)$, for which a Pad\'{e} approximant
 or other power series expansion can be used. % \cite{MolerVanLoan2003}
 
 \subsection{Exactly-solved special case (TKF91)}
@@ -153,7 +177,7 @@ a(t) & 0 & 0 \\
 f(t) & 0 & 0 \\
 p(t) & 0 & 0 
 \end{bmatrix}
-\exp(Qt)_{\omega_i \omega_j}
+\exp({\bf Q}t)_{\omega_i \omega_j}
 \\
 U_I(\omega_j,t) & = &
 \begin{bmatrix}
@@ -185,7 +209,7 @@ The pairwise alignment of ancestor $i$ and descendant $j$ can be summarized by t
 The alignment probability, computable in time $O(L)$ (and in practice very fast), is
 \[
 P(A_M,A_{ID},S(t)|S(0)) =
-\prod_{(\omega,\omega') \in A_M} \exp(Qt)_{\omega \omega'}
+\prod_{(\omega,\omega') \in A_M} \exp({\bf Q}t)_{\omega \omega'}
 \prod_{(\delta,\delta') \in A_{ID}} G(|\delta|,|\delta'|,t)
 \prod_{\omega'\in \delta'} \pi_{\omega'}
 \]
@@ -214,7 +238,7 @@ g^{j-1} r^{i-1}
 \subsection{Phylogenetic alignment}
 
 Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences on a phylogeny.
-Upgrade $\exp(Qt)$ to Felsenstein pruning. % \cite{Felsenstein81}.
+Upgrade $\exp({\bf Q}t)$ to Felsenstein pruning. % \cite{Felsenstein81}.
 
 For the alignment-unspecified form, use automata composition to obtain $N$-sequence HMMs \cite{SilvestreRyanEtAl2020}.
 The resulting Forward algorithm is $O(L^N)$.
