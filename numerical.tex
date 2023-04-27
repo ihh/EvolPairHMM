@@ -135,7 +135,6 @@ In general, for ${\bf J} \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N
 {\bf V}_{\lambda t} & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\lambda t} \right) {\bf V}_0
 \end{eqnarray*}
 
-
 Thus
 \begin{eqnarray*}
 E_{XY} & = &
@@ -144,14 +143,33 @@ E_{XY} & = &
 \right. \\ & & \quad \times
 \left(
      {\bf J}^{X \to Y} \circ
-     \left( \vexpansion{\rightarrow N} \right)
-     \left( \uexpansion \right)
+     \left( \left( \vexpansion{\rightarrow N} \right)
+     \left( \uexpansion \right) \right)
 \right)
  \\ & & \quad \left. \times
  \left( \vexpansion{M \nrightarrow} \right)
 \right)_{11}  + O(\delta_\lambda^2) + O(\delta_t^2)
 \end{eqnarray*}
 
+For convenience define
+\[
+W_{a,b,c,d} =
+\left( {\bf V}^{\nrightarrow M}_a \left( {\bf J}^{X \to Y} \circ \left( {\bf V}^{\rightarrow N}_b {\bf U}_c \right) \right) {\bf V}^{M \nrightarrow}_d \right)_{11}
+\]
+Examining the coefficients of $\delta t$ and $\delta \lambda \delta t$, we see that
+
+\begin{eqnarray*}
+  \frac{\partial}{\partial t}E_{XY} & = &
+  W_{t,0,0,0} + W_{0,t,0,0} + W_{0,0,t,0} + W_{0,0,0,t}
+  \\
+  \frac{\partial^2}{\partial \lambda \partial t}E_{XY} & = &
+  W_{t,\lambda,0,0} + W_{t,0,\lambda,0} + W_{t,0,0,\lambda}
+  + W_{\lambda,t,0,0} + W_{0,t,\lambda,0} + W_{0,t,0,\lambda}
+  + W_{\lambda,0,t,0} + W_{0,\lambda,t,0} + W_{0,0,t,\lambda}
+  \\ & &
+  + W_{\lambda,0,0,t} + W_{0,\lambda,0,t} + W_{0,0,\lambda,t}
+  + W_{\lambda t,0,0,0} + W_{0,\lambda t,0,0} + W_{0,0,\lambda t,0} + W_{0,0,0,\lambda t}
+\end{eqnarray*}
 
 \subsection{General geometric indel model (GGI)}
 
