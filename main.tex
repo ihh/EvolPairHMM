@@ -214,8 +214,23 @@ Upgrade $\exp(Qt)$ to Felsenstein pruning. % \cite{Felsenstein81}.
 
 For the alignment-unspecified form, use automata composition to obtain $N$-sequence HMMs \cite{SilvestreRyanEtAl2020}.
 The resulting Forward algorithm is $O(L^N)$.
-To ameliorate this, discard all but a few representative sample paths \cite{WestessonEtAl2012},
-or use MCMC \cite{RedelingsSuchard2007}.
+This can be reduced to $O(L^2)$ by MCMC \cite{RedelingsSuchard2007}
+and further improved by sampling \cite{WestessonEtAl2012}
+and adaptive dynamic programming \cite{DeMaio2020}.
+
+\section{Potts Hamiltonian}
+
+Suppose that the $L$-character sequence
+is selected from a Potts Hamiltonian
+\begin{eqnarray*}
+P(S) & = & \frac{1}{Z} \exp(H(S)) \\
+H(S_1 \ldots S_L) & = &
+\sum_{i=1}^L h_i(S_i)
++
+\sum_{i=1}^L \sum_{i<j}^L J_{ij}(S_i,S_j)
+\\
+Z & = & \sum_S \exp(H(S))
+\end{eqnarray*}
 
 
 \section{Grammatically structured indel model (GSI)}
@@ -240,7 +255,7 @@ Any recursive grammatical expansion of $X$ further down the parse tree
 is resampled instantaneously whenever the rule expansion changes.
 The stationary distribution $\pi^{(W)}_X$ of the rate matrix $Q^{(W)}$ is the rule probability $P(W \to X|G)$.
 
-Let some other subset of nonterminals be designated as {\em indel states}.
+Let some other subset of nonterminals be designated as {\em link states}.
 All outgoing rules from these symbols must be of the form $W \to X W$ or $W \to \epsilon$.
 Such rules expand to become a sequence of $X$'s in the parse tree.
 This sequence evolves over time as a self-contained geometric general indel model.
@@ -249,7 +264,7 @@ where $\pi^{(W)}_X = P(W \to X|G) / (\lambda_W / \mu_W)$ is the distribution ove
 and $\lambda_W / \mu_W = 1 - P(W \to \epsilon|G)$ is the geometric parameter of the list length distribution at equilibrium.
 This GGI model does not itself have a substitution model built into it,
 but the elements of the list can themselves be state variables;
-for example, $X$ can itself be a substitution or indel state,
+for example, $X$ can itself be a substitution or link state,
 or it can expand to a sequence of such symbols.
 
 \subsection{Pair grammar}
@@ -270,7 +285,7 @@ In ${\cal G}_t$, the substitution rules $W \to X$ of ${\cal G}$ are replaced by 
 \end{array}
 \]
 
-Also in ${\cal G}_t$, the indel rules $W \to X W$ and $W\to\epsilon$ of ${\cal G}$ are replaced by rules
+Also in ${\cal G}_t$, the link rules $W \to X W$ and $W\to\epsilon$ of ${\cal G}$ are replaced by rules
 
 \[
 \begin{array}{rclll}
@@ -288,6 +303,34 @@ Also in ${\cal G}_t$, the indel rules $W \to X W$ and $W\to\epsilon$ of ${\cal G
       & | & \epsilon & & (1 - \lambda_W/\mu_W) (1-q_W) \\
 \end{array}
 \]
+
+\section{Context-sensitive TKF91}
+
+As long as we are introducing latent information...
+
+In this version of TKF91, there is only insertion and deletion of links; no substitution.
+There are $K$ types of mortal link.
+At equilibrium, the probability of observing sequence $S$
+is
+\[
+\Phi(S_1 \ldots S_L) =
+\phi(\omega'=S_1|\omega=\epsilon)
+\left( \prod_{i=1}^{L-1} \phi(\omega'=S_{i+1}|\omega=S_i) \right)
+\phi(\omega'=\epsilon|\omega=S_L)
+\]
+where $\phi(\omega,\omega')$ is a joint distribution over adjacent link types,
+with $\omega=\epsilon$ and $\omega'=\epsilon$ representing the ends of the sequence.
+
+The insertion rate $\omega_i \omega_k \to \omega_i \omega_j \omega_k$
+is $\lambda \phi(\omega_k|\omega_j) \phi(\omega_j|\omega_i)$.
+
+The deletion rate $\omega_i \omega_j \omega_k \to \omega_i \omega_k$
+is $\mu \phi(\omega_k|\omega_i)$.
+
+Can we give this the renormalization treatment, e.g. by summarizing the path in terms of counts of adjacent types $(\omega,\omega')$?
+Probably. But we don't need to. In the limit of very low indel rates, it's sufficient to consider 2-, 1-, or even 0-event trajectories.
+The 0-event limit just gives you the phylo-HMM with transition matrix $\phi$.
+
 
 \bibliographystyle{unsrt}
 \bibliography{references}
