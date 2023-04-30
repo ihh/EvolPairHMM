@@ -180,11 +180,22 @@ Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see th
 
 \subsection{Runge-Kutta}
 
-Parameters of $\mathbb{F}(t)$ are $\{ T_{XY} \}$.
+Let $\Theta$ denote the parameters of $\mathbb{G}(\delta_t)$
+while ${\bf T}(t)$, a vector of all the $T_{XY}(t)$, parameterizes $\mathbb{F}(t)$.
 
-Parameters of $\mathbb{G}(\delta_t)$ are $\Theta$.
+We want to use the Runge-Kutta method (RK4) to numerically estimate $T_{XY}$ at timepoints $(t_0=0, t_1, t_2 \ldots)$.
+Let $\Delta_n = t_{n+1}-t_n$.
+Applying the RK4 method gives
 
-% Runge-Kutta for T_{XY}
+\begin{eqnarray*}
+  {\bf T}^{(n+1)} & = & {\bf T}^{(n)} + \frac{\Delta_n}{6} \left( {\bf K}^{(n,1)} + 2{\bf K}^{(n,2)} + 2{\bf K}^{(n,3)} + {\bf K}^{(n,4)} \right) \\
+  {\bf K}^{(n,1)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)}\right) \\
+  {\bf K}^{(n,2)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right) \\
+  {\bf K}^{(n,3)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right) \\
+  {\bf K}^{(n,4)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)
+\end{eqnarray*}
+where $F_{XY}(\Theta,{\bf T}) = \frac{\partial}{\partial t} T_{XY}(\Theta,{\bf T})$.
+
 % Derivatives of Runge-Kutta w.r.t. \theta_i and T_{XY}
 
 
