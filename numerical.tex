@@ -81,6 +81,7 @@ We are interested in
 \frac{\partial^2}{\partial \theta \partial t}T_{XY} & = & \lim_{\delta_\theta \to 0} \lim_{\delta_t \to 0}
 \frac{\left(T_{XY}(\theta+\delta_\theta,t,\delta_t) - T_{XY}(\theta+\delta_\theta,t,0)\right) - \left(T_{XY}(\theta,t,\delta_t) - T_{XY}(\theta,t,0)\right)}{\delta_\theta \delta_t}
 \end{eqnarray*}
+We will use the time derivative to numerically integrate $T_{XY}$ so for later convenience define $F_{XY} = \frac{\partial}{\partial t} T_{XY}$.
 
 Expand ${\bf U}$ to first order in both $\delta_\theta$ and $\delta_t$
 \newcommand\tthetaexpansion[2]{  {#2}_0^{#1}
@@ -177,11 +178,14 @@ Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see th
   + W_{\theta t,0,0,0} + W_{0,\theta t,0,0} + W_{0,0,\theta t,0} + W_{0,0,0,\theta t}
 \end{eqnarray*}
 
+This first-order expansion allows us to ``differentiate through'' the matrix inverse.
+These equations remain valid if the parameter $\theta$, with respect to which we are differentiating, is itself one of the $T_{XY}$
+(since these are parameters of $\mathbb{F}(t)$ and hence of ${\bf U}$).
 
 \subsection{Runge-Kutta}
 
 Let $\Theta$ denote the parameters of $\mathbb{G}(\delta_t)$
-while ${\bf T}(t)$, a vector of all the $T_{XY}(t)$, parameterizes $\mathbb{F}(t)$.
+while ${\bf T}(t)$, including all the $T_{XY}(t)$, parameterizes $\mathbb{F}(t)$.
 
 We want to use the Runge-Kutta method (RK4) to numerically estimate $T_{XY}$ at timepoints $(t_0=0, t_1, t_2 \ldots)$.
 Let $\Delta_n = t_{n+1}-t_n$.
@@ -189,14 +193,26 @@ Applying the RK4 method gives
 
 \begin{eqnarray*}
   {\bf T}^{(n+1)} & = & {\bf T}^{(n)} + \frac{\Delta_n}{6} \left( {\bf K}^{(n,1)} + 2{\bf K}^{(n,2)} + 2{\bf K}^{(n,3)} + {\bf K}^{(n,4)} \right) \\
-  {\bf K}^{(n,1)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)}\right) \\
-  {\bf K}^{(n,2)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right) \\
-  {\bf K}^{(n,3)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right) \\
-  {\bf K}^{(n,4)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)
+  {\bf K}^{(n,1)} & = & {\bf F}\left(\Phi,{\bf T}^{(n)}\right) \\
+  {\bf K}^{(n,2)} & = & {\bf F}\left(\Phi,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right) \\
+  {\bf K}^{(n,3)} & = & {\bf F}\left(\Phi,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right) \\
+  {\bf K}^{(n,4)} & = & {\bf F}\left(\Phi,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)
 \end{eqnarray*}
 where $F_{XY}(\Theta,{\bf T}) = \frac{\partial}{\partial t} T_{XY}(\Theta,{\bf T})$.
 
-% Derivatives of Runge-Kutta w.r.t. \theta_i and T_{XY}
+For any parameter $\theta \in \Theta$ we can use the chain rule to find the derivative
+
+\newcommand\ptheta{\frac{\partial}{\partial\theta}}
+\newcommand\ptxy{\frac{\partial}{\partial T_{XY}}}
+\newcommand\allpartials[1]{\ptheta #1 + \sum_{X,Y} \ptxy #1 \ptheta T_{XY}^{(n)}}
+\newcommand\allpartialsk[3]{\ptheta #1 + \sum_{X,Y} \ptxy #1 \left( \ptheta T_{XY}^{(n)} + #2 \ptheta K_{XY}^{(n,#3)} \right)}
+\begin{eqnarray*}
+  \ptheta {\bf T}^{(n+1)} & = & \ptheta {\bf T}^{(n)} + \frac{\Delta_n}{6} \left( \ptheta {\bf K}^{(n,1)} + 2\ptheta{\bf K}^{(n,2)} + 2\ptheta{\bf K}^{(n,3)} + \ptheta{\bf K}^{(n,4)} \right) \\
+  \ptheta {\bf K}^{(n,1)} & = & \allpartials{{\bf F}\left(\Theta,{\bf T}^{(n)}\right)} \\
+  \ptheta {\bf K}^{(n,2)} & = & \allpartialsk{{\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right)}{\frac{\Delta_n}{2}}{1} \\
+  \ptheta {\bf K}^{(n,3)} & = & \allpartialsk{{\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right)}{\frac{\Delta_n}{2}}{2} \\
+  \ptheta {\bf K}^{(n,4)} & = & \allpartialsk{{\bf F}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)}{\Delta_n}{3}
+\end{eqnarray*}
 
 
 \subsection{Combined model}
@@ -283,7 +299,7 @@ T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
 
 The substitution matrix for the M state of the Pair HMM is
 the matrix exponential $\exp({\bf Q}t)$, for which a Pad\'{e} approximant
-or other power series expansion can be used. % \cite{MolerVanLoan2003}
+or other power series expansion can be used in order to remain automatically differentiable under frameworks like PyTorch or Jax. % \cite{MolerVanLoan2003}
 
 \subsection{Exactly-solved special case (TKF91)}
 
