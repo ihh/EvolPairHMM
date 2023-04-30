@@ -47,7 +47,7 @@ in a path that begins and ends in state 1
 is
 
 \[
-E_{XY} =
+T_{XY} =
 \left(
 \left( {\bf I} - {\bf J}^{\nrightarrow M} \circ {\bf U} \right)^{-1}
 \left(
@@ -63,38 +63,39 @@ E_{XY} =
 
 \subsection{Rate of change of expected transition count}
 
-Suppose that the transition matrix is a function of some model parameter $\lambda$ and time $t$.
-
-Let ${\bf U}(\lambda,t,\delta_t)$ be the transition matrix at time $t$, infinitesimal time increment $\delta_t$, and parameter value $\lambda$.
+Let ${\bf U}(\theta,t,\delta_t)$ be the transition matrix
+of the composite machine $\mathbb{F}(t)\mathbb{G}(\delta_t)$
+at time $t$, infinitesimal time increment $\delta_t$, and parameter value $\theta$.
 In general this is first-order in $\delta_t$, so it has the form
 \[
-  {\bf U}(\lambda,t,\delta_t) = {\bf U}_0(\lambda,t) + {\bf U}_t(\lambda,t) \delta_t
+  {\bf U}(\theta,t,\delta_t) = {\bf U}_0(\theta,t) + {\bf U}_t(\theta,t) \delta_t
   \]
 
   
-Let $E_{XY}(\lambda,t,\delta_t)$ be the corresponding expected number of $X \to Y$ transitions.
+  Let $T_{XY}(\theta,t,\delta_t)$ be the corresponding expected number of $X \to Y$ transitions in $\mathbb{FG}$
+  between consecutive visits to state 1.
 
 We are interested in
 \begin{eqnarray*}
-\frac{\partial}{\partial t}E_{XY} & = & \lim_{\delta_t \to 0} \frac{E_{XY}(\lambda,t,\delta_t) - E_{XY}(\lambda,t,0)}{\delta_t} \\
-\frac{\partial^2}{\partial \lambda \partial t}E_{XY} & = & \lim_{\delta_\lambda \to 0} \lim_{\delta_t \to 0}
-\frac{\left(E_{XY}(\lambda+\delta_\lambda,t,\delta_t) - E_{XY}(\lambda+\delta_\lambda,t,0)\right) - \left(E_{XY}(\lambda,t,\delta_t) - E_{XY}(\lambda,t,0)\right)}{\delta_\lambda \delta_t}
+\frac{\partial}{\partial t}T_{XY} & = & \lim_{\delta_t \to 0} \frac{T_{XY}(\theta,t,\delta_t) - T_{XY}(\theta,t,0)}{\delta_t} \\
+\frac{\partial^2}{\partial \theta \partial t}T_{XY} & = & \lim_{\delta_\theta \to 0} \lim_{\delta_t \to 0}
+\frac{\left(T_{XY}(\theta+\delta_\theta,t,\delta_t) - T_{XY}(\theta+\delta_\theta,t,0)\right) - \left(T_{XY}(\theta,t,\delta_t) - T_{XY}(\theta,t,0)\right)}{\delta_\theta \delta_t}
 \end{eqnarray*}
 
-Expand ${\bf U}$ to first order in both $\delta_\lambda$ and $\delta_t$
-\newcommand\tlambdaexpansion[2]{  {#2}_0^{#1}
-  + {#2}_\lambda^{#1} \delta_\lambda
+Expand ${\bf U}$ to first order in both $\delta_\theta$ and $\delta_t$
+\newcommand\tthetaexpansion[2]{  {#2}_0^{#1}
+  + {#2}_\theta^{#1} \delta_\theta
   + {#2}_t^{#1} \delta_t
-  + {#2}_{\lambda t}^{#1} \delta_\lambda \delta_t }
-\newcommand\uexpansion{\tlambdaexpansion{}{\bf U}}
-\newcommand\vexpansion[1]{\tlambdaexpansion{#1}{\bf V}}
+  + {#2}_{\theta t}^{#1} \delta_\theta \delta_t }
+\newcommand\uexpansion{\tthetaexpansion{}{\bf U}}
+\newcommand\vexpansion[1]{\tthetaexpansion{#1}{\bf V}}
 \[
-  {\bf U}(\lambda+\delta_\lambda,t,\delta_t) = \uexpansion + O(\delta_\lambda^2) % + O(\delta_t^2)
+  {\bf U}(\theta+\delta_\theta,t,\delta_t) = \uexpansion + O(\delta_\theta^2) % + O(\delta_t^2)
 \]
-where ${\bf U}_0={\bf U}(\lambda,t,0)$,
-${\bf U}_t=\frac{1}{\delta_t} \left( {\bf U}(\lambda,t,\delta_t) - {\bf U}(\lambda,t,0) \right)$,
-${\bf U}_\lambda=\frac{\partial}{\partial \lambda} {\bf U}_0$,
-${\bf U}_{\lambda t}=\frac{\partial}{\partial \lambda}  {\bf U}_t$.
+where ${\bf U}_0={\bf U}(\theta,t,0)$,
+${\bf U}_t=\frac{1}{\delta_t} \left( {\bf U}(\theta,t,\delta_t) - {\bf U}(\theta,t,0) \right)$,
+${\bf U}_\theta=\frac{\partial}{\partial \theta} {\bf U}_0$,
+${\bf U}_{\theta t}=\frac{\partial}{\partial \theta}  {\bf U}_t$.
 
 We can now expand the matrix inverses.
 In general, for ${\bf J} \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N}, {\bf J}^{M \nrightarrow} \}$,
@@ -102,47 +103,47 @@ In general, for ${\bf J} \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N
   \left( {\bf I} - {\bf J} \circ {\bf U} \right)^{-1}
 %  & = &
 %  \left( {\bf I} - {\bf J} \circ {\bf U}_0
-%  - {\bf J} \circ {\bf U}_\lambda \delta_\lambda
+%  - {\bf J} \circ {\bf U}_\theta \delta_\theta
 %  - {\bf J} \circ {\bf U}_t \delta_t
-%  - {\bf J} \circ {\bf U}_{\lambda t} \delta_\lambda \delta_t
-%  + O(\delta_\lambda^2) + O(\delta_t^2)
+%  - {\bf J} \circ {\bf U}_{\theta t} \delta_\theta \delta_t
+%  + O(\delta_\theta^2) + O(\delta_t^2)
 %  \right)^{-1} \\
 %  & = &
 %  \left(
 %  \left( {\bf I} - {\bf J} \circ {\bf U}_0 \right)
 %  \left( {\bf I}
-%  - {\bf V}_0 \left( {\bf J} \circ {\bf U}_\lambda \delta_\lambda
+%  - {\bf V}_0 \left( {\bf J} \circ {\bf U}_\theta \delta_\theta
 %  + {\bf J} \circ {\bf U}_t \delta_t
-%  + {\bf J} \circ {\bf U}_{\lambda t} \delta_\lambda \delta_t
+%  + {\bf J} \circ {\bf U}_{\theta t} \delta_\theta \delta_t
 %  \right) \right)
-%  + O(\delta_\lambda^2) + O(\delta_t^2)
+%  + O(\delta_\theta^2) + O(\delta_t^2)
 %  \right)^{-1} \\
 %  & = &
 %  \left(
 %  \left( {\bf I}
-%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_\lambda \delta_\lambda
+%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_\theta \delta_\theta
 %  + {\bf J} \circ {\bf U}_t \delta_t
-%  + {\bf J} \circ {\bf U}_{\lambda t} \delta_\lambda \delta_t
+%  + {\bf J} \circ {\bf U}_{\theta t} \delta_\theta \delta_t
 %  \right)
 %  \right) \right)
 %  {\bf V}_0
-%  + O(\delta_\lambda^2) + O(\delta_t^2) \\
+%  + O(\delta_\theta^2) + O(\delta_t^2) \\
 %  & = &
 %  {\bf V}_0
-%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_\lambda \right) {\bf V}_0 \delta_\lambda
+%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_\theta \right) {\bf V}_0 \delta_\theta
 %  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_t \right) {\bf V}_0 \delta_t
-%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\lambda t} \right) {\bf V}_0 \delta_\lambda \delta_t
-%  + O(\delta_\lambda^2) + O(\delta_t^2) \\
-  & = & \vexpansion{} + O(\delta_\lambda^2) + O(\delta_t^2) \\
+%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\theta t} \right) {\bf V}_0 \delta_\theta \delta_t
+%  + O(\delta_\theta^2) + O(\delta_t^2) \\
+  & = & \vexpansion{} + O(\delta_\theta^2) + O(\delta_t^2) \\
 {\bf V}_0 & = & ({\bf I} - {\bf J} \circ {\bf U}_0)^{-1} \\
-{\bf V}_\lambda & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_\lambda \right) {\bf V}_0 \\
+{\bf V}_\theta & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_\theta \right) {\bf V}_0 \\
 {\bf V}_t & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_t \right) {\bf V}_0 \\
-{\bf V}_{\lambda t} & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\lambda t} \right) {\bf V}_0
+{\bf V}_{\theta t} & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\theta t} \right) {\bf V}_0
 \end{eqnarray*}
 
 Thus
 \begin{eqnarray*}
-E_{XY} & = &
+T_{XY} & = &
 \left(
 \left( \vexpansion{\nrightarrow M} \right)
 \right. \\ & & \quad \times
@@ -153,7 +154,7 @@ E_{XY} & = &
 \right)
  \\ & & \quad \left. \times
  \left( \vexpansion{M \nrightarrow} \right)
-\right)_{11}  + O(\delta_\lambda^2) + O(\delta_t^2)
+\right)_{11}  + O(\delta_\theta^2) + O(\delta_t^2)
 \end{eqnarray*}
 
 For convenience define
@@ -161,20 +162,30 @@ For convenience define
 W_{a,b,c,d} =
 \left( {\bf V}^{\nrightarrow M}_a \left( {\bf J}^{X \to Y} \circ \left( {\bf V}^{\rightarrow N}_b {\bf U}_c \right) \right) {\bf V}^{M \nrightarrow}_d \right)_{11}
 \]
-Examining the coefficients of $\delta_t$ and $\delta_\lambda \delta_t$, we see that
+Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see that
 
 \begin{eqnarray*}
-  \frac{\partial}{\partial t}E_{XY} & = &
+  \frac{\partial}{\partial t}T_{XY} & = &
   W_{t,0,0,0} + W_{0,t,0,0} + W_{0,0,t,0} + W_{0,0,0,t}
   \\
-  \frac{\partial^2}{\partial \lambda \partial t}E_{XY} & = &
-  W_{t,\lambda,0,0} + W_{t,0,\lambda,0} + W_{t,0,0,\lambda}
-  + W_{\lambda,t,0,0} + W_{0,t,\lambda,0} + W_{0,t,0,\lambda}
-  + W_{\lambda,0,t,0} + W_{0,\lambda,t,0} + W_{0,0,t,\lambda}
+  \frac{\partial^2}{\partial \theta \partial t}T_{XY} & = &
+  W_{t,\theta,0,0} + W_{t,0,\theta,0} + W_{t,0,0,\theta}
+  + W_{\theta,t,0,0} + W_{0,t,\theta,0} + W_{0,t,0,\theta}
+  + W_{\theta,0,t,0} + W_{0,\theta,t,0} + W_{0,0,t,\theta}
   \\ & &
-  + W_{\lambda,0,0,t} + W_{0,\lambda,0,t} + W_{0,0,\lambda,t}
-  + W_{\lambda t,0,0,0} + W_{0,\lambda t,0,0} + W_{0,0,\lambda t,0} + W_{0,0,0,\lambda t}
+  + W_{\theta,0,0,t} + W_{0,\theta,0,t} + W_{0,0,\theta,t}
+  + W_{\theta t,0,0,0} + W_{0,\theta t,0,0} + W_{0,0,\theta t,0} + W_{0,0,0,\theta t}
 \end{eqnarray*}
+
+
+\subsection{Runge-Kutta}
+
+Parameters of $\mathbb{F}(t)$ are $\{ T_{XY} \}$.
+
+Parameters of $\mathbb{G}(\delta_t)$ are $\Theta$.
+
+% Runge-Kutta for T_{XY}
+% Derivatives of Runge-Kutta w.r.t. \theta_i and T_{XY}
 
 
 \subsection{Combined model}
@@ -182,32 +193,17 @@ Examining the coefficients of $\delta_t$ and $\delta_\lambda \delta_t$, we see t
 \includegraphics[width=\textwidth]{PairInstant.pdf}
 
 \[
- {\bf U}_0 =
+ {\bf U} =
   \left( \begin{array}{ccccccccc}
-a & 0 & b & 0 & 0 & c & 0 & 0 & 0 \\
+a (1-(\lambda+\mu) \delta_t) & \lambda \delta_t & b (1-(\lambda+\mu) \delta_t) & 0 & a \mu \delta_t & c & 0 & 0 & b \mu \delta_t \\
 a (1-x) & x & b (1-x) & 0 & 0 & 0 & 0 & c & 0 \\
-f & 0 & g & 0 & 0 & h & 0 & 0 & 0 \\
+f (1-(\lambda+\mu) \delta_t) & 0 & g (1-(\lambda+\mu) \delta_t) & \lambda \delta_t & f \mu \delta_t & h & 0 & 0 & g \mu \delta_t \\
 f (1-x) & 0 & g (1-x) & x & 0 & 0 & 0 & h & 0 \\
 a (1-y) & 0 & b (1-y) & 0 & a y & 0 & c & 0 & b y \\
-p & 0 & q & 0 & 0 & r & 0 & 0 & 0 \\
+p (1-(\lambda+\mu) \delta_t) & 0 & q (1-(\lambda+\mu) \delta_t) & 0 & p \mu \delta_t & r & 0 & 0 & q \mu \delta_t \\
 p (1-y) & 0 & q (1-y) & 0 & p y & 0 & r & 0 & q y \\
 p (1-x) & 0 & q (1-x) & 0 & 0 & 0 & 0 & r & 0 \\
 f (1-y) & 0 & g (1-y) & 0 & f y & 0 & h & 0 & g y    
-  \end{array} \right)
-\]
-
-\[
- {\bf U}_t =
-  \left( \begin{array}{ccccccccc}
--a (\lambda+\mu) & \lambda & -b (\lambda+\mu) & 0 & a \mu & 0 & 0 & 0 & b \mu \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
--f (\lambda+\mu) & 0 & -g (\lambda+\mu) & \lambda & f \mu & 0 & 0 & 0 & g \mu \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
--p (\lambda+\mu) & 0 & -q (\lambda+\mu) & 0 & p \mu & 0 & 0 & 0 & q \mu \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0
   \end{array} \right)
 \]
 
@@ -219,7 +215,7 @@ $\sigma_N=\{9\}$ (white).
   
 \subsection{General geometric indel model (GGI)}
 
-A sequence $S(t)$ evolves by
+A sequence ${\cal S}S(t)$ evolves by
 substitutions (rate matrix ${\bf Q}$),
 deletions (rate $\mu$ per site, extension probability $y$),
 and
@@ -234,7 +230,7 @@ If the model is required to be reversible then $\lambda y(1-x) = \mu x(1-y)$.
 
 \subsection{Conditional Pair HMM (transducer) with time-dependent parameters}
 Derived in \cite{Holmes2020}.
-A Pair HMM whose state path likelihood approximates $P(S(t)|S(0))$
+A Pair HMM whose state path likelihood approximates $P({\cal S}(t)|{\cal S}(0))$
 
 \includegraphics[width=\textwidth]{PairHMM.pdf}
 
@@ -250,12 +246,12 @@ p & q & r
 & = &
 \begin{bmatrix}
 T_{MM} & T_{MI} & 1-T_{MM}-T_{MI} \\
-T_{IM}/W_I & (W_I-T_{MI}-T_{DI})/W_I & (T_{MI}+T_{DI}-T_{IM})/W_I \\
-(1-T_{MM}-T_{IM})/W_D & T_{DI}/W_D & (W_D+T_{MM}+T_{IM}-T_{DI}-1)/W_D 
+T_{IM}/S_I & (S_I-T_{MI}-T_{DI})/S_I & (T_{MI}+T_{DI}-T_{IM})/S_I \\
+(1-T_{MM}-T_{IM})/S_D & T_{DI}/S_D & (S_D+T_{MM}+T_{IM}-T_{DI}-1)/S_D 
 \end{bmatrix}
 \\
-W_I(t) & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
-W_D(t) & = & \exp\left(\frac{\mu t}{1-y}\right)-1 \\
+S_I(t) & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
+S_D(t) & = & \exp\left(\frac{\mu t}{1-y}\right)-1 \\
 T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
 \\
   \frac{d}{dt} T_{MM}(t) & = &
@@ -271,8 +267,8 @@ T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
   \mu \frac{(1-g) (b (1-r-h q)+c g q)}{(1-g y) (f (1-r)+h p)}
 \end{eqnarray*}
 
-The $T_{ij}(t)$ may be approximated by Runge-Kutta methods,
-e.g. Dormand-Prince. % \cite{DormandPrince1980}
+%The $T_{ij}(t)$ may be approximated by Runge-Kutta methods,
+%e.g. Dormand-Prince. % \cite{DormandPrince1980}
 
 The substitution matrix for the M state of the Pair HMM is
 the matrix exponential $\exp({\bf Q}t)$, for which a Pad\'{e} approximant
@@ -307,15 +303,15 @@ $\gamma = 1 - \frac{\mu \beta}{\lambda (1 - \alpha)}$.
 
 Suppose a prefix list (or tree) of sequences.
 Node 1 corresponds to the empty sequence.
-Nodes $N>1$ correspond to nonempty sequences $S_N$.
-Character $\omega_N$ is the last character of $S_N$.
-The parent node $\psi_N$ corresponds to the longest prefix of $S_N$:
-removing $\omega_N$ from $S_N$ leaves $S_{\psi_N}$.
+Nodes $N>1$ correspond to nonempty sequences ${\cal S}_N$.
+Character $\omega_N$ is the last character of ${\cal S}_N$.
+The parent node $\psi_N$ corresponds to the longest prefix of ${\cal S}_N$:
+removing $\omega_N$ from ${\cal S}_N$ leaves ${\cal S}_{\psi_N}$.
 
 Let $F(i,j,t) = \begin{bmatrix} F_M & F_I & F_D \end{bmatrix}$
-be the per-state Forward likelihoods for sequences $S_i,S_j$.
+be the per-state Forward likelihoods for sequences ${\cal S}_i,{\cal S}_j$.
 
-We seek $F^\dagger(i,j,t) = P(S(t)=S_j|S(0)=S_i)$.
+We seek $F^\dagger(i,j,t) = P({\cal S}(t)={\cal S}_j|{\cal S}(0)={\cal S}_i)$.
 The Forward recursions are, for $i>1$ and $j>1$
 \begin{eqnarray*}
 F(1,1,t) & = & \begin{bmatrix} 1 & 0 & 0 \end{bmatrix}
@@ -367,21 +363,21 @@ where $L$ is the sequence length.
 
 The pairwise alignment of ancestor $i$ and descendant $j$ can be summarized by two lists:
 \begin{itemize}
-    \item The list $A_M$ of pairs of aligned characters $(\omega,\omega')$ from ancestor $S(0)$ and descendant $S(t)$;
+    \item The list $A_M$ of pairs of aligned characters $(\omega,\omega')$ from ancestor ${\cal S}(0)$ and descendant ${\cal S}(t)$;
     \item The list $A_{ID}$ of pairs of unaligned gap sequences $(\delta,\delta')$ that were deleted and inserted in between.
 \end{itemize}
 
 The alignment probability, computable in time $O(L)$ (and in practice very fast), is
 \[
-P(A_M,A_{ID},S(t)|S(0)) =
+P(A_M,A_{ID},{\cal S}(t)|{\cal S}(0)) =
 \prod_{(\omega,\omega') \in A_M} \exp({\bf Q}t)_{\omega \omega'}
 \prod_{(\delta,\delta') \in A_{ID}} G(|\delta|,|\delta'|,t)
 \prod_{\omega'\in \delta'} \pi_{\omega'}
 \]
 
-where $G(i,j,t)$ is the probability that between the next pair of aligned characters in $S(0)$ and $S(t)$,
-there were $i$ characters deleted from $S(0)$ 
-and $j$ characters inserted into $S(t)$,
+where $G(i,j,t)$ is the probability that between the next pair of aligned characters in ${\cal S}(0)$ and ${\cal S}(t)$,
+there were $i$ characters deleted from ${\cal S}(0)$ 
+and $j$ characters inserted into ${\cal S}(t)$,
 with no homology
 \begin{eqnarray*}
 G(0,0,t) & = & a \\
