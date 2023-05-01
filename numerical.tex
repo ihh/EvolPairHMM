@@ -12,6 +12,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
+\usepackage{cancel}
 \usepackage{graphicx}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 
@@ -27,17 +28,22 @@
 
 \subsection{Expected transition count}
 
+\newcommand\nottomatch{L}
+\newcommand\notfrommatch{R}
+\newcommand\tonull{N}
+\newcommand\xtoy{{X \to Y}}
+
 Define some indicator matrices
-${\bf J}^{X \to Y}$,
-${\bf J}^{\nrightarrow M}$,
-${\bf J}^{\rightarrow N}$,
-${\bf J}^{M \nrightarrow}$
+${\bf J}^\xtoy$,
+${\bf J}^\nottomatch$,
+${\bf J}^\tonull$,
+${\bf J}^\notfrommatch$
 
 \begin{eqnarray*}
-  J^{X \to Y}_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \in \sigma_X$ and $j \in \sigma_Y$} \\ 0 & \mbox{if $i \notin \sigma_X$ or $j \notin \sigma_Y$} \end{array} \right. \\
-  J^{\nrightarrow M}_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \notin \sigma_M$} \\ 0 & \mbox{if $j \in \sigma_M$} \end{array} \right. \\
-  J^{\rightarrow N}_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \in \sigma_N$} \\ 0 & \mbox{if $j \notin \sigma_N$} \end{array} \right. \\
-  J^{M \nrightarrow}_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \notin \sigma_M$} \\ 0 & \mbox{if $i \in \sigma_N$} \end{array} \right.
+  J^\xtoy_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \in \sigma_X$ and $j \in \sigma_Y$} \\ 0 & \mbox{if $i \notin \sigma_X$ or $j \notin \sigma_Y$} \end{array} \right. \\
+  J^\nottomatch_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \notin \sigma_M$} \\ 0 & \mbox{if $j \in \sigma_M$} \end{array} \right. \\
+  J^\tonull_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \in \sigma_N$} \\ 0 & \mbox{if $j \notin \sigma_N$} \end{array} \right. \\
+  J^\notfrommatch_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \notin \sigma_M$} \\ 0 & \mbox{if $i \in \sigma_N$} \end{array} \right.
 \end{eqnarray*}
 
 Let ${\bf U}$ be the transition matrix.
@@ -49,15 +55,15 @@ is
 \[
 T_{XY} =
 \left(
-\left( {\bf I} - {\bf J}^{\nrightarrow M} \otimes {\bf U} \right)^{-1}
+\left( {\bf I} - {\bf J}^\nottomatch \otimes {\bf U} \right)^{-1}
 \left(
-     {\bf J}^{X \to Y} \otimes
+     {\bf J}^\xtoy \otimes
      \left(
-     \left( {\bf I} - {\bf J}^{\rightarrow N} \otimes {\bf U} \right)^{-1}
+     \left( {\bf I} - {\bf J}^\tonull \otimes {\bf U} \right)^{-1}
           {\bf U}
      \right)
 \right)
-\left( {\bf I} - {\bf J}^{M \nrightarrow} \otimes {\bf U} \right)^{-1}
+\left( {\bf I} - {\bf J}^\notfrommatch \otimes {\bf U} \right)^{-1}
 \right)_{11}
 \]
 
@@ -102,7 +108,7 @@ ${\bf U}_\theta=\frac{\partial}{\partial \theta} {\bf U}_0$,
 ${\bf U}_{\theta t}=\frac{\partial}{\partial \theta}  {\bf U}_t$.
 
 We can now expand the matrix inverses.
-In general, for ${\bf J}^x \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N}, {\bf J}^{M \nrightarrow} \}$,
+In general, for $x \in \{ \nottomatch, \tonull, \notfrommatch \}$,
 \begin{eqnarray*}
   \left( {\bf I} - {\bf J}^x \otimes {\bf U} \right)^{-1}
 %  & = &
@@ -149,22 +155,22 @@ Thus
 \begin{eqnarray*}
 T_{XY} & = &
 \left(
-\left( \vexpansion{\nrightarrow M} \right)
+\left( \vexpansion\nottomatch \right)
 \right. \\ & & \quad \times
 \left(
-     {\bf J}^{X \to Y} \otimes
-     \left( \left( \vexpansion{\rightarrow N} \right)
+     {\bf J}^\xtoy \otimes
+     \left( \left( \vexpansion\tonull \right)
      \left( \uexpansion \right) \right)
 \right)
  \\ & & \quad \left. \times
- \left( \vexpansion{M \nrightarrow} \right)
+ \left( \vexpansion\notfrommatch \right)
 \right)_{11}  + O(\delta_\theta^2) + O(\delta_t^2)
 \end{eqnarray*}
 
 For convenience define
 \[
 W_{a,b,c,d} =
-\left( {\bf V}^{\nrightarrow M}_a \left( {\bf J}^{X \to Y} \otimes \left( {\bf V}^{\rightarrow N}_b {\bf U}_c \right) \right) {\bf V}^{M \nrightarrow}_d \right)_{11}
+\left( {\bf V}^\nottomatch_a \left( {\bf J}^\xtoy \otimes \left( {\bf V}^\tonull_b {\bf U}_c \right) \right) {\bf V}^\notfrommatch_d \right)_{11}
 \]
 Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see that
 
