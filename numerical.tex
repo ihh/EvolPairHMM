@@ -101,47 +101,47 @@ ${\bf U}_\theta=\frac{\partial}{\partial \theta} {\bf U}_0$,
 ${\bf U}_{\theta t}=\frac{\partial}{\partial \theta}  {\bf U}_t$.
 
 We can now expand the matrix inverses.
-In general, for ${\bf J} \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N}, {\bf J}^{M \nrightarrow} \}$,
+In general, for ${\bf J}^x \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N}, {\bf J}^{M \nrightarrow} \}$,
 \begin{eqnarray*}
-  \left( {\bf I} - {\bf J} \otimes {\bf U} \right)^{-1}
+  \left( {\bf I} - {\bf J}^x \otimes {\bf U} \right)^{-1}
 %  & = &
-%  \left( {\bf I} - {\bf J} \otimes {\bf U}_0
-%  - {\bf J} \otimes {\bf U}_\theta \delta_\theta
-%  - {\bf J} \otimes {\bf U}_t \delta_t
-%  - {\bf J} \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
+%  \left( {\bf I} - {\bf J}^x \otimes {\bf U}_0
+%  - {\bf J}^x \otimes {\bf U}_\theta \delta_\theta
+%  - {\bf J}^x \otimes {\bf U}_t \delta_t
+%  - {\bf J}^x \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
 %  + O(\delta_\theta^2) + O(\delta_t^2)
 %  \right)^{-1} \\
 %  & = &
 %  \left(
-%  \left( {\bf I} - {\bf J} \otimes {\bf U}_0 \right)
+%  \left( {\bf I} - {\bf J}^x \otimes {\bf U}_0 \right)
 %  \left( {\bf I}
-%  - {\bf V}_0 \left( {\bf J} \otimes {\bf U}_\theta \delta_\theta
-%  + {\bf J} \otimes {\bf U}_t \delta_t
-%  + {\bf J} \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
+%  - {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_\theta \delta_\theta
+%  + {\bf J}^x \otimes {\bf U}_t \delta_t
+%  + {\bf J}^x \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
 %  \right) \right)
 %  + O(\delta_\theta^2) + O(\delta_t^2)
 %  \right)^{-1} \\
 %  & = &
 %  \left(
 %  \left( {\bf I}
-%  + {\bf V}_0 \left( {\bf J} \otimes {\bf U}_\theta \delta_\theta
-%  + {\bf J} \otimes {\bf U}_t \delta_t
-%  + {\bf J} \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
+%  + {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_\theta \delta_\theta
+%  + {\bf J}^x \otimes {\bf U}_t \delta_t
+%  + {\bf J}^x \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
 %  \right)
 %  \right) \right)
-%  {\bf V}_0
+%  {\bf V}^x_0
 %  + O(\delta_\theta^2) + O(\delta_t^2) \\
 %  & = &
-%  {\bf V}_0
-%  + {\bf V}_0 \left( {\bf J} \otimes {\bf U}_\theta \right) {\bf V}_0 \delta_\theta
-%  + {\bf V}_0 \left( {\bf J} \otimes {\bf U}_t \right) {\bf V}_0 \delta_t
-%  + {\bf V}_0 \left( {\bf J} \otimes {\bf U}_{\theta t} \right) {\bf V}_0 \delta_\theta \delta_t
+%  {\bf V}^x_0
+%  + {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_\theta \right) {\bf V}^x_0 \delta_\theta
+%  + {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_t \right) {\bf V}^x_0 \delta_t
+%  + {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_{\theta t} \right) {\bf V}^x_0 \delta_\theta \delta_t
 %  + O(\delta_\theta^2) + O(\delta_t^2) \\
-  & = & \vexpansion{} + O(\delta_\theta^2) + O(\delta_t^2) \\
-{\bf V}_0 & = & ({\bf I} - {\bf J} \otimes {\bf U}_0)^{-1} \\
-{\bf V}_\theta & = & {\bf V}_0 \left( {\bf J} \otimes {\bf U}_\theta \right) {\bf V}_0 \\
-{\bf V}_t & = & {\bf V}_0 \left( {\bf J} \otimes {\bf U}_t \right) {\bf V}_0 \\
-{\bf V}_{\theta t} & = & {\bf V}_0 \left( {\bf J} \otimes {\bf U}_{\theta t} \right) {\bf V}_0
+  & = & \vexpansion{x} + O(\delta_\theta^2) + O(\delta_t^2) \\
+{\bf V}^x_0 & = & ({\bf I} - {\bf J} \otimes {\bf U}_0)^{-1} \\
+{\bf V}^x_\theta & = & {\bf V}^x_0 \left( {\bf J} \otimes {\bf U}_\theta \right) {\bf V}^x_0 \\
+{\bf V}^x_t & = & {\bf V}^x_0 \left( {\bf J} \otimes {\bf U}_t \right) {\bf V}^x_0 \\
+{\bf V}^x_{\theta t} & = & {\bf V}^x_0 \left( {\bf J} \otimes {\bf U}_{\theta t} \right) {\bf V}^x_0
 \end{eqnarray*}
 
 Thus
