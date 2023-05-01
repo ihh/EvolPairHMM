@@ -83,7 +83,8 @@ We are interested in
 \frac{\partial^2}{\partial \theta \partial t}T_{XY} & = & \lim_{\delta_\theta \to 0} \lim_{\delta_t \to 0}
 \frac{\left(T_{XY}(\theta+\delta_\theta,t,\delta_t) - T_{XY}(\theta+\delta_\theta,t,0)\right) - \left(T_{XY}(\theta,t,\delta_t) - T_{XY}(\theta,t,0)\right)}{\delta_\theta \delta_t}
 \end{eqnarray*}
-We will use the time derivative to numerically integrate $T_{XY}$ so for later convenience define $F_{XY} = \frac{\partial}{\partial t} T_{XY}$.
+We will use the time derivative to numerically integrate $T_{XY}$, and the second derivative for parameter-fitting.
+For later convenience define $F_{XY} \equiv \frac{\partial}{\partial t} T_{XY}$.
 
 Expand ${\bf U}$ to first order in both $\delta_\theta$ and $\delta_t$
 \newcommand\tthetaexpansion[2]{  {#2}_0^{#1}
@@ -168,10 +169,10 @@ W_{a,b,c,d} =
 Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see that
 
 \begin{eqnarray*}
-  \frac{\partial}{\partial t}T_{XY} & = &
+  F_{XY} & = &
   W_{t,0,0,0} + W_{0,t,0,0} + W_{0,0,t,0} + W_{0,0,0,t}
   \\
-  \frac{\partial^2}{\partial \theta \partial t}T_{XY} & = &
+  \frac{\partial}{\partial \theta}F_{XY} & = &
   W_{t,\theta,0,0} + W_{t,0,\theta,0} + W_{t,0,0,\theta}
   + W_{\theta,t,0,0} + W_{0,t,\theta,0} + W_{0,t,0,\theta}
   + W_{\theta,0,t,0} + W_{0,\theta,t,0} + W_{0,0,t,\theta}
@@ -195,12 +196,11 @@ Applying the RK4 method gives
 
 \begin{eqnarray*}
   {\bf T}^{(n+1)} & = & {\bf T}^{(n)} + \frac{\Delta_n}{6} \left( {\bf K}^{(n,1)} + 2{\bf K}^{(n,2)} + 2{\bf K}^{(n,3)} + {\bf K}^{(n,4)} \right) \\
-  {\bf K}^{(n,1)} & = & {\bf F}\left(\Phi,{\bf T}^{(n)}\right) \\
-  {\bf K}^{(n,2)} & = & {\bf F}\left(\Phi,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right) \\
-  {\bf K}^{(n,3)} & = & {\bf F}\left(\Phi,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right) \\
-  {\bf K}^{(n,4)} & = & {\bf F}\left(\Phi,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)
+  {\bf K}^{(n,1)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)}\right) \\
+  {\bf K}^{(n,2)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right) \\
+  {\bf K}^{(n,3)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right) \\
+  {\bf K}^{(n,4)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)
 \end{eqnarray*}
-where $F_{XY}(\Theta,{\bf T}) = \frac{\partial}{\partial t} T_{XY}(\Theta,{\bf T})$.
 
 For any parameter $\theta \in \Theta$ we can use the chain rule to find the derivative
 
