@@ -49,17 +49,19 @@ is
 \[
 T_{XY} =
 \left(
-\left( {\bf I} - {\bf J}^{\nrightarrow M} \circ {\bf U} \right)^{-1}
+\left( {\bf I} - {\bf J}^{\nrightarrow M} \otimes {\bf U} \right)^{-1}
 \left(
-     {\bf J}^{X \to Y} \circ
+     {\bf J}^{X \to Y} \otimes
      \left(
-     \left( {\bf I} - {\bf J}^{\rightarrow N} \circ {\bf U} \right)^{-1}
+     \left( {\bf I} - {\bf J}^{\rightarrow N} \otimes {\bf U} \right)^{-1}
           {\bf U}
      \right)
 \right)
-\left( {\bf I} - {\bf J}^{M \nrightarrow} \circ {\bf U} \right)^{-1}
+\left( {\bf I} - {\bf J}^{M \nrightarrow} \otimes {\bf U} \right)^{-1}
 \right)_{11}
 \]
+
+Here $\otimes$ is the elementwise product.
 
 \subsection{Rate of change of expected transition count}
 
@@ -101,45 +103,45 @@ ${\bf U}_{\theta t}=\frac{\partial}{\partial \theta}  {\bf U}_t$.
 We can now expand the matrix inverses.
 In general, for ${\bf J} \in \{ {\bf J}^{\nrightarrow M}, {\bf J}^{\rightarrow N}, {\bf J}^{M \nrightarrow} \}$,
 \begin{eqnarray*}
-  \left( {\bf I} - {\bf J} \circ {\bf U} \right)^{-1}
+  \left( {\bf I} - {\bf J} \otimes {\bf U} \right)^{-1}
 %  & = &
-%  \left( {\bf I} - {\bf J} \circ {\bf U}_0
-%  - {\bf J} \circ {\bf U}_\theta \delta_\theta
-%  - {\bf J} \circ {\bf U}_t \delta_t
-%  - {\bf J} \circ {\bf U}_{\theta t} \delta_\theta \delta_t
+%  \left( {\bf I} - {\bf J} \otimes {\bf U}_0
+%  - {\bf J} \otimes {\bf U}_\theta \delta_\theta
+%  - {\bf J} \otimes {\bf U}_t \delta_t
+%  - {\bf J} \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
 %  + O(\delta_\theta^2) + O(\delta_t^2)
 %  \right)^{-1} \\
 %  & = &
 %  \left(
-%  \left( {\bf I} - {\bf J} \circ {\bf U}_0 \right)
+%  \left( {\bf I} - {\bf J} \otimes {\bf U}_0 \right)
 %  \left( {\bf I}
-%  - {\bf V}_0 \left( {\bf J} \circ {\bf U}_\theta \delta_\theta
-%  + {\bf J} \circ {\bf U}_t \delta_t
-%  + {\bf J} \circ {\bf U}_{\theta t} \delta_\theta \delta_t
+%  - {\bf V}_0 \left( {\bf J} \otimes {\bf U}_\theta \delta_\theta
+%  + {\bf J} \otimes {\bf U}_t \delta_t
+%  + {\bf J} \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
 %  \right) \right)
 %  + O(\delta_\theta^2) + O(\delta_t^2)
 %  \right)^{-1} \\
 %  & = &
 %  \left(
 %  \left( {\bf I}
-%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_\theta \delta_\theta
-%  + {\bf J} \circ {\bf U}_t \delta_t
-%  + {\bf J} \circ {\bf U}_{\theta t} \delta_\theta \delta_t
+%  + {\bf V}_0 \left( {\bf J} \otimes {\bf U}_\theta \delta_\theta
+%  + {\bf J} \otimes {\bf U}_t \delta_t
+%  + {\bf J} \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
 %  \right)
 %  \right) \right)
 %  {\bf V}_0
 %  + O(\delta_\theta^2) + O(\delta_t^2) \\
 %  & = &
 %  {\bf V}_0
-%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_\theta \right) {\bf V}_0 \delta_\theta
-%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_t \right) {\bf V}_0 \delta_t
-%  + {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\theta t} \right) {\bf V}_0 \delta_\theta \delta_t
+%  + {\bf V}_0 \left( {\bf J} \otimes {\bf U}_\theta \right) {\bf V}_0 \delta_\theta
+%  + {\bf V}_0 \left( {\bf J} \otimes {\bf U}_t \right) {\bf V}_0 \delta_t
+%  + {\bf V}_0 \left( {\bf J} \otimes {\bf U}_{\theta t} \right) {\bf V}_0 \delta_\theta \delta_t
 %  + O(\delta_\theta^2) + O(\delta_t^2) \\
   & = & \vexpansion{} + O(\delta_\theta^2) + O(\delta_t^2) \\
-{\bf V}_0 & = & ({\bf I} - {\bf J} \circ {\bf U}_0)^{-1} \\
-{\bf V}_\theta & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_\theta \right) {\bf V}_0 \\
-{\bf V}_t & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_t \right) {\bf V}_0 \\
-{\bf V}_{\theta t} & = & {\bf V}_0 \left( {\bf J} \circ {\bf U}_{\theta t} \right) {\bf V}_0
+{\bf V}_0 & = & ({\bf I} - {\bf J} \otimes {\bf U}_0)^{-1} \\
+{\bf V}_\theta & = & {\bf V}_0 \left( {\bf J} \otimes {\bf U}_\theta \right) {\bf V}_0 \\
+{\bf V}_t & = & {\bf V}_0 \left( {\bf J} \otimes {\bf U}_t \right) {\bf V}_0 \\
+{\bf V}_{\theta t} & = & {\bf V}_0 \left( {\bf J} \otimes {\bf U}_{\theta t} \right) {\bf V}_0
 \end{eqnarray*}
 
 Thus
@@ -149,7 +151,7 @@ T_{XY} & = &
 \left( \vexpansion{\nrightarrow M} \right)
 \right. \\ & & \quad \times
 \left(
-     {\bf J}^{X \to Y} \circ
+     {\bf J}^{X \to Y} \otimes
      \left( \left( \vexpansion{\rightarrow N} \right)
      \left( \uexpansion \right) \right)
 \right)
@@ -161,7 +163,7 @@ T_{XY} & = &
 For convenience define
 \[
 W_{a,b,c,d} =
-\left( {\bf V}^{\nrightarrow M}_a \left( {\bf J}^{X \to Y} \circ \left( {\bf V}^{\rightarrow N}_b {\bf U}_c \right) \right) {\bf V}^{M \nrightarrow}_d \right)_{11}
+\left( {\bf V}^{\nrightarrow M}_a \left( {\bf J}^{X \to Y} \otimes \left( {\bf V}^{\rightarrow N}_b {\bf U}_c \right) \right) {\bf V}^{M \nrightarrow}_d \right)_{11}
 \]
 Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see that
 
