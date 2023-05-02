@@ -26,31 +26,33 @@
 
 \section{Statistical alignment}
 
-\subsection{Expected transition count}
+\subsection{Expected transition count $T_{XY}$}
+
+Given a Markov chain with match, insert, delete, and null states $\{ \sigma_M = \{ 1 \}, \sigma_I, \sigma_D, \sigma_N \}$
+we seek the expected number of times $T_{XY}$ that the shortest closed walk from/to state 1,
+with its null states removed, includes a transition from $\sigma_X$ to $\sigma_Y$.
 
 \newcommand\nottomatch{L}
 \newcommand\notfrommatch{R}
+\newcommand\tox{X}
 \newcommand\tonull{N}
 \newcommand\xtoy{{X \to Y}}
 
 Define some indicator matrices
 ${\bf J}^\xtoy$,
+${\bf J}^\tox$,
 ${\bf J}^\nottomatch$,
-${\bf J}^\tonull$,
 ${\bf J}^\notfrommatch$
 
 \begin{eqnarray*}
   J^\xtoy_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \in \sigma_X$ and $j \in \sigma_Y$} \\ 0 & \mbox{if $i \notin \sigma_X$ or $j \notin \sigma_Y$} \end{array} \right. \\
+  J^\tox_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \in \sigma_X$} \\ 0 & \mbox{if $j \notin \sigma_X$} \end{array} \right. \\
   J^\nottomatch_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \notin \sigma_M$} \\ 0 & \mbox{if $j \in \sigma_M$} \end{array} \right. \\
-  J^\tonull_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $j \in \sigma_N$} \\ 0 & \mbox{if $j \notin \sigma_N$} \end{array} \right. \\
-  J^\notfrommatch_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \notin \sigma_M$} \\ 0 & \mbox{if $i \in \sigma_N$} \end{array} \right.
+  J^\notfrommatch_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \notin \sigma_M$} \\ 0 & \mbox{if $i \in \sigma_M$} \end{array} \right.
 \end{eqnarray*}
 
-Let ${\bf U}$ be the transition matrix.
-
-The expected number of transitions of type $X \to Y$
-in a path that begins and ends in state 1
-is
+Let ${\bf U}$ be the transition matrix of the Markov chain.
+Then
 
 \[
 T_{XY} =
@@ -69,19 +71,21 @@ T_{XY} =
 
 Here $\otimes$ is the elementwise product.
 
-\subsection{Rate of change of expected transition count}
+\subsection{Rate of change $F_{XY}$ of expected transition count}
+
+Suppose that
+$\mathbb{Q}(\theta)$ is the generator for an indel process,
+$\mathbb{G}(\theta,\delta_t) = \mathbb{I} + \mathbb{Q}(\theta) \delta_t$ is the infinitesimal Pair HMM,
+$\mathbb{F}(t)$ the finite-time approximator,
+and $\mathbb{FG}$ the machine product of $\mathbb{F}$ and $\mathbb{G}$.
 
 Let ${\bf U}(\theta,t,\delta_t)$ be the transition matrix
-of the composite machine $\mathbb{F}(t)\mathbb{G}(\delta_t)$
+of the composite machine $\mathbb{FG}$
 at time $t$, infinitesimal time increment $\delta_t$, and parameter value $\theta$.
-In general this is first-order in $\delta_t$, so it has the form
+By the definition of $\mathbb{G}$ this is first-order in $\delta_t$, so it has the form
 \[
   {\bf U}(\theta,t,\delta_t) = {\bf U}_0(\theta,t) + {\bf U}_t(\theta,t) \delta_t
   \]
-
-  
-  Let $T_{XY}(\theta,t,\delta_t)$ be the corresponding expected number of $X \to Y$ transitions in $\mathbb{FG}$
-  between consecutive visits to state 1.
 
 We are interested in
 \begin{eqnarray*}
@@ -89,8 +93,8 @@ We are interested in
 \frac{\partial^2}{\partial \theta \partial t}T_{XY} & = & \lim_{\delta_\theta \to 0} \lim_{\delta_t \to 0}
 \frac{\left(T_{XY}(\theta+\delta_\theta,t,\delta_t) - T_{XY}(\theta+\delta_\theta,t,0)\right) - \left(T_{XY}(\theta,t,\delta_t) - T_{XY}(\theta,t,0)\right)}{\delta_\theta \delta_t}
 \end{eqnarray*}
-We will use the time derivative to numerically integrate $T_{XY}$, and the second derivative for parameter-fitting.
-For later convenience define $F_{XY} \equiv \frac{\partial}{\partial t} T_{XY}$.
+We will use the time derivative to numerically integrate $T_{XY}$, and the cross partial derivative for parameter-fitting.
+For later convenience define $R_{XY} \equiv \frac{\partial}{\partial t} T_{XY}$.
 
 Expand ${\bf U}$ to first order in both $\delta_\theta$ and $\delta_t$
 \newcommand\tthetaexpansion[2]{  {#2}_0^{#1}
@@ -175,10 +179,10 @@ W_{a,b,c,d} =
 Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see that
 
 \begin{eqnarray*}
-  F_{XY} & = &
+  R_{XY} & = &
   W_{t,0,0,0} + W_{0,t,0,0} + W_{0,0,t,0} + W_{0,0,0,t}
   \\
-  \frac{\partial}{\partial \theta}F_{XY} & = &
+  \frac{\partial}{\partial \theta}R_{XY} & = &
   W_{t,\theta,0,0} + W_{t,0,\theta,0} + W_{t,0,0,\theta}
   + W_{\theta,t,0,0} + W_{0,t,\theta,0} + W_{0,t,0,\theta}
   + W_{\theta,0,t,0} + W_{0,\theta,t,0} + W_{0,0,t,\theta}
@@ -191,7 +195,7 @@ This first-order expansion allows us to ``differentiate through'' the matrix inv
 These equations remain valid if the parameter $\theta$, with respect to which we are differentiating, is itself one of the $T_{XY}$
 (since these are parameters of $\mathbb{F}(t)$ and hence of ${\bf U}$).
 
-\subsection{Runge-Kutta}
+\subsection{Runge-Kutta recursions for $T_{XY}$ and derivatives}
 
 Let $\Theta$ denote the parameters of $\mathbb{G}(\delta_t)$
 while ${\bf T}(t)$, including all the $T_{XY}(t)$, parameterizes $\mathbb{F}(t)$.
@@ -202,10 +206,10 @@ Applying the RK4 method gives
 
 \begin{eqnarray*}
   {\bf T}^{(n+1)} & = & {\bf T}^{(n)} + \frac{\Delta_n}{6} \left( {\bf K}^{(n,1)} + 2{\bf K}^{(n,2)} + 2{\bf K}^{(n,3)} + {\bf K}^{(n,4)} \right) \\
-  {\bf K}^{(n,1)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)}\right) \\
-  {\bf K}^{(n,2)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right) \\
-  {\bf K}^{(n,3)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right) \\
-  {\bf K}^{(n,4)} & = & {\bf F}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)
+  {\bf K}^{(n,1)} & = & {\bf R}\left(\Theta,{\bf T}^{(n)}\right) \\
+  {\bf K}^{(n,2)} & = & {\bf R}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right) \\
+  {\bf K}^{(n,3)} & = & {\bf R}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right) \\
+  {\bf K}^{(n,4)} & = & {\bf R}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)
 \end{eqnarray*}
 
 For any parameter $\theta \in \Theta$ we can use the chain rule to find the derivative
@@ -216,41 +220,15 @@ For any parameter $\theta \in \Theta$ we can use the chain rule to find the deri
 \newcommand\allpartialsk[3]{\ptheta #1 + \sum_{X,Y} \ptxy #1 \left( \ptheta T_{XY}^{(n)} + #2 \ptheta K_{XY}^{(n,#3)} \right)}
 \begin{eqnarray*}
   \ptheta {\bf T}^{(n+1)} & = & \ptheta {\bf T}^{(n)} + \frac{\Delta_n}{6} \left( \ptheta {\bf K}^{(n,1)} + 2\ptheta{\bf K}^{(n,2)} + 2\ptheta{\bf K}^{(n,3)} + \ptheta{\bf K}^{(n,4)} \right) \\
-  \ptheta {\bf K}^{(n,1)} & = & \allpartials{{\bf F}\left(\Theta,{\bf T}^{(n)}\right)} \\
-  \ptheta {\bf K}^{(n,2)} & = & \allpartialsk{{\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right)}{\frac{\Delta_n}{2}}{1} \\
-  \ptheta {\bf K}^{(n,3)} & = & \allpartialsk{{\bf F}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right)}{\frac{\Delta_n}{2}}{2} \\
-  \ptheta {\bf K}^{(n,4)} & = & \allpartialsk{{\bf F}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)}{\Delta_n}{3}
+  \ptheta {\bf K}^{(n,1)} & = & \allpartials{{\bf R}\left(\Theta,{\bf T}^{(n)}\right)} \\
+  \ptheta {\bf K}^{(n,2)} & = & \allpartialsk{{\bf R}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,1)}\right)}{\frac{\Delta_n}{2}}{1} \\
+  \ptheta {\bf K}^{(n,3)} & = & \allpartialsk{{\bf R}\left(\Theta,{\bf T}^{(n)} + \frac{\Delta_n}{2} {\bf K}^{(n,2)}\right)}{\frac{\Delta_n}{2}}{2} \\
+  \ptheta {\bf K}^{(n,4)} & = & \allpartialsk{{\bf R}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)}{\Delta_n}{3}
 \end{eqnarray*}
 
+\subsection{Generator $\mathbb{G}(\delta_t)$ for General Geometric Indel model (GGI)}
 
-\subsection{Combined model}
-
-\includegraphics[width=\textwidth]{PairInstant.pdf}
-
-\[
- {\bf U} =
-  \left( \begin{array}{ccccccccc}
-a (1-(\lambda+\mu) \delta_t) & \lambda \delta_t & b (1-(\lambda+\mu) \delta_t) & 0 & a \mu \delta_t & c & 0 & 0 & b \mu \delta_t \\
-a (1-x) & x & b (1-x) & 0 & 0 & 0 & 0 & c & 0 \\
-f (1-(\lambda+\mu) \delta_t) & 0 & g (1-(\lambda+\mu) \delta_t) & \lambda \delta_t & f \mu \delta_t & h & 0 & 0 & g \mu \delta_t \\
-f (1-x) & 0 & g (1-x) & x & 0 & 0 & 0 & h & 0 \\
-a (1-y) & 0 & b (1-y) & 0 & a y & 0 & c & 0 & b y \\
-p (1-(\lambda+\mu) \delta_t) & 0 & q (1-(\lambda+\mu) \delta_t) & 0 & p \mu \delta_t & r & 0 & 0 & q \mu \delta_t \\
-p (1-y) & 0 & q (1-y) & 0 & p y & 0 & r & 0 & q y \\
-p (1-x) & 0 & q (1-x) & 0 & 0 & 0 & 0 & r & 0 \\
-f (1-y) & 0 & g (1-y) & 0 & f y & 0 & h & 0 & g y    
-  \end{array} \right)
-\]
-
-State sets
-$\sigma_M=\{1\}$ (orange),
-$\sigma_I=\{2,3,4\}$ (green),
-$\sigma_D=\{5,6,7,8\}$ (red),
-$\sigma_N=\{9\}$ (white).
-  
-\subsection{General geometric indel model (GGI)}
-
-A sequence ${\cal S}S(t)$ evolves by
+A sequence ${\cal S}(t)$ evolves by
 substitutions (rate matrix ${\bf Q}$),
 deletions (rate $\mu$ per site, extension probability $y$),
 and
@@ -263,9 +241,9 @@ At equilibrium, sequence length $\sim$ Geometric($\lambda/\mu$). Composition is 
 
 If the model is required to be reversible then $\lambda y(1-x) = \mu x(1-y)$.
 
-\subsection{Conditional Pair HMM (transducer) with time-dependent parameters}
-Derived in \cite{Holmes2020}.
-A Pair HMM whose state path likelihood approximates $P({\cal S}(t)|{\cal S}(0))$
+\subsection{Approximate time-dependent transducer $\mathbb{F}(t)$ for GGI model}
+
+A Pair HMM whose Forward likelihood approximates $P({\cal S}(t)|{\cal S}(0))$
 
 \includegraphics[width=\textwidth]{PairHMM.pdf}
 
@@ -273,18 +251,59 @@ At $t=0$: $a(0)=1$, $f(0)=1-x$, $g(0)=x$, $p(0)=1-y$, $r(0)=y$, and $b(0)=c(0)=h
 
 For $t>0$, % following Holmes (2020)
 \begin{eqnarray*}
-\begin{bmatrix}
+\begin{pmatrix}
 a & b & c \\
 f & g & h \\
 p & q & r 
-\end{bmatrix}
+\end{pmatrix}
 & = &
-\begin{bmatrix}
+\begin{pmatrix}
+T_{MM} / S_M & T_{MI} / S_M & T_{MD} / S_M \\
+T_{IM} / S_I & T_{II} / S_I & T_{ID} / S_I \\
+T_{DM} / S_D & T_{DI} / S_D & T_{DD} / S_D 
+\end{pmatrix}
+\\
+& = &
+\begin{pmatrix}
 T_{MM} & T_{MI} & 1-T_{MM}-T_{MI} \\
 T_{IM}/S_I & (S_I-T_{MI}-T_{DI})/S_I & (T_{MI}+T_{DI}-T_{IM})/S_I \\
 (1-T_{MM}-T_{IM})/S_D & T_{DI}/S_D & (S_D+T_{MM}+T_{IM}-T_{DI}-1)/S_D 
-\end{bmatrix}
-\\
+\end{pmatrix}
+\end{eqnarray*}
+
+where $S_x = \sum_{y \in \{M,I,D\}} T_{xy}  = \sum_{y \in \{M,I,D\}} T_{yx}$
+and noting that $S_M = 1$.
+
+\subsection{Composite machine $\mathbb{FG}$ for GGI model}
+
+\includegraphics[width=\textwidth]{PairInstant.pdf}
+
+\[
+ {\bf U} =
+  \begin{pmatrix}
+a (1-(\lambda+\mu) \delta_t) & \lambda \delta_t & b (1-(\lambda+\mu) \delta_t) & 0 & a \mu \delta_t & c & 0 & 0 & b \mu \delta_t \\
+a (1-x) & x & b (1-x) & 0 & 0 & 0 & 0 & c & 0 \\
+f (1-(\lambda+\mu) \delta_t) & 0 & g (1-(\lambda+\mu) \delta_t) & \lambda \delta_t & f \mu \delta_t & h & 0 & 0 & g \mu \delta_t \\
+f (1-x) & 0 & g (1-x) & x & 0 & 0 & 0 & h & 0 \\
+a (1-y) & 0 & b (1-y) & 0 & a y & 0 & c & 0 & b y \\
+p (1-(\lambda+\mu) \delta_t) & 0 & q (1-(\lambda+\mu) \delta_t) & 0 & p \mu \delta_t & r & 0 & 0 & q \mu \delta_t \\
+p (1-y) & 0 & q (1-y) & 0 & p y & 0 & r & 0 & q y \\
+p (1-x) & 0 & q (1-x) & 0 & 0 & 0 & 0 & r & 0 \\
+f (1-y) & 0 & g (1-y) & 0 & f y & 0 & h & 0 & g y    
+  \end{pmatrix}
+\]
+
+State sets
+$\sigma_M=\{1\}$ (orange),
+$\sigma_I=\{2,3,4\}$ (green),
+$\sigma_D=\{5,6,7,8\}$ (red),
+$\sigma_N=\{9\}$ (white).
+  
+\subsection{Algebraic ODEs for $T_{XY}$ under GGI model}
+
+Derived in \cite{Holmes2020}.
+
+\begin{eqnarray*}
 S_I(t) & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
 S_D(t) & = & \exp\left(\frac{\mu t}{1-y}\right)-1 \\
 T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
@@ -302,29 +321,26 @@ T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
   \mu \frac{(1-g) (b (1-r-h q)+c g q)}{(1-g y) (f (1-r)+h p)}
 \end{eqnarray*}
 
-%The $T_{ij}(t)$ may be approximated by Runge-Kutta methods,
-%e.g. Dormand-Prince. % \cite{DormandPrince1980}
-
 The substitution matrix for the M state of the Pair HMM is
 the matrix exponential $\exp({\bf Q}t)$, for which a Pad\'{e} approximant
 or other power series expansion can be used in order to remain automatically differentiable under frameworks like PyTorch or Jax. % \cite{MolerVanLoan2003}
 
-\subsection{Exactly-solved special case (TKF91)}
+\subsection{TKF91 as exactly-solved special case of GGI model}
 
 When $x=y=0$ the model is TKF91 \cite{ThorneEtAl91}
 with solution
 $
-\begin{bmatrix}
+\begin{pmatrix}
 a & b & c \\
 f & g & h \\
 p & q & r 
-\end{bmatrix}
+\end{pmatrix}
 =
-\begin{bmatrix}
+\begin{pmatrix}
 (1-\beta)\alpha & \beta & (1-\beta)(1-\alpha) \\
 (1-\beta)\alpha & \beta & (1-\beta)(1-\alpha) \\
 (1-\gamma)\alpha & \gamma & (1-\gamma)(1-\alpha)
-\end{bmatrix}
+\end{pmatrix}
 $
 where
 $\alpha = \exp(-\mu t)$,
@@ -334,7 +350,7 @@ $\gamma = 1 - \frac{\mu \beta}{\lambda (1 - \alpha)}$.
 
 
 
-\subsection{Alignment unspecified}
+\subsection{GGI model transition likelihood, alignment unspecified}
 
 Suppose a prefix list (or tree) of sequences.
 Node 1 corresponds to the empty sequence.
@@ -343,13 +359,13 @@ Character $\omega_N$ is the last character of ${\cal S}_N$.
 The parent node $\psi_N$ corresponds to the longest prefix of ${\cal S}_N$:
 removing $\omega_N$ from ${\cal S}_N$ leaves ${\cal S}_{\psi_N}$.
 
-Let $F(i,j,t) = \begin{bmatrix} F_M & F_I & F_D \end{bmatrix}$
+Let $F(i,j,t) = \begin{pmatrix} F_M & F_I & F_D \end{pmatrix}$
 be the per-state Forward likelihoods for sequences ${\cal S}_i,{\cal S}_j$.
 
 We seek $F^\dagger(i,j,t) = P({\cal S}(t)={\cal S}_j|{\cal S}(0)={\cal S}_i)$.
 The Forward recursions are, for $i>1$ and $j>1$
 \begin{eqnarray*}
-F(1,1,t) & = & \begin{bmatrix} 1 & 0 & 0 \end{bmatrix}
+F(1,1,t) & = & \begin{pmatrix} 1 & 0 & 0 \end{pmatrix}
 \\
 F(1,j,t) & = &
 F(1,\psi_j,t) U_I(\omega_j,t)
@@ -362,39 +378,39 @@ F(\psi_i,\psi_j,t) U_M(\omega_i,\omega_j,t)
 + F(i,\psi_j,t) U_I(\omega_j,t)
 + F(\psi_i,j,t) U_D(\omega_i,t)
 \\
-F^\dagger(i,j,t) & = & F(i,j,t) \begin{bmatrix}
+F^\dagger(i,j,t) & = & F(i,j,t) \begin{pmatrix}
 1-b(t) \\
 1-g(t) \\
-1-q(t) \end{bmatrix}
+1-q(t) \end{pmatrix}
 \\
 U_M(\omega_i,\omega_j,t) & = &
-\begin{bmatrix}
+\begin{pmatrix}
 a(t) & 0 & 0 \\
 f(t) & 0 & 0 \\
 p(t) & 0 & 0 
-\end{bmatrix}
+\end{pmatrix}
 \exp({\bf Q}t)_{\omega_i \omega_j}
 \\
 U_I(\omega_j,t) & = &
-\begin{bmatrix}
+\begin{pmatrix}
 0 & b(t) & 0 \\
 0 & g(t) & 0 \\
 0 & q(t) & 0 
-\end{bmatrix}
+\end{pmatrix}
 \pi_{\omega_j}
 \\
 U_D(\omega_i,t) & = &
-\begin{bmatrix}
+\begin{pmatrix}
 0 & 0 & c(t) \\
 0 & 0 & h(t) \\
 0 & 0 & r(t) 
-\end{bmatrix}
+\end{pmatrix}
 \end{eqnarray*}
 
 The time complexity to compute the Forward likelihood is $O(L^2)$,
 where $L$ is the sequence length.
 
-\subsection{Alignment specified}
+\subsection{GGI model transition likelihood, alignment specified}
 
 The pairwise alignment of ancestor $i$ and descendant $j$ can be summarized by two lists:
 \begin{itemize}
@@ -431,7 +447,7 @@ g^{j-1} r^{i-1}
 % The unobserved index $k$ counts zig-zags on the Pair HMM state path
 % ($D \to I \to D$ or $I \to D \to I$).
 
-\subsection{Phylogenetic alignment}
+\subsection{Phylogenetic alignment under GGI model}
 
 Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences on a phylogeny.
 Upgrade $\exp({\bf Q}t)$ to Felsenstein pruning. % \cite{Felsenstein81}.
