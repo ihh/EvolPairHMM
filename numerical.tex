@@ -29,7 +29,7 @@
 \subsection{Expected transition count $T_{XY}$}
 
 Given a Markov chain with match, insert, delete, and null states $\{ \sigma_M = \{ 1 \}, \sigma_I, \sigma_D, \sigma_N \}$
-we seek the expected number of times $T_{XY}$ that the shortest closed walk from/to state 1,
+we seek $T_{XY}$, the expected number of times that the shortest closed walk from/to state 1,
 with its null states removed, includes a transition from $\sigma_X$ to $\sigma_Y$.
 
 \newcommand\nottomatch{L}
@@ -54,8 +54,8 @@ ${\bf J}^\notfrommatch$
 Let ${\bf U}$ be the transition matrix of the Markov chain.
 Then
 
-\[
-T_{XY} =
+\begin{eqnarray*}
+T_{XY} & = &
 \left(
 \left( {\bf I} - {\bf J}^\nottomatch \otimes {\bf U} \right)^{-1}
 \left(
@@ -67,9 +67,10 @@ T_{XY} =
 \right)
 \left( {\bf I} - {\bf J}^\notfrommatch \otimes {\bf U} \right)^{-1}
 \right)_{11}
-\]
+\end{eqnarray*}
 
 Here $\otimes$ is the elementwise product.
+
 
 \subsection{Rate of change $F_{XY}$ of expected transition count}
 
@@ -172,10 +173,10 @@ T_{XY} & = &
 \end{eqnarray*}
 
 For convenience define
-\[
-W_{a,b,c,d} =
+\begin{eqnarray*}
+W_{a,b,c,d} & = &
 \left( {\bf V}^\nottomatch_a \left( {\bf J}^\xtoy \otimes \left( {\bf V}^\tonull_b {\bf U}_c \right) \right) {\bf V}^\notfrommatch_d \right)_{11}
-\]
+\end{eqnarray*}
 Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see that
 
 \begin{eqnarray*}
@@ -194,6 +195,46 @@ Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see th
 This first-order expansion allows us to ``differentiate through'' the matrix inverse.
 These equations remain valid if the parameter $\theta$, with respect to which we are differentiating, is itself one of the $T_{XY}$
 (since these are parameters of $\mathbb{F}(t)$ and hence of ${\bf U}$).
+
+\subsection{Expected state count $S_X$}
+
+We will also need $S_X$, the expected number of $\sigma_X$-states in the walk.
+Note that $S_x = \sum_{y \in \{M,I,D\}} T_{xy}  = \sum_{y \in \{M,I,D\}} T_{yx}$
+and $S_M = 1$.
+Thus if we have all the $\{ T_{XY} \}$ then we can trivially find the $\{ S_X \}$.
+However, sometimes it will be useful to compute the $S_X$ independently,
+as for example in the GGI model below, where it is easier to solve ODEs for the $S_X$ than the $T_{XY}$.
+
+\begin{eqnarray*}
+S_X & = &
+\left(
+     \left(
+          {\bf J}^\tox \otimes
+          \left( {\bf I} - {\bf J}^\nottomatch \otimes {\bf U} \right)^{-1}
+     \right)
+\left( {\bf I} - {\bf J}^\notfrommatch \otimes {\bf U} \right)^{-1}
+\right)_{11}
+\\
+& = &
+\left(
+     \left(
+          {\bf J}^\tox \otimes
+          \left( \vexpansion\nottomatch \right)
+     \right)
+\left( \vexpansion\notfrommatch \right)
+\right)_{11}  + O(\delta_\theta^2) + O(\delta_t^2)
+  \\
+  \frac{\partial}{\partial t} S_X & = &
+  W'_{t,0} + W'_{0,t}
+  \\
+  \frac{\partial^2}{\partial \theta \partial t} S_X & = &
+  W'_{t,\theta} + W'_{\theta,t}
+  + W'_{\theta t,0} + W'_{0,\theta t}
+\\
+W'_{a,b} & = &
+\left( \left( {\bf J}^\tox \otimes {\bf V}^\nottomatch_a \right) {\bf V}^\notfrommatch_b \right)_{11}
+\end{eqnarray*}
+
 
 \subsection{Runge-Kutta recursions for $T_{XY}$ and derivatives}
 
@@ -271,9 +312,6 @@ T_{IM}/S_I & (S_I-T_{MI}-T_{DI})/S_I & (T_{MI}+T_{DI}-T_{IM})/S_I \\
 \end{pmatrix}
 \end{eqnarray*}
 
-where $S_x = \sum_{y \in \{M,I,D\}} T_{xy}  = \sum_{y \in \{M,I,D\}} T_{yx}$
-and noting that $S_M = 1$.
-
 \subsection{Composite machine $\mathbb{FG}$ for GGI model}
 
 \includegraphics[width=\textwidth]{PairInstant.pdf}
@@ -293,7 +331,7 @@ f (1-y) & 0 & g (1-y) & 0 & f y & 0 & h & 0 & g y
   \end{pmatrix}
 \]
 
-State sets
+State sets are
 $\sigma_M=\{1\}$ (orange),
 $\sigma_I=\{2,3,4\}$ (green),
 $\sigma_D=\{5,6,7,8\}$ (red),
