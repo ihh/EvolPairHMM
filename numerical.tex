@@ -551,7 +551,7 @@ g^{j-1} r^{i-1}
 Both forms of the pairwise likelihood (alignment specified, or unspecified) can be extended to multiple sequences on a phylogeny.
 Upgrade $\exp({\bf Q}t)$ to Felsenstein pruning. % \cite{Felsenstein81}.
 
-For the alignment-unspecified form, use automata composition to obtain $N$-sequence HMMs \cite{SilvestreRyanEtAl2020}.
+For the alignment-unspecified form, use transducer composition to obtain $N$-sequence HMMs \cite{SilvestreRyanEtAl2020}.
 The resulting Forward algorithm is $O(L^N)$.
 To ameliorate this, discard all but a few representative sample paths \cite{WestessonEtAl2012},
 or use MCMC \cite{RedelingsSuchard2007}.
