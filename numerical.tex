@@ -71,7 +71,7 @@ so that $\mathbb{A}$'s output labels match $\mathbb{B}$'s input labels and $\mat
     0 & \mbox{otherwise}
   \end{array} \right.
 \]
-Note this composition preserves alignment transitivity: characters that are aligned\footnote{In the sense of being associated with the same transition.}
+Note this composition preserves alignment transitivity: characters that are aligned\footnote{In the sense of being associated with the same transition, on a given state path.}
 through both $\mathbb{A}$ and $\mathbb{B}$ are aligned by $\mathbb{AB}$.
 We will require this to be true of all transducer compositions we consider.
 
@@ -92,7 +92,7 @@ Any transducer can be transformed into an equivalent state-based emitter by addi
 
 \subsection{Expected transition count $T_{XY}$}
 
-Given a conditionally-normalized\footnote{Meaning the Forward weight is nonnegative; and its sum over output sequences, for a given input sequence, is 1.}
+Given a conditionally-normalized\footnote{Meaning the Forward weight is a probability whose sum over output sequences, for any given input sequence, is 1.}
 state-based emitter with exactly one match state $\sigma_M = \{ 1 \}$, which is also the start and sole end state,
 we seek $T_{XY}$, the expected number of times that the shortest closed walk from/to state 1,
 with its null states removed, includes a transition from $\sigma_X$ to $\sigma_Y$.
