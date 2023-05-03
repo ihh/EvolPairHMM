@@ -41,7 +41,8 @@ $\tau \subseteq \Phi \times \gappedalphabet \times \gappedalphabet \times \Phi$ 
 ${\cal W}:\tau \to \Re$ is the transition weight function.
 
 A transition $(i,x,y,j)$ has source state $i$, input label $x$, output label $y$, and destination state $j$.
-For two sequences ${\cal X}, {\cal Y} \in \Omega^\ast$ define the Forward weight $\mathbb{T}_{\cal XY}$ to be the sum of weights of all paths from $\phi_0$ to any $\psi \in \Psi$
+For input and output sequences ${\cal X}, {\cal Y} \in \Omega^\ast$ define the Forward\footnote{So-called because it can be computed by the Forward algorithm, after removing any null cycles.} weight
+$\mathbb{T}_{\cal XY}$ to be the sum of weights of all paths from $\phi_0$ to any $\psi \in \Psi$
 such that the concatenated input and output labels are, respectively, ${\cal X}$ and ${\cal Y}$, where the weight of a path is defined as the product of its transition weights.
 Two transducers $\mathbb{A}=(\Omega,\ldots), \mathbb{B}=(\Omega,\ldots)$ are considered equivalent if $\mathbb{A}_{\cal XY} = \mathbb{B}_{\cal XY}\ \forall\ {\cal X},{\cal Y} \in \Omega^\ast$.
 
@@ -86,7 +87,8 @@ Any transducer can be transformed into an equivalent state-based emitter by addi
 
 \subsection{Expected transition count $T_{XY}$}
 
-Given a probabilistically-weighted state-based emitter with exactly one match state $\sigma_M = \{ 1 \}$, which is also the start and sole end state,
+Given a conditionally-normalized\footnote{Meaning the Forward weight is between 0 and 1, and summed over output sequences for a given input sequence is 1.}
+state-based emitter with exactly one match state $\sigma_M = \{ 1 \}$, which is also the start and sole end state,
 we seek $T_{XY}$, the expected number of times that the shortest closed walk from/to state 1,
 with its null states removed, includes a transition from $\sigma_X$ to $\sigma_Y$.
 
