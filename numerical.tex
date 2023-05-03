@@ -69,9 +69,9 @@ so that $\mathbb{A}$'s output labels match $\mathbb{B}$'s input labels and $\mat
   \end{array} \right.
 \]
 
-\subsection{Moore machines}
+\subsection{State-based emissions}
 
-A transducer is a Moore machine if its state space can be partitioned into
+A transducer has state-based emissions if its state space can be partitioned into
 match, insert, delete, and null states $\{ \sigma_M, \sigma_I, \sigma_D, \sigma_N \}$
 such that for all transitions $(i,x,y,j)$ of finite weight, exactly one of the following is true
 \begin{eqnarray*}
@@ -82,11 +82,11 @@ such that for all transitions $(i,x,y,j)$ of finite weight, exactly one of the f
 \end{eqnarray*}
 and further ${\cal W}(i,x,y,j) = U_{ij} E_j(x,y)$ where ${\bf U}$ is a transition matrix and $E_j$ an emission weight.
 
-Any transducer can be transformed into an equivalent Moore machine by adding states.
+Any transducer can be transformed into an equivalent state-based emitter by adding states.
 
 \subsection{Expected transition count $T_{XY}$}
 
-Given a Moore machine with exactly one match state $\sigma_M = \{ 1 \}$, which is also the start and sole end state,
+Given a state-based emitter with exactly one match state $\sigma_M = \{ 1 \}$, which is also the start and sole end state,
 we seek $T_{XY}$, the expected number of times that the shortest closed walk from/to state 1,
 with its null states removed, includes a transition from $\sigma_X$ to $\sigma_Y$.
 
