@@ -450,67 +450,10 @@ $\gamma = 1 - \frac{\mu \beta}{\lambda (1 - \alpha)}$.
 
 
 
-\subsection{GGI model transition likelihood, alignment unspecified}
+\subsection{GGI model transition likelihood}
 
-Suppose a prefix list (or tree) of sequences.
-Node 1 corresponds to the empty sequence.
-Nodes $N>1$ correspond to nonempty sequences ${\cal S}_N$.
-Character $\omega_N$ is the last character of ${\cal S}_N$.
-The parent node $\psi_N$ corresponds to the longest prefix of ${\cal S}_N$:
-removing $\omega_N$ from ${\cal S}_N$ leaves ${\cal S}_{\psi_N}$.
-
-Let $F(i,j,t) = \begin{pmatrix} F_M & F_I & F_D \end{pmatrix}$
-be the per-state Forward likelihoods for sequences ${\cal S}_i,{\cal S}_j$.
-
-We seek $F^\dagger(i,j,t) = P({\cal S}(t)={\cal S}_j|{\cal S}(0)={\cal S}_i)$.
-The Forward recursions are, for $i>1$ and $j>1$
-\begin{eqnarray*}
-F(1,1,t) & = & \begin{pmatrix} 1 & 0 & 0 \end{pmatrix}
-\\
-F(1,j,t) & = &
-F(1,\psi_j,t) U_I(\omega_j,t)
-\\
-F(i,1,t) & = &
-F(\psi_i,1,t) U_D(\omega_i,t)
-\\
-F(i,j,t) & = &
-F(\psi_i,\psi_j,t) U_M(\omega_i,\omega_j,t)
-+ F(i,\psi_j,t) U_I(\omega_j,t)
-+ F(\psi_i,j,t) U_D(\omega_i,t)
-\\
-F^\dagger(i,j,t) & = & F(i,j,t) \begin{pmatrix}
-1-b(t) \\
-1-g(t) \\
-1-q(t) \end{pmatrix}
-\\
-U_M(\omega_i,\omega_j,t) & = &
-\begin{pmatrix}
-a(t) & 0 & 0 \\
-f(t) & 0 & 0 \\
-p(t) & 0 & 0 
-\end{pmatrix}
-\exp({\bf Q}t)_{\omega_i \omega_j}
-\\
-U_I(\omega_j,t) & = &
-\begin{pmatrix}
-0 & b(t) & 0 \\
-0 & g(t) & 0 \\
-0 & q(t) & 0 
-\end{pmatrix}
-\pi_{\omega_j}
-\\
-U_D(\omega_i,t) & = &
-\begin{pmatrix}
-0 & 0 & c(t) \\
-0 & 0 & h(t) \\
-0 & 0 & r(t) 
-\end{pmatrix}
-\end{eqnarray*}
-
-The time complexity to compute the Forward likelihood is $O(L^2)$,
-where $L$ is the sequence length.
-
-\subsection{GGI model transition likelihood, alignment specified}
+The following recipe refers to the case where the alignment is specified.
+If it's unspecified, use the Forward algorithm to sum over alignments.
 
 The pairwise alignment of ancestor $i$ and descendant $j$ can be summarized by two lists:
 \begin{itemize}
