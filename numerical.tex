@@ -26,9 +26,67 @@
 
 \section{Statistical alignment}
 
+\subsection{Transducer composition}
+
+\newcommand\gappedalphabet{(\Omega \cup \{\epsilon\})}
+
+For our purposes, a transducer is a tuple
+$\mathbb{T} = (\Omega, \Phi, \phi_0, \Psi, \tau, {\cal W})$
+where
+$\Omega$ is an alphabet,
+$\Phi$ is a set of states,
+$\phi_0 \in \Phi$ is the start state,
+$\Psi \subseteq \Phi$ are the end states,
+$\tau \subseteq \Phi \times \gappedalphabet \times \gappedalphabet \times \Phi$ is the transition relation, and
+${\cal W}:\tau \to \Re$ is the transition weight function.
+
+A transition $(i,x,y,j)$ has source state $i$, input label $x$, output label $y$, and destination state $j$.
+For two sequences ${\cal X}, {\cal Y} \in \Omega^\ast$ define the Forward weight $\mathbb{T}_{\cal XY}$ to be the sum of weights of all paths from $\phi_0$ to any $\psi \in \Psi$
+such that the concatenated input and output labels  ${\cal X}$ and ${\cal Y}$, respectively, where the path weight is defined as the product of the path's transition weights.
+Two transducers $\mathbb{A}=(\Omega,\ldots), \mathbb{B}=(\Omega,\ldots)$ are considered equivalent if $\mathbb{A}_{\cal XY} = \mathbb{B}_{\cal XY}\ \forall\ {\cal X},{\cal Y} \in \Omega^\ast$.
+
+A transition is an ``input'' if its input label is not $\epsilon$, and ``null'' if both its input and output labels are $\epsilon$.
+The ``outgoing transitions'' of a state are all the finite-weight transitions whose source is that state.
+A state ``waits'' if all its outgoing transitions are inputs
+and ``continues'' if (i) it's not an end state and (ii) none of its outgoing transitions are inputs.
+A transducer is a ``waiting machine'' if all its states either wait or continue.
+Any transducer can be transformed into an equivalent waiting machine by adding states and null transitions to split any state that doesn't meet the requirement.
+
+A composition of two transducers $\mathbb{A},\mathbb{B}$ is a transducer $\mathbb{AB}$ representing the matrix product
+\[
+(\mathbb{AB})_{{\cal XZ}} = \sum_{{\cal Y} \in \Omega^\ast} \mathbb{A}_{\cal XY} \mathbb{B}_{\cal YZ} \ \forall\ {\cal X},{\cal Z} \in \Omega^\ast
+\]
+To establish the existence of at least one such transducer it's sufficient to consider the case where $\mathbb{B}$ is a waiting machine.
+Take the Cartesian product of $\mathbb{A}$'s and $\mathbb{B}$'s state spaces and synchronize transitions,
+so that $\mathbb{A}$'s output labels match $\mathbb{B}$'s input labels and $\mathbb{B}$ must be in a wait state before $\mathbb{A}$ can transition
+\[
+  {\cal W}_{\mathbb{AB}}((i,i'),x,z,(j,j')) = \left\{
+  \begin{array}{ll}
+    {\cal W}_{\mathbb{A}}(i,x,\epsilon,j) + \displaystyle \sum_{y \in \Omega} {\cal W}_{\mathbb{A}}(i,x,y,j) {\cal W}_{\mathbb{B}}(i',y,\epsilon,i') & \mbox{if $i'$ waits, $j' = i'$, and $z = \epsilon$} \\
+    \displaystyle \sum_{y \in \Omega} {\cal W}_{\mathbb{A}}(i,x,y,j) {\cal W}_{\mathbb{B}}(i',y,z,j') & \mbox{if $i'$ waits and $j' \neq i'$} \\
+    {\cal W}_{\mathbb{B}}(i',\epsilon,z,j') & \mbox{if $i'$ continues, $j = i$, and $x = \epsilon$} \\
+    0 & \mbox{otherwise}
+  \end{array} \right.
+\]
+
+\subsection{Moore machines}
+
+A transducer is a Moore machine if its state space can be partitioned into
+match, insert, delete, and null states $\{ \sigma_M, \sigma_I, \sigma_D, \sigma_N \}$
+such that for all transitions $(i,x,y,j)$ of finite weight, exactly one of the following is true
+\begin{eqnarray*}
+  j \in \sigma_M: & x \in \Omega, & y \in \Omega \\
+  j \in \sigma_I: & x = \epsilon, & y \in \Omega \\
+  j \in \sigma_D: & x \in \Omega, & y = \epsilon \\
+  j \in \sigma_N: & x = \epsilon, & y = \epsilon
+\end{eqnarray*}
+and further ${\cal W}(i,x,y,j) = U_{ij} E_j(x,y)$ where ${\bf U}$ is a transition matrix and $E_j$ an emission weight.
+
+Any transducer can be transformed into an equivalent Moore machine by adding states.
+
 \subsection{Expected transition count $T_{XY}$}
 
-Given a Markov chain with match, insert, delete, and null states $\{ \sigma_M = \{ 1 \}, \sigma_I, \sigma_D, \sigma_N \}$
+Given a Moore machine with exactly one match state $\sigma_M = \{ 1 \}$, which is also the start and sole end state,
 we seek $T_{XY}$, the expected number of times that the shortest closed walk from/to state 1,
 with its null states removed, includes a transition from $\sigma_X$ to $\sigma_Y$.
 
@@ -51,7 +109,7 @@ ${\bf J}^\notfrommatch$
   J^\notfrommatch_{ij} & = & \left\{ \begin{array}{ll} 1 & \mbox{if $i \notin \sigma_M$} \\ 0 & \mbox{if $i \in \sigma_M$} \end{array} \right.
 \end{eqnarray*}
 
-Let ${\bf U}$ be the transition matrix of the Markov chain.
+Let ${\bf U}$ be the transition matrix.
 Then
 
 \begin{eqnarray*}
@@ -70,6 +128,7 @@ T_{XY} & = &
 \end{eqnarray*}
 
 Here $\otimes$ is the elementwise product.
+
 
 
 \subsection{Rate of change $R_{XY}$ of expected transition count}
@@ -359,9 +418,11 @@ T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
   \mu \frac{(1-g) (b (1-r-h q)+c g q)}{(1-g y) (f (1-r)+h p)}
 \end{eqnarray*}
 
-The substitution matrix for the M state of the Pair HMM is
-the matrix exponential $\exp({\bf Q}t)$, for which a Pad\'{e} approximant
+The substitution matrix $E_M(x,y)$ for the match state is
+the matrix exponential $\exp({\bf Q}t)_{xy}$, for which a Pad\'{e} approximant
 or other power series expansion can be used in order to remain automatically differentiable under frameworks like PyTorch or Jax. % \cite{MolerVanLoan2003}
+For the insert states the emission weights are $E_I(\epsilon,y)=\pi_y$,
+and for the delete states $E_D(x,\epsilon)=1$.
 
 \subsection{TKF91 as exactly-solved special case of GGI model}
 
