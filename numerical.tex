@@ -138,7 +138,7 @@ Suppose that
 $\mathbb{Q}(\theta)$ is the generator for an indel process,
 $\mathbb{G}(\theta,\delta_t) = \mathbb{I} + \mathbb{Q}(\theta) \delta_t$ is the infinitesimal Pair HMM,
 $\mathbb{F}(t)$ the finite-time approximator,
-and $\mathbb{FG}$ the machine product of $\mathbb{F}$ and $\mathbb{G}$.
+and $\mathbb{FG}$ the composition of $\mathbb{F}$ and $\mathbb{G}$.
 
 Let ${\bf U}(\theta,t,\delta_t)$ be the transition matrix
 of the composite machine $\mathbb{FG}$
@@ -338,7 +338,7 @@ characters $\sim {\bf Q}$'s stationary distribution $\pi$).
 
 \includegraphics[width=\textwidth]{InstantHMM.pdf}
 
-At equilibrium, sequence length $\sim$ Geometric($\lambda/\mu$). Composition is $\pi$.
+At equilibrium, sequence length $\sim$ Geometric($\lambda/\mu$). Character frequencies $\pi$.
 
 If the model is required to be reversible then $\lambda y(1-x) = \mu x(1-y)$.
 
