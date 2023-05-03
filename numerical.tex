@@ -18,7 +18,7 @@
 
 \usepackage{natbib}
 
-\title{Evolutionary Pair HMM}
+\title{Evolutionary Transducer}
 \author{Ian Holmes}
 
 \begin{document}
@@ -143,9 +143,9 @@ Here $\otimes$ is the elementwise product.
 
 Suppose that
 $\mathbb{Q}(\theta)$ is the generator for an indel process,
-$\mathbb{G}(\theta,\delta_t) = \mathbb{I} + \mathbb{Q}(\theta) \delta_t$ is the infinitesimal Pair HMM,
+$\mathbb{G}(\theta,\delta_t) = \mathbb{I} + \mathbb{Q}(\theta) \delta_t$ is the infinitesimal transducer,
 $\mathbb{F}(t)$ the finite-time approximator,
-and $\mathbb{FG}$ the composition of $\mathbb{F}$ and $\mathbb{G}$.
+and $\mathbb{FG}$ the transitively-aligning composition of $\mathbb{F}$ and $\mathbb{G}$.
 
 Let ${\bf U}(\theta,t,\delta_t)$ be the transition matrix
 of the composite machine $\mathbb{FG}$
@@ -351,7 +351,7 @@ If the model is required to be reversible then $\lambda y(1-x) = \mu x(1-y)$.
 
 \subsection{Approximate time-dependent transducer $\mathbb{F}(t)$ for GGI model}
 
-A Pair HMM whose Forward likelihood approximates $P({\cal S}(t)|{\cal S}(0))$
+A transducer whose Forward likelihood approximates $P({\cal S}(t)|{\cal S}(0))$
 
 \includegraphics[width=\textwidth]{PairHMM.pdf}
 
