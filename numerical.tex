@@ -124,19 +124,19 @@ Then
 \begin{eqnarray*}
 T_{XY} & = &
 \left(
-\left( {\bf I} - {\bf J}^\nottomatch \otimes {\bf U} \right)^{-1}
+\left( {\bf I} - {\bf J}^\nottomatch \odot {\bf U} \right)^{-1}
 \left(
-     {\bf J}^\xtoy \otimes
+     {\bf J}^\xtoy \odot
      \left(
-     \left( {\bf I} - {\bf J}^\tonull \otimes {\bf U} \right)^{-1}
+     \left( {\bf I} - {\bf J}^\tonull \odot {\bf U} \right)^{-1}
           {\bf U}
      \right)
 \right)
-\left( {\bf I} - {\bf J}^\notfrommatch \otimes {\bf U} \right)^{-1}
+\left( {\bf I} - {\bf J}^\notfrommatch \odot {\bf U} \right)^{-1}
 \right)_{11}
 \end{eqnarray*}
 
-Here $\otimes$ is the elementwise product.
+Here $\odot$ is the elementwise product.
 
 
 
@@ -183,45 +183,45 @@ ${\bf U}_{\theta t}=\frac{\partial}{\partial \theta}  {\bf U}_t$.
 We can now expand the matrix inverses.
 In general, for $x \in \{ \nottomatch, \tonull, \notfrommatch \}$,
 \begin{eqnarray*}
-  \left( {\bf I} - {\bf J}^x \otimes {\bf U} \right)^{-1}
+  \left( {\bf I} - {\bf J}^x \odot {\bf U} \right)^{-1}
 %  & = &
-%  \left( {\bf I} - {\bf J}^x \otimes {\bf U}_0
-%  - {\bf J}^x \otimes {\bf U}_\theta \delta_\theta
-%  - {\bf J}^x \otimes {\bf U}_t \delta_t
-%  - {\bf J}^x \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
+%  \left( {\bf I} - {\bf J}^x \odot {\bf U}_0
+%  - {\bf J}^x \odot {\bf U}_\theta \delta_\theta
+%  - {\bf J}^x \odot {\bf U}_t \delta_t
+%  - {\bf J}^x \odot {\bf U}_{\theta t} \delta_\theta \delta_t
 %  + O(\delta_\theta^2) + O(\delta_t^2)
 %  \right)^{-1} \\
 %  & = &
 %  \left(
-%  \left( {\bf I} - {\bf J}^x \otimes {\bf U}_0 \right)
+%  \left( {\bf I} - {\bf J}^x \odot {\bf U}_0 \right)
 %  \left( {\bf I}
-%  - {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_\theta \delta_\theta
-%  + {\bf J}^x \otimes {\bf U}_t \delta_t
-%  + {\bf J}^x \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
+%  - {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_\theta \delta_\theta
+%  + {\bf J}^x \odot {\bf U}_t \delta_t
+%  + {\bf J}^x \odot {\bf U}_{\theta t} \delta_\theta \delta_t
 %  \right) \right)
 %  + O(\delta_\theta^2) + O(\delta_t^2)
 %  \right)^{-1} \\
 %  & = &
 %  \left(
 %  \left( {\bf I}
-%  + {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_\theta \delta_\theta
-%  + {\bf J}^x \otimes {\bf U}_t \delta_t
-%  + {\bf J}^x \otimes {\bf U}_{\theta t} \delta_\theta \delta_t
+%  + {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_\theta \delta_\theta
+%  + {\bf J}^x \odot {\bf U}_t \delta_t
+%  + {\bf J}^x \odot {\bf U}_{\theta t} \delta_\theta \delta_t
 %  \right)
 %  \right) \right)
 %  {\bf V}^x_0
 %  + O(\delta_\theta^2) + O(\delta_t^2) \\
 %  & = &
 %  {\bf V}^x_0
-%  + {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_\theta \right) {\bf V}^x_0 \delta_\theta
-%  + {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_t \right) {\bf V}^x_0 \delta_t
-%  + {\bf V}^x_0 \left( {\bf J}^x \otimes {\bf U}_{\theta t} \right) {\bf V}^x_0 \delta_\theta \delta_t
+%  + {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_\theta \right) {\bf V}^x_0 \delta_\theta
+%  + {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_t \right) {\bf V}^x_0 \delta_t
+%  + {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_{\theta t} \right) {\bf V}^x_0 \delta_\theta \delta_t
 %  + O(\delta_\theta^2) + O(\delta_t^2) \\
   & = & \vexpansion{x} + O(\delta_\theta^2) + O(\delta_t^2) \\
-{\bf V}^x_0 & = & ({\bf I} - {\bf J} \otimes {\bf U}_0)^{-1} \\
-{\bf V}^x_\theta & = & {\bf V}^x_0 \left( {\bf J} \otimes {\bf U}_\theta \right) {\bf V}^x_0 \\
-{\bf V}^x_t & = & {\bf V}^x_0 \left( {\bf J} \otimes {\bf U}_t \right) {\bf V}^x_0 \\
-{\bf V}^x_{\theta t} & = & {\bf V}^x_0 \left( {\bf J} \otimes {\bf U}_{\theta t} \right) {\bf V}^x_0
+{\bf V}^x_0 & = & ({\bf I} - {\bf J} \odot {\bf U}_0)^{-1} \\
+{\bf V}^x_\theta & = & {\bf V}^x_0 \left( {\bf J} \odot {\bf U}_\theta \right) {\bf V}^x_0 \\
+{\bf V}^x_t & = & {\bf V}^x_0 \left( {\bf J} \odot {\bf U}_t \right) {\bf V}^x_0 \\
+{\bf V}^x_{\theta t} & = & {\bf V}^x_0 \left( {\bf J} \odot {\bf U}_{\theta t} \right) {\bf V}^x_0
 \end{eqnarray*}
 
 Thus
@@ -231,7 +231,7 @@ T_{XY} & = &
 \left( \vexpansion\nottomatch \right)
 \right. \\ & & \quad \times
 \left(
-     {\bf J}^\xtoy \otimes
+     {\bf J}^\xtoy \odot
      \left( \left( \vexpansion\tonull \right)
      \left( \uexpansion \right) \right)
 \right)
@@ -243,7 +243,7 @@ T_{XY} & = &
 For convenience define
 \begin{eqnarray*}
 W_{a,b,c,d} & = &
-\left( {\bf V}^\nottomatch_a \left( {\bf J}^\xtoy \otimes \left( {\bf V}^\tonull_b {\bf U}_c \right) \right) {\bf V}^\notfrommatch_d \right)_{11}
+\left( {\bf V}^\nottomatch_a \left( {\bf J}^\xtoy \odot \left( {\bf V}^\tonull_b {\bf U}_c \right) \right) {\bf V}^\notfrommatch_d \right)_{11}
 \end{eqnarray*}
 Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see that
 
@@ -277,16 +277,16 @@ as for example in the GGI model below, where it is easier to solve ODEs for the 
 S_X & = &
 \left(
      \left(
-          {\bf J}^\tox \otimes
-          \left( {\bf I} - {\bf J}^\nottomatch \otimes {\bf U} \right)^{-1}
+          {\bf J}^\tox \odot
+          \left( {\bf I} - {\bf J}^\nottomatch \odot {\bf U} \right)^{-1}
      \right)
-\left( {\bf I} - {\bf J}^\notfrommatch \otimes {\bf U} \right)^{-1}
+\left( {\bf I} - {\bf J}^\notfrommatch \odot {\bf U} \right)^{-1}
 \right)_{11}
 \\
 & = &
 \left(
      \left(
-          {\bf J}^\tox \otimes
+          {\bf J}^\tox \odot
           \left( \vexpansion\nottomatch \right)
      \right)
 \left( \vexpansion\notfrommatch \right)
@@ -300,7 +300,7 @@ S_X & = &
   + W'_{\theta t,0} + W'_{0,\theta t}
 \\
 W'_{a,b} & = &
-\left( \left( {\bf J}^\tox \otimes {\bf V}^\nottomatch_a \right) {\bf V}^\notfrommatch_b \right)_{11}
+\left( \left( {\bf J}^\tox \odot {\bf V}^\nottomatch_a \right) {\bf V}^\notfrommatch_b \right)_{11}
 \end{eqnarray*}
 
 
