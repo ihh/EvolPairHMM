@@ -36,10 +36,12 @@ where
 $\Omega$ is an alphabet,
 $\Phi$ is a set of states,
 $\phi_0 \in \Phi$ is the start state,
-$\Psi \subseteq \Phi$ are the end states, and
-$\tau:\Phi \times \gappedalphabet \times \gappedalphabet \times \Phi \to \Re$ is the transition weight function ($\epsilon$ is the empty string).
+$\Psi \subseteq \Phi$ are the end states, 
+$\tau:\mathfrak{T} \to \Re$ is the transition weight function,
+$\mathfrak{T} = \Phi \times \gappedalphabet \times \gappedalphabet \times \Phi$ is the set of possible transitions,
+and $\epsilon$ is the empty string.
 
-A transition $(i,x,y,j)$ has source state $i$, input label $x$, output label $y$, and destination state $j$.
+A transition $(i,x,y,j) \in \mathfrak{T}$ has source and destination states $i,j$ and input and output labels $x,y$.
 For input and output sequences ${\cal X}, {\cal Y} \in \Omega^\ast$
 define the Forward\footnote{So-called because it can be computed by the Forward algorithm, after removing any null transition cycles.} weight
 $\mathbb{T}_{\cal XY}$ to be the sum of weights of all paths from $\phi_0$ to any $\psi \in \Psi$
