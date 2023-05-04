@@ -38,12 +38,12 @@ $\Phi$ is a set of states,
 $\phi_0 \in \Phi$ is the start state,
 $\Psi \subseteq \Phi$ are the end states, 
 $\tau:\mathfrak{T} \to \Re$ is the transition weight function,
-$\mathfrak{T} = \Phi \times \gappedalphabet \times \gappedalphabet \times \Phi$ is the set of possible transitions,
+$\mathfrak{T} = \Phi \times \gappedalphabet \times \gappedalphabet \times \Phi$ is the labeled transition relation,
 and $\epsilon$ is the empty string.
 
 A transition $(i,x,y,j) \in \mathfrak{T}$ has source and destination states $i,j$ and input and output labels $x,y$.
 For input and output sequences ${\cal X}, {\cal Y} \in \Omega^\ast$
-define the Forward\footnote{So-called because it can be computed by the Forward algorithm, after removing any null transition cycles.} weight
+define the Forward\footnote{So-called because it can be computed by the Forward algorithm, after marginalizing any null transition cycles.} weight
 $\mathbb{T}_{\cal XY}$ to be the sum of weights of all paths from $\phi_0$ to any $\psi \in \Psi$
 such that the concatenated input and output labels are, respectively, ${\cal X}$ and ${\cal Y}$, where the weight of a path is defined as the product of its transition weights.
 Two transducers are considered equivalent if their Forward weights are equal for all input and output sequences.
@@ -145,7 +145,7 @@ Here $\otimes$ is the elementwise product.
 Suppose that
 $\mathbb{Q}(\theta)$ is the generator for an indel process,
 $\mathbb{G}(\theta,\delta_t) = \mathbb{I} + \mathbb{Q}(\theta) \delta_t$ is the infinitesimal transducer,
-$\mathbb{F}(t)$ the finite-time approximator,
+$\mathbb{F}(t)$ the finite-time approximator\footnote{Alternatively, $\mathbb{F}$ can be an HMM whose output approximates the equilibrium distribution of $\mathbb{Q}$ as $t \to \infty$.},
 and $\mathbb{FG}$ the transitively-aligning composition of $\mathbb{F}$ and $\mathbb{G}$.
 
 Let ${\bf U}(\theta,t,\delta_t)$ be the transition matrix
