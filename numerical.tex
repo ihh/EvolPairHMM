@@ -95,7 +95,7 @@ Any transducer can be transformed into an equivalent state-based emitter by addi
 \subsection{Expected transition count $T_{XY}$}
 
 Given a conditionally-normalized\footnote{Meaning the Forward weight is a probability whose sum over output sequences, for any given input sequence, is 1.}
-state-based emitter with exactly one match state $\sigma_M = \{ 1 \}$, which is also the start and sole end state,
+state-based emitter with exactly one match state $\sigma_M = \{ 1 \}$,
 we seek $T_{XY}$, the expected number of times that the shortest closed walk from/to state 1,
 with its null states removed, includes a transition from $\sigma_X$ to $\sigma_Y$.
 
@@ -348,17 +348,24 @@ and
 insertions (rate $\lambda$, extension $x$,
 characters $\sim {\bf Q}$'s stationary distribution $\pi$).
 
-\includegraphics[width=\textwidth]{InstantHMM.pdf}
-
 At equilibrium, sequence length $\sim$ Geometric($\lambda/\mu$). Character frequencies $\pi$.
 
 If the model is required to be reversible then $\lambda y(1-x) = \mu x(1-y)$.
+
+\includegraphics[width=\textwidth]{InstantHMM.pdf}
+
+To calculate gap length distributions inside the sequence, it's convenient to ignore end effects,
+assuming instead that the sequence is infinitely long.
+We can then dispense with start and end states, as shown in the figure on the left.
+(For finite-length sequences, we could use the version on the right.)
 
 \subsection{Approximate finite-time transducer $\mathbb{F}$ for GGI model}
 
 A transducer whose Forward likelihood approximates $P({\cal S}(t)|{\cal S}(0))$
 
 \includegraphics[width=\textwidth]{PairHMM.pdf}
+
+Again, the version on the left is for infinite sequences; on the right, finite sequences.
 
 At $t=0$: $a(0)=1$, $f(0)=1-x$, $g(0)=x$, $p(0)=1-y$, $r(0)=y$, and $b(0)=c(0)=h(0)=q(0)=0$.
 
