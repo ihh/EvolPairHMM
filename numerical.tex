@@ -144,8 +144,8 @@ Here $\odot$ is the elementwise product.
 \subsection{Rate of change $R_{XY}$ of expected transition count}
 
 Suppose that
-$\mathbb{Q}(\theta)$ is the generator for an indel process,
-$\mathbb{G}(\theta,\delta_t) = \mathbb{I} + \mathbb{Q}(\theta) \delta_t$ is the infinitesimal transducer,
+$\mathbb{Q}$ is the generator for an indel process,
+$\mathbb{G}(\delta_t) = \mathbb{I} + \mathbb{Q} \delta_t$ is the infinitesimal transducer,
 $\mathbb{F}(t)$ the finite-time approximator\footnote{Alternatively, $\mathbb{F}$ can be an HMM whose output approximates the equilibrium distribution of $\mathbb{Q}$ as $t \to \infty$.},
 and $\mathbb{FG}$ the transitively-aligning composition of $\mathbb{F}$ and $\mathbb{G}$.
 
@@ -262,8 +262,8 @@ Examining the coefficients of $\delta_t$ and $\delta_\theta \delta_t$, we see th
 \end{eqnarray*}
 
 This first-order expansion allows us to ``differentiate through'' the matrix inverse.
-These equations remain valid if the parameter $\theta$, with respect to which we are differentiating, is itself one of the $T_{XY}$
-(since these are parameters of $\mathbb{F}(t)$ and hence of ${\bf U}$).
+%These equations remain valid if the parameter $\theta$, with respect to which we are differentiating, is itself one of the $T_{XY}$
+%(since these are parameters of $\mathbb{F}$ and hence of ${\bf U}$).
 
 \subsection{Expected state count $S_X$}
 
@@ -307,8 +307,11 @@ W'_{a,b} & = &
 
 \subsection{Runge-Kutta recursions for $T_{XY}$ and derivatives}
 
-Let $\Theta$ denote the parameters of $\mathbb{G}(\delta_t)$
-while ${\bf T}(t)$, including all the $T_{XY}(t)$, parameterizes $\mathbb{F}(t)$.
+Let ${\bf R} \equiv {\bf R}(\Theta,{\bf T})$,
+where $\mathbb{G} \equiv \mathbb{G}(\Theta,\delta_t)$
+and $\mathbb{F} \equiv \mathbb{F}({\bf T},t)$.
+
+${\bf R}$ includes all the $R_{XY}$, as ${\bf T}$ includes the $T_{XY}$, and $\Theta$ the infinitesimal model parameters.
 
 We want to use the Runge-Kutta method (RK4) to numerically estimate $T_{XY}$ at timepoints $(t_0=0, t_1, t_2 \ldots)$.
 Let $\Delta_n = t_{n+1}-t_n$.
@@ -336,7 +339,7 @@ For any parameter $\theta \in \Theta$ we can use the chain rule to find the deri
   \ptheta {\bf K}^{(n,4)} & = & \allpartialsk{{\bf R}\left(\Theta,{\bf T}^{(n)} + \Delta_n {\bf K}^{(n,3)}\right)}{\Delta_n}{3}
 \end{eqnarray*}
 
-\subsection{Generator $\mathbb{G}(\delta_t)$ for General Geometric Indel model (GGI)}
+\subsection{Infinitesimal transducer $\mathbb{G}$ for General Geometric Indel model (GGI)}
 
 A sequence ${\cal S}(t)$ evolves by
 substitutions (rate matrix ${\bf Q}$),
@@ -351,7 +354,7 @@ At equilibrium, sequence length $\sim$ Geometric($\lambda/\mu$). Character frequ
 
 If the model is required to be reversible then $\lambda y(1-x) = \mu x(1-y)$.
 
-\subsection{Approximate time-dependent transducer $\mathbb{F}(t)$ for GGI model}
+\subsection{Approximate finite-time transducer $\mathbb{F}$ for GGI model}
 
 A transducer whose Forward likelihood approximates $P({\cal S}(t)|{\cal S}(0))$
 
