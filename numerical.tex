@@ -503,8 +503,33 @@ C(i,j,k,t) & = &
 \left( b(j-k)(rfk + hp(i-k)) + c(i-k)(gpk + qf(j-k)) \right)
 \end{eqnarray*}
 
-% The unobserved index $k$ counts zig-zags on the Pair HMM state path
+% The unobserved index $k$ counts "unnecessary" zig-zags on the Pair HMM state path
 % ($D \to I \to D$ or $I \to D \to I$).
+
+% With i D's, and j I's,
+% and an initial transition M->I (b) and return I->M (f),
+% you can have at most min(i,j-1) zigzags
+% There are (j-1 choose k) ways of picking the k I's before which each crossover takes place
+% There are (i-1 choose k-1) ways of picking the k-1 D's before which each return (except the last one) takes place
+% 
+% With i D's, and j I's,
+% and an initial transition M->I (b) and return D->M (p),
+% you can have at most min(i-1,j-1) zigzags
+% There are (j-1 choose k) ways of picking the k I's before which each crossover takes place
+% There are (i-1 choose k) ways of picking the k D's before which each return takes place
+% 
+% With i D's, and j I's,
+% and an initial transition M->D (c) and return I->M (f),
+% you can have at most min(i-1,j-1) zigzags
+% There are (i-1 choose k) ways of picking the k D's before which each crossover takes place
+% There are (j-1 choose k) ways of picking the k I's before which each return takes place
+% 
+% With i D's, and j I's,
+% and an initial transition M->D (c) and return D->M (p),
+% you can have at most min(i-1,j) zigzags
+% There are (i-1 choose k) ways of picking the k D's before which each crossover takes place
+% There are (j-1 choose k-1) ways of picking the k-1 I's before which each return (except the last one) takes place
+
 
 \subsection{Phylogenetic alignment under GGI model}
 
