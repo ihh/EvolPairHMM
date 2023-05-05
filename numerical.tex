@@ -483,24 +483,26 @@ there were $i$ characters deleted from ${\cal S}(0)$
 and $j$ characters inserted into ${\cal S}(t)$,
 with no homology
 \begin{eqnarray*}
-\lefteqn{G(i,j,t) =} \\
-& &
+G(i,j,t) & = &
 \left\{ \begin{array}{ll}
 a & i=j=0 \\
 cr^{i-1}p & i>0, j=0 \\
 bg^{j-1}f & i=0, j>0 \\
 \displaystyle
 g^{j-1} r^{i-1}
-\sum_{k=0}^{\min(i,j)-1}
-\left(\frac{hq}{gr}\right)^k
-\left[
-\binom{i}{k} \binom{j-1}{k} brf
-+ \binom{i-1}{k} \binom{j-1}{k} (bhp+cqf)
-+ \binom{i-1}{k} \binom{j}{k} cgp
-\right]
+\left(
+bhp + cqf +
+\sum_{k=1}^{\min(i,j)} C(i,j,k,t)
+\right)
 & i>0, j>0
 \end{array} \right.
+\\
+C(i,j,k,t) & = &
+\left( \frac{hq}{gr} \right)^k
+\binom{i-1}{k-1} \binom{j-1}{k-1} \frac{1}{k^2}
+\left( b(j-k)(rfk + hp(i-k)) + c(i-k)(gpk + qf(j-k)) \right)
 \end{eqnarray*}
+
 % The unobserved index $k$ counts zig-zags on the Pair HMM state path
 % ($D \to I \to D$ or $I \to D \to I$).
 
