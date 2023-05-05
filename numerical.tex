@@ -50,8 +50,8 @@ Two transducers are considered equivalent if their Forward weights are equal for
 
 A transition is an ``input'' if its input label is not $\epsilon$, and ``null'' if both its input and output labels are $\epsilon$.
 The ``outgoing transitions'' of a state are all the finite-weight transitions whose source is that state.
-A state ``waits'' if all its outgoing transitions are inputs
-and ``continues'' if (i) it's not an end state and (ii) none of its outgoing transitions are inputs.
+A state ``waits'' if all its outgoing transitions (if there are any) are inputs,
+and ``continues'' if (i) it has at least one outgoing transition and (ii) none of its outgoing transitions are inputs.
 A transducer is a ``waiting machine'' if all its states either wait or continue.
 Any transducer can be transformed into an equivalent waiting machine by adding an extra state and null transition to split any state
 that doesn't meet the requirement.
@@ -74,8 +74,8 @@ so that $\mathbb{A}$'s output labels match $\mathbb{B}$'s input labels and $\mat
 \]
 Note this composition preserves alignment transitivity: characters that are aligned\footnote{In the sense of being associated with the same transition, on a given state path.}
 through both $\mathbb{A}$ and $\mathbb{B}$ are aligned by $\mathbb{AB}$ with the same weight.
-We will require this to be true of all transducer compositions we consider,
-since it's crucial to how we map transitions from composite machines back to simpler machines.
+We will require this to be true of all transducer compositions we consider:
+it's how we map transitions from composite machines to simpler machines.
 
 \subsection{State-based emissions}
 
@@ -267,12 +267,12 @@ This first-order expansion allows us to ``differentiate through'' the matrix inv
 
 \subsection{Expected state count $S_X$}
 
-We will also need $S_X$, the expected number of $\sigma_X$-states entered by the walk.
+In order to parameterize $\mathbb{F}$ using $\{ T_{XY} \}$, we need to normalize by $S_X$, the expected number of $\sigma_X$-states entered by the walk.
 Note that $S_x = \sum_{y \in \{M,I,D\}} T_{xy}  = \sum_{y \in \{M,I,D\}} T_{yx}$
 and $S_M = 1$.
 Thus if we have all the $\{ T_{XY} \}$ then we can trivially find the $\{ S_X \}$.
-However, sometimes it will be useful to compute the $S_X$ independently,
-as for example in the GGI model below, where it is easier to solve ODEs for the $S_X$ than the $T_{XY}$.
+
+Sometimes it may be useful to compute the $S_X$ separately:
 
 \begin{eqnarray*}
 S_X & = &
@@ -293,16 +293,20 @@ S_X & = &
 \left( \vexpansion\notfrommatch \right)
 \right)_{11}  + O(\delta_\theta^2) + O(\delta_t^2)
   \\
-  \frac{\partial}{\partial t} S_X & = &
+\frac{\partial}{\partial t} S_X & = &
   W'_{t,0} + W'_{0,t}
   \\
-  \frac{\partial^2}{\partial \theta \partial t} S_X & = &
+\frac{\partial^2}{\partial \theta \partial t} S_X & = &
   W'_{t,\theta} + W'_{\theta,t}
   + W'_{\theta t,0} + W'_{0,\theta t}
 \\
 W'_{a,b} & = &
 \left( \left( {\bf J}^\tox \odot {\bf V}^\nottomatch_a \right) {\bf V}^\notfrommatch_b \right)_{11}
 \end{eqnarray*}
+
+The approach in \cite{Holmes2020} (following \cite{DeMaio2020}) is to find $S_X$ for the transition matrix of $\mathbb{F}$ using
+the first of the above equations, then to express $\frac{\partial}{\partial t} S_X = \sum_y R_{YX}$
+in terms of this, obtaining a solvable ODE for $S_X$.
 
 
 \subsection{Runge-Kutta recursions for $T_{XY}$ and derivatives}
