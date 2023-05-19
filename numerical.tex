@@ -219,10 +219,10 @@ In general, for $x \in \{ \nottomatch, \tonull, \notfrommatch \}$,
 %  + {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_{\theta t} \right) {\bf V}^x_0 \delta_\theta \delta_t
 %  + O(\delta_\theta^2) + O(\delta_t^2) \\
   & = & \vexpansion{x} + O(\delta_\theta^2) + O(\delta_t^2) \\
-{\bf V}^x_0 & = & ({\bf I} - {\bf J} \odot {\bf U}_0)^{-1} \\
-{\bf V}^x_\theta & = & {\bf V}^x_0 \left( {\bf J} \odot {\bf U}_\theta \right) {\bf V}^x_0 \\
-{\bf V}^x_t & = & {\bf V}^x_0 \left( {\bf J} \odot {\bf U}_t \right) {\bf V}^x_0 \\
-{\bf V}^x_{\theta t} & = & {\bf V}^x_0 \left( {\bf J} \odot {\bf U}_{\theta t} \right) {\bf V}^x_0
+{\bf V}^x_0 & = & ({\bf I} - {\bf J}^x \odot {\bf U}_0)^{-1} \\
+{\bf V}^x_\theta & = & {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_\theta \right) {\bf V}^x_0 \\
+{\bf V}^x_t & = & {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_t \right) {\bf V}^x_0 \\
+{\bf V}^x_{\theta t} & = & {\bf V}^x_0 \left( {\bf J}^x \odot {\bf U}_{\theta t} \right) {\bf V}^x_0
 \end{eqnarray*}
 
 Thus
