@@ -317,9 +317,10 @@ and $\mathbb{F} \equiv \mathbb{F}({\bf T},t)$.
 
 ${\bf R}$ includes all the $R_{XY}$, as ${\bf T}$ includes the $T_{XY}$, and $\Theta$ the infinitesimal model parameters.
 
-We want to use the Runge-Kutta method (RK4) to numerically estimate $T_{XY}$ at timepoints $(t_0=0, t_1, t_2 \ldots)$.
+We use the Runge-Kutta method (RK4) to numerically integrate $\dot{\bf T}={\bf R}$
+so as to estimate $T_{XY}(t)$ at timepoints $(t_0=0, t_1, t_2 \ldots)$.
 Let $\Delta_n = t_{n+1}-t_n$.
-Applying the RK4 method gives
+Applying RK4 gives
 
 \begin{eqnarray*}
   {\bf T}^{(n+1)} & = & {\bf T}^{(n)} + \frac{\Delta_n}{6} \left( {\bf K}^{(n,1)} + 2{\bf K}^{(n,2)} + 2{\bf K}^{(n,3)} + {\bf K}^{(n,4)} \right) \\
