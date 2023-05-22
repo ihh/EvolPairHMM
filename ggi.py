@@ -205,6 +205,19 @@ def Ftransitions_3x3 (t: Float,
   t1 = sol.ts[-1]
   return Ftransitions_from_counts_3x3 (t1, T1, params)
 
+# TKF91 special case
+def Ftransitions_TKF91 (t: Float,
+                        lam: Float,
+                        mu: Float):
+  elt = jnp.exp (-lam*t)
+  emt = jnp.exp (-mu*t)
+  a = emt
+  b = lam * (elt - emt) / (mu*elt - lam*emt)
+  g = 1 - mu*b/(lam*(1-a))
+  return jnp.array([[(1-b)*a,b,(1-b)*(1-a)],
+                    [(1-b)*a,b,(1-b)*(1-a)],
+                    [(1-g)*a,g,(1-g)*(1-a)]])
+
 # Substitution matrix code
 def get_eqm (submat):
   large_t = 1 / jnp.min(jnp.abs(submat)[jnp.nonzero(submat)])
