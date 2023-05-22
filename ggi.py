@@ -13,7 +13,7 @@ import jax
 import jax.numpy as jnp
 
 from jax import grad, vmap
-from jax.scipy.special import logsumexp
+from jax.scipy.special import logsumexp, gammaln
 from jax.scipy.linalg import expm
 
 from functools import partial
@@ -424,6 +424,51 @@ def forward_inefficient (x, y, transmat, submat, pi):
 
 forward_inefficient_wrap = forward_wrap (forward_inefficient)
 forward_inefficient_wrap_grad = grad (forward_inefficient_wrap, [2,3,4])
+
+# Binomial coefficient using gamma functions
+def log_binom (x: Float, y: Float):
+  return gammaln(x+1) - gammaln(y+1) - gammaln(x-y+1)
+
+# Returns the (log) of the probability of seeing a particular size of gap
+def gap_prob (nDeletions, nInsertions, transmat):
+  [[a,b,c],[f,g,h],[p,q,r]] = transmat
+  log = jnp.log
+  def logaccum_Ck (k : int, logsum: float):
+    logbinom = log_binom(nDeletions-1,k-1) + log_binom(nInsertions-1,k-1)
+    logCk = k * log(h*q/(g*r)) + logbinom - 2*log(k) + log(b*(nInsertions-k)*(r*f*k + h*p*(nDeletions-k) + c*(nDeletions-k)*(g*p*k + q*f*(nInsertions-k))))
+    return logsumexp (jnp.array([logsum, logCk]))
+  return jnp.where (nDeletions == 0,
+                    jnp.where (nInsertions == 0,
+                               log(a),
+                               log(b) + (nInsertions - 1)*log(g) + log(f)),
+                    jnp.where (nInsertions == 0,
+                               log(c) + (nDeletions - 1)*log(r) + log(p),
+                               (nDeletions - 1)*log(g) + (nInsertions-1)*log(r)
+                               + jax.lax.fori_loop (1,
+                                                    1 + jnp.minimum(nDeletions,nInsertions),
+                                                    logaccum_Ck,
+                                                    logsumexp (jnp.array([log(b) + log(h) + log(p),
+                                                                          log(c) + log(q) + log(f)])))))
+
+# Impure reference implementation using Forward algorithm
+def gap_prob_impure_dp (nDeletions, nInsertions, transmat):
+  [[a,b,c],[f,g,h],[p,q,r]] = jnp.log (transmat)
+  xs, ys = nDeletions + 1, nInsertions + 1
+  F = np.full ((xs, ys, 3), -np.Infinity)
+  F[0,0,0] = 0
+  for i in range(xs):
+    for j in range(ys):
+      if (j > 0):
+        F[i,j,1] = logsumexp (jnp.array ([F[i,j-1,0] + b,
+                                          F[i,j-1,1] + g,
+                                          F[i,j-1,2] + q]))
+      if (i > 0):
+        F[i,j,2] = logsumexp (jnp.array ([F[i-1,j,0] + c,
+                                          F[i-1,j,1] + h,
+                                          F[i-1,j,2] + r]))
+  return logsumexp (jnp.array ([F[xs-1,ys-1,0] + a,
+                     F[xs-1,ys-1,1] + f,
+                     F[xs-1,ys-1,2] + p]))
 
 # Commented out IPython magic to ensure Python compatibility.
 dna = "acgt"
