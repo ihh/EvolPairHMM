@@ -307,12 +307,16 @@ def forward_impure (x, y, transmat, submat, pi):
                      F[xs-1,ys-1,1] + logsumexp(jnp.array ([f,h])),
                      F[xs-1,ys-1,2] + logsumexp(jnp.array ([p,r]))]))
 
+def calc_transmat_submat_pi (t, indelParams, substRateMatrix):
+  transmat = Ftransitions (t, indelParams)
+  Q = normalize_rate_matrix (substRateMatrix)
+  pi = get_eqm (Q)
+  submat = expm (Q * t)
+  return transmat, submat, pi
+
 def forward_wrap (forwardFunc):
   def wrapped (x, y, t, indelParams, substRateMatrix):
-    transmat = Ftransitions (t, indelParams)
-    Q = normalize_rate_matrix (substRateMatrix)
-    pi = get_eqm (Q)
-    submat = expm (Q * t)
+    transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix)
     return forwardFunc (x, y, transmat, submat, pi)
   return wrapped
 
@@ -469,6 +473,49 @@ def gap_prob_impure_dp (nDeletions, nInsertions, transmat):
   return logsumexp (jnp.array ([F[xs-1,ys-1,0] + a,
                      F[xs-1,ys-1,1] + f,
                      F[xs-1,ys-1,2] + p]))
+
+def is_gap (c):
+  return c == '.' or c == '-'
+
+def summarize_alignment (xstr, ystr, alph):
+  if len(xstr) != len(ystr):
+    raise Exception ("Alignment strings must have same length")
+  ni = nd = 0
+  subCount = {}
+  gapCount = {}
+  def inc (dict, x, y):
+    if x >= 0 and y >= 0:
+      key = str(x) + " " + str(y)
+      dict[key] = dict[key] + 1 if key in dict else 1
+  def dict2array (dict):
+    return jnp.array ([[int(s) for s in key.split()] + [dict[key]] for key in dict.keys()])
+  for i in range(len(xstr)):
+    xc,yc = xstr[i], ystr[i]
+    if not is_gap(xc) and not is_gap(yc):
+      inc (subCount, alph.index(xc), alph.index(yc))
+      inc (gapCount, nd, ni)
+      ni = nd = 0
+    else:
+      if not is_gap(xc):
+        nd = nd + 1
+      if not is_gap(yc):
+        ni = ni + 1
+  inc (gapCount, nd, ni)
+  return dict2array(subCount), dict2array(gapCount)
+
+def alignment_likelihood (alignmentSummary, t, indelParams, substRateMatrix):
+  subCounts, gapCounts = alignmentSummary
+  transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix)
+  def sub_loglike (x_y_count):
+    x, y, count = x_y_count
+    return count * (jnp.log(submat[x][y]) - jnp.log(pi[y]))
+  def gap_loglike (i_j_count):
+    i, j, count = i_j_count
+    return count * gap_prob (i, j, transmat)
+  print(subCounts)
+  print(gapCounts)
+  return jnp.sum (jnp.concatenate (jnp.array ([vmap(sub_loglike)(subCounts),
+                                               vmap(gap_loglike)(gapCounts)])))
 
 # Commented out IPython magic to ensure Python compatibility.
 dna = "acgt"
