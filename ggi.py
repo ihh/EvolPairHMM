@@ -512,10 +512,9 @@ def alignment_likelihood (alignmentSummary, t, indelParams, substRateMatrix):
   def gap_loglike (i_j_count):
     i, j, count = i_j_count
     return count * gap_prob (i, j, transmat)
-  print(subCounts)
-  print(gapCounts)
-  return jnp.sum (jnp.concatenate (jnp.array ([vmap(sub_loglike)(subCounts),
-                                               vmap(gap_loglike)(gapCounts)])))
+#  print(subCounts)
+#  print(gapCounts)
+  return jnp.sum (vmap(sub_loglike)(subCounts)) + jnp.sum (vmap(gap_loglike)(gapCounts))
 
 # Commented out IPython magic to ensure Python compatibility.
 dna = "acgt"
