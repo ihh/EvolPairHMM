@@ -573,8 +573,10 @@ def simulate (rngSeed, len, t, indelParams, substRateMatrix):
   return align
 
 def simulated_alignment_str (align, alph):
-  return [''.join(['-' if col[i]==None else alph[col[i]] for col in align]) for i in [0,1]]
-
+  rows = [[col[row] for col in align] for row in [0,1]]
+  ungapped = [filter(lambda col:col!=None,row) for row in rows]
+  row2str = lambda row: ''.join(['-' if col==None else alph[col] for col in row])
+  return row2str(ungapped[0]), row2str(ungapped[1]), [row2str(row) for row in rows]
 
 # Commented out IPython magic to ensure Python compatibility.
 dna = "acgt"
