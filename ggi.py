@@ -243,6 +243,10 @@ def onehot(str,alph):
   char2onehot = {alph[i]: [1. if j==i else 0. for j in R] for i in R}
   return jnp.array ([char2onehot[c] for c in list(str)])
 
+# null model sequence probability
+def null_model_prob (seq_1hot, pi):
+  return jnp.sum (jnp.dot (seq_1hot, jnp.log(pi)))
+
 # impure (but legible) reference implementation of Forward algorithm
 # x is the ancestor, its index is i
 # y is the descendant, its index is j
