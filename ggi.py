@@ -516,6 +516,66 @@ def alignment_likelihood (alignmentSummary, t, indelParams, substRateMatrix):
 #  print(gapCounts)
   return jnp.sum (vmap(sub_loglike)(subCounts)) + jnp.sum (vmap(gap_loglike)(gapCounts))
 
+# workaround for lack of geometric distribution in older jax.random
+def geometric (prng, p):
+  return int(jnp.ceil(jnp.log(jax.random.uniform(prng)) / jnp.log1p(-p)))
+
+# this is a weird mix of jax, numpy, and basic Python because I gave up on making it differentiable halfway through writing it :-\
+def simulate (rngSeed, len, t, indelParams, substRateMatrix):
+  Q = normalize_rate_matrix (substRateMatrix)
+  log_pi = jnp.log (get_eqm (Q))
+  log_submat = jnp.log (expm (Q * t))
+  lam,mu,x,y = indelParams
+  ancKey,desKey,rngKey = jax.random.split (jax.random.PRNGKey (rngSeed), num=3)
+  anc = jax.random.categorical (ancKey, log_pi, shape=(len,))
+  des = jax.random.categorical (desKey, vmap(lambda i:log_submat[i,:])(anc))
+  ancPos = jnp.arange (des.shape[0])
+  seq = jnp.array([des,ancPos]).transpose()
+  while t > 0:
+    timeKey, posKey, lenKey, insKey, nextKey = jax.random.split (rngKey, num=5)
+    seqLen = seq.shape[0]
+    totalInsRate = (seqLen+1) * lam
+    totalDelRate = seqLen * mu
+    totalRate = totalInsRate + totalDelRate
+    posRand = jax.random.uniform (posKey) * totalRate
+    isInsert = posRand < totalInsRate
+    pos = int (jnp.floor (jnp.where (isInsert,
+                                     posRand / lam,
+                                     (posRand - totalInsRate) / mu)))
+    evtLen = 1 + geometric (lenKey, 1 - jnp.where(isInsert,x,y))
+    insProbs = np.full((evtLen,log_pi.shape[0]),log_pi)
+    insertSeq = jax.random.categorical (insKey, jnp.array(insProbs))
+    insertPos = np.full (evtLen, -1)
+    insertion = jnp.array([insertSeq,insertPos]).transpose()
+    t = t - jax.random.exponential(timeKey) / totalRate
+    if t > 0:
+      if isInsert:
+        seq = jnp.insert(seq,pos,insertion,0)
+#        print("inserting ",insertSeq," before position ",pos)
+      else:
+        seq = jnp.delete(seq,slice(pos,pos+jnp.minimum(seqLen,evtLen)),0)
+#        print("deleting ",evtLen," from position ",pos)
+    rngKey = nextKey
+  nextAncPos = 0
+  align = []
+  for pos in range(seq.shape[0]):
+    if seq[pos][1] >= 0:
+      while nextAncPos < seq[pos][1]:
+        align = align + [(int(anc[nextAncPos]),None)]
+        nextAncPos = nextAncPos + 1
+      align = align + [(int(anc[nextAncPos]),int(seq[pos][0]))]
+      nextAncPos = nextAncPos + 1
+    else:
+      align = align + [(None,int(seq[pos][0]))]
+  while nextAncPos < anc.shape[0]:
+    align = align + [(int(anc[nextAncPos]),None)]
+    nextAncPos = nextAncPos + 1
+  return align
+
+def simulated_alignment_str (align, alph):
+  return [''.join(['-' if col[i]==None else alph[col[i]] for col in align]) for i in [0,1]]
+
+
 # Commented out IPython magic to ensure Python compatibility.
 dna = "acgt"
 xstr = "aacg"
