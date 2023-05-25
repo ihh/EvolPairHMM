@@ -25,6 +25,10 @@ from jaxtyping import Array, Float, PyTree
 !pip install diffrax
 from diffrax import diffeqsolve, ODETerm, Dopri5, PIDController, SaveAt
 
+!pip install jaxopt
+from jaxopt import ProjectedGradient
+from jaxopt.projection import projection_non_negative
+
 # helper to calculate SI and SD
 def SID (t: Float,
          eventRate: Float,
@@ -218,9 +222,8 @@ def Ftransitions_TKF91 (t: Float,
                     [(1-b)*a,b,(1-b)*(1-a)],
                     [(1-g)*a,g,(1-g)*(1-a)]])
 
-# Substitution matrix code
 def get_eqm (submat):
-  large_t = 1 / jnp.min(jnp.abs(submat)[jnp.nonzero(submat)])
+  large_t = 1 / jnp.min(jnp.abs(submat)[jnp.nonzero(submat,size=1)])
   return jnp.matmul (expm (submat * large_t), jnp.ones (submat.shape[0]))
 
 def normalize_rate_matrix(mx):
@@ -234,7 +237,6 @@ def hky85 (eqm, ti, tv):
   raw = [[eqm[j] * (ti if i & 1 == j & 1 else tv) for j in idx] for i in idx]
   return normalize_rate_matrix (jnp.array (raw))
 
-# Sequence featurization
 def dsq(str,alph):
   return jnp.array ([alph.index(c) for c in list(str)])
 
@@ -242,10 +244,6 @@ def onehot(str,alph):
   R = range(len(alph))
   char2onehot = {alph[i]: [1. if j==i else 0. for j in R] for i in R}
   return jnp.array ([char2onehot[c] for c in list(str)])
-
-# null model sequence probability
-def null_model_prob (seq_1hot, pi):
-  return jnp.sum (jnp.dot (seq_1hot, jnp.log(pi)))
 
 # impure (but legible) reference implementation of Forward algorithm
 # x is the ancestor, its index is i
@@ -278,6 +276,16 @@ def forward_impure_1hot (x, y, transmat, submat, pi):
   return logsumexp (jnp.array ([F[xs-1,ys-1,0] + logsumexp(jnp.array ([a,c])),
                      F[xs-1,ys-1,1] + logsumexp(jnp.array ([f,h])),
                      F[xs-1,ys-1,2] + logsumexp(jnp.array ([p,r]))]))
+
+# null model sequence (log) probability
+def null_model_prob_1hot (seq_1hot, pi):
+  return jnp.sum (jnp.dot (seq_1hot, jnp.log(pi)))
+
+def null_model_prob (dsq, pi):
+  return null_model_prob (jax.nn.one_hot(dsq, pi.shape[0]), pi)
+
+def dummy_null_model (seq, pi):
+  return 0.
 
 # impure (but legible) reference implementation of Forward algorithm
 # x is the ancestor, its index is i
@@ -319,9 +327,9 @@ def calc_transmat_submat_pi (t, indelParams, substRateMatrix):
   return transmat, submat, pi
 
 def forward_wrap (forwardFunc):
-  def wrapped (x, y, t, indelParams, substRateMatrix):
+  def wrapped (x, y, t, indelParams, substRateMatrix, null=dummy_null_model):
     transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix)
-    return forwardFunc (x, y, transmat, submat, pi)
+    return forwardFunc (x, y, transmat, submat, pi) + null(x,pi) + null(y,pi)
   return wrapped
 
 forward_impure_wrap = forward_wrap (forward_impure)
@@ -437,14 +445,13 @@ forward_inefficient_wrap_grad = grad (forward_inefficient_wrap, [2,3,4])
 def log_binom (x: Float, y: Float):
   return gammaln(x+1) - gammaln(y+1) - gammaln(x-y+1)
 
-# Returns the (log) of the probability of seeing a particular size of gap
+# Returns the (log of the) probability of seeing a particular size of gap
 def gap_prob (nDeletions, nInsertions, transmat):
   [[a,b,c],[f,g,h],[p,q,r]] = transmat
   log = jnp.log
-  def logaccum_Ck (k : int, logsum: float):
+  def Ck (k : int):
     logbinom = log_binom(nDeletions-1,k-1) + log_binom(nInsertions-1,k-1)
-    logCk = k * log(h*q/(g*r)) + logbinom - 2*log(k) + log(b*(nInsertions-k)*(r*f*k + h*p*(nDeletions-k) + c*(nDeletions-k)*(g*p*k + q*f*(nInsertions-k))))
-    return logsumexp (jnp.array([logsum, logCk]))
+    return jnp.exp (k * log(h*q/(g*r)) + logbinom - 2*log(k) + log(b*(nInsertions-k)*(r*f*k + h*p*(nDeletions-k)) + c*(nDeletions-k)*(g*p*k + q*f*(nInsertions-k))))
   return jnp.where (nDeletions == 0,
                     jnp.where (nInsertions == 0,
                                log(a),
@@ -452,11 +459,9 @@ def gap_prob (nDeletions, nInsertions, transmat):
                     jnp.where (nInsertions == 0,
                                log(c) + (nDeletions - 1)*log(r) + log(p),
                                (nDeletions - 1)*log(g) + (nInsertions-1)*log(r)
-                               + jax.lax.fori_loop (1,
-                                                    1 + jnp.minimum(nDeletions,nInsertions),
-                                                    logaccum_Ck,
-                                                    logsumexp (jnp.array([log(b) + log(h) + log(p),
-                                                                          log(c) + log(q) + log(f)])))))
+                               + log (b*h*p + c*q*f + sum ([jnp.where ((k<nInsertions or k<nDeletions) and k<=nInsertions and k<=nDeletions,
+                                                                       Ck(k),
+                                                                       0) for k in range(1,nDeletions+nInsertions)]))))
 
 # Impure reference implementation using Forward algorithm
 def gap_prob_impure_dp (nDeletions, nInsertions, transmat):
@@ -492,7 +497,7 @@ def summarize_alignment (xstr, ystr, alph):
       key = str(x) + " " + str(y)
       dict[key] = dict[key] + 1 if key in dict else 1
   def dict2array (dict):
-    return jnp.array ([[int(s) for s in key.split()] + [dict[key]] for key in dict.keys()])
+    return [[int(s) for s in key.split()] + [dict[key]] for key in dict.keys()]
   for i in range(len(xstr)):
     xc,yc = xstr[i], ystr[i]
     if not is_gap(xc) and not is_gap(yc):
@@ -507,31 +512,30 @@ def summarize_alignment (xstr, ystr, alph):
   inc (gapCount, nd, ni)
   return dict2array(subCount), dict2array(gapCount)
 
-def alignment_likelihood (alignmentSummary, t, indelParams, substRateMatrix):
+def alignment_likelihood (alignmentSummary, t, indelParams, substRateMatrix, conditional=True):
   subCounts, gapCounts = alignmentSummary
   transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix)
+  log_pi = jnp.log(pi)
   def sub_loglike (x_y_count):
     x, y, count = x_y_count
-    return count * (jnp.log(submat[x][y]) - jnp.log(pi[y]))
+    return count * (jnp.log(submat[x][y]) + jnp.where (conditional, -log_pi[y], log_pi[x]))
   def gap_loglike (i_j_count):
     i, j, count = i_j_count
     return count * gap_prob (i, j, transmat)
-#  print(subCounts)
-#  print(gapCounts)
-  return jnp.sum (vmap(sub_loglike)(subCounts)) + jnp.sum (vmap(gap_loglike)(gapCounts))
+  return sum ([sub_loglike(c) for c in subCounts]) + sum ([gap_loglike(c) for c in gapCounts])
 
 # workaround for lack of geometric distribution in older jax.random
 def geometric (prng, p):
   return int(jnp.ceil(jnp.log(jax.random.uniform(prng)) / jnp.log1p(-p)))
 
 # this is a weird mix of jax, numpy, and basic Python because I gave up on making it differentiable halfway through writing it :-\
-def simulate (rngSeed, len, t, indelParams, substRateMatrix):
+def simulate (rngSeed, initLen, t, indelParams, substRateMatrix):
   Q = normalize_rate_matrix (substRateMatrix)
   log_pi = jnp.log (get_eqm (Q))
   log_submat = jnp.log (expm (Q * t))
   lam,mu,x,y = indelParams
   ancKey,desKey,rngKey = jax.random.split (jax.random.PRNGKey (rngSeed), num=3)
-  anc = jax.random.categorical (ancKey, log_pi, shape=(len,))
+  anc = jax.random.categorical (ancKey, log_pi, shape=(initLen,))
   des = jax.random.categorical (desKey, vmap(lambda i:log_submat[i,:])(anc))
   ancPos = jnp.arange (des.shape[0])
   seq = jnp.array([des,ancPos]).transpose()
@@ -582,27 +586,23 @@ def simulated_alignment_str (align, alph):
   row2str = lambda row: ''.join(['-' if col==None else alph[col] for col in row])
   return row2str(ungapped[0]), row2str(ungapped[1]), [row2str(row) for row in rows]
 
-# Commented out IPython magic to ensure Python compatibility.
-dna = "acgt"
-xstr = "aacg"
-ystr = "aagt"
-x = dsq (xstr, dna)
-y = dsq (ystr, dna)
-x1 = onehot (xstr, dna)
-y1 = onehot (ystr, dna)
-t = 1.
-indelParams = (.05,.05,.9,.9)
-substParams = hky85 ([.25,.25,.25,.25], 10, 1)
-# %time print ("Impure Forward (1hot):", forward_wrap(forward_impure_1hot) (x1, y1, t, indelParams, substParams))
-# %time print ("Impure Forward:", forward_impure_wrap (x, y, t, indelParams, substParams))
-# %time print ("Inefficient Forward:", forward_inefficient_wrap (x, y, t, indelParams, substParams))
-# %time print ("grad(Inefficient Forward):", forward_inefficient_wrap_grad (x, y, t, indelParams, substParams))
-def num_grad_fwd_t (x, y, t, indelParams, substParams):
-  dt = .01
-  return (forward_impure_wrap (x, y, t + dt, indelParams, substParams) - forward_impure_wrap (x, y, t, indelParams, substParams)) / dt
-def num_grad_fwd_lambda (x, y, t, indelParams, substParams):
-  dl = .00001
-  indelParams_plus_dl = (indelParams[0] + dl, indelParams[1], indelParams[2], indelParams[3])
-  return (forward_impure_wrap (x, y, t, indelParams_plus_dl, substParams) - forward_impure_wrap (x, y, t, indelParams, substParams)) / dl
-# %time print ("numerical gradient_t(Impure Forward):", num_grad_fwd_t (x, y, t, indelParams, substParams))
-# %time print ("numerical gradient_lambda(Impure Forward):", num_grad_fwd_lambda (x, y, t, indelParams, substParams))
+# Alternative parameterization for indelParams that allows all parameters to share similar constraints
+# x = 1 - exp(-x_prime)
+# y = 1 - exp(-y_prime)
+def calc_indel_params (altIndelParams):
+  lam, mu, x_prime, y_prime = altIndelParams
+  return lam, mu, 1 - jnp.exp(-x_prime), 1 - jnp.exp(-y_prime)
+
+def alt_indel_params (indelParams):
+  lam, mu, x, y = indelParams
+  return lam, mu, -jnp.log(1-x), -jnp.log(1-y)
+
+# Find maximum likelihood params of an indel-substitution model
+# Assumes likelihood is called as likelihood(indelParams,substRateMatrix)
+def find_ml_params (likelihood, initIndelParams, initSubstRateMatrix):
+  def wrapped_likelihood (x):
+    altIndelParams,substRateMatrix = x
+    return likelihood (calc_indel_params(altIndelParams), substRateMatrix)
+  pg = ProjectedGradient(fun=wrapped_likelihood, projection=projection_non_negative, verbose=True)
+  altIndelParams, substRateMatrix = pg.run ((alt_indel_params(initIndelParams), initSubstRateMatrix))
+  return calc_indel_params(altIndelParams), substRateMatrix
