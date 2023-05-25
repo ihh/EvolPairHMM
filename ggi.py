@@ -450,8 +450,9 @@ def gap_prob (nDeletions, nInsertions, transmat):
   [[a,b,c],[f,g,h],[p,q,r]] = transmat
   log = jnp.log
   def Ck (k : int):
-    logbinom = log_binom(nDeletions-1,k-1) + log_binom(nInsertions-1,k-1)
-    return jnp.exp (k * log(h*q/(g*r)) + logbinom - 2*log(k) + log(b*(nInsertions-k)*(r*f*k + h*p*(nDeletions-k)) + c*(nDeletions-k)*(g*p*k + q*f*(nInsertions-k))))
+    logbinom = log_binom(jnp.where(nDeletions>k,nDeletions-1,k),k-1) + log_binom(jnp.where(nInsertions>k,nInsertions-1,k),k-1) # guard against out-of-range errors
+    log_arg = b*(nInsertions-k)*(r*f*k + h*p*(nDeletions-k)) + c*(nDeletions-k)*(g*p*k + q*f*(nInsertions-k)) # guard against log(0)
+    return jnp.exp (k * log(h*q/(g*r)) + logbinom - 2*log(k) + log(jnp.where(log_arg>0,log_arg,1)))
   return jnp.where (nDeletions == 0,
                     jnp.where (nInsertions == 0,
                                log(a),
