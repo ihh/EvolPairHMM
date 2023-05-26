@@ -587,23 +587,37 @@ def simulated_alignment_str (align, alph):
   row2str = lambda row: ''.join(['-' if col==None else alph[col] for col in row])
   return row2str(ungapped[0]), row2str(ungapped[1]), [row2str(row) for row in rows]
 
-# Alternative parameterization for indelParams that allows all parameters to share similar constraints
-# x = 1 - exp(-x_prime)
-# y = 1 - exp(-y_prime)
-def calc_indel_params (altIndelParams):
-  lam, mu, x_prime, y_prime = altIndelParams
-  return lam, mu, 1 - jnp.exp(-x_prime), 1 - jnp.exp(-y_prime)
+# Constraints via alternate parameterization
+# Probabilities:
+#  x = 1 - exp(-|x_prime|)
+#  y = 1 - exp(-|y_prime|)
+# All rates are absolute values, e.g.
+#  lambda = |lambda_prime|
+#  etc.
 
-def alt_indel_params (indelParams):
+# Convert parameters that we use into the form that solvers will like
+def project_params (params_prime):
+  indelParams_prime, substRateMatrix_prime = params_prime
+  lam_prime, mu_prime, x_prime, y_prime = indelParams_prime
+  indelParams = jnp.abs(lam_prime), jnp.abs(mu_prime), 1 - jnp.exp(-jnp.abs(x_prime)), 1 - jnp.exp(-jnp.abs(y_prime))
+  substRateMatrix = jnp.abs (substRateMatrix_prime)
+  params = indelParams, substRateMatrix
+  return params
+
+# Convert solver parameters into the form we use
+def unproject_params (params):
+  indelParams, substRateMatrix = params
   lam, mu, x, y = indelParams
-  return lam, mu, -jnp.log(1-x), -jnp.log(1-y)
+  indelParams_prime = jnp.array ([lam, mu, -jnp.log(1-x), -jnp.log(1-y)])
+  params_prime = indelParams_prime, substRateMatrix
+  return params_prime
 
-# Find maximum likelihood params of an indel-substitution model
-# Assumes likelihood is called as likelihood(indelParams,substRateMatrix)
-def find_ml_params (likelihood, initIndelParams, initSubstRateMatrix):
-  def wrapped_likelihood (x):
-    altIndelParams,substRateMatrix = x
-    return likelihood (calc_indel_params(altIndelParams), substRateMatrix)
-  pg = ProjectedGradient(fun=wrapped_likelihood, projection=projection_non_negative, verbose=True)
-  altIndelParams, substRateMatrix = pg.run ((alt_indel_params(initIndelParams), initSubstRateMatrix))
-  return calc_indel_params(altIndelParams), substRateMatrix
+# Wrap our likelihood function, projecting parameters
+def projected_likelihood (likelihood):
+  return lambda params_prime: likelihood(project_params(params_prime))
+
+# Run solver
+def find_ml_params (likelihood, initParams):
+  solver = jaxopt.LBFGS (projected_likelihood (likelihood), verbose=True)
+  result = solver.run (unproject_params (initParams))
+  return project_params (result.params)
