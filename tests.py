@@ -172,3 +172,28 @@ print(alg(s, t, indelParams, substParams))
 
 
 
+
+# Commented out IPython magic to ensure Python compatibility.
+rngKey = 123456
+initLen = 100
+t = .5
+indelParams = (.05,.05,.9,.9)
+substParams = hky85 ([.25,.25,.25,.25], 10, 1)
+alph = "acgt"
+# %time x,y,align = simulated_alignment_str (simulate(rngKey,initLen,t,indelParams,substParams,verbose=True),alph)
+summ = summarize_alignment (align[0], align[1], alph)
+L = jax.jit (lambda params: alignment_likelihood (summ, t, params[0], params[1], conditional=False))
+
+Lg = jax.jit (lambda params: gap_loglike (summ[0], t, params[0]))
+Ls = jax.jit (lambda params: sub_loglike (summ[1], t, params[1]))
+
+
+initParams = ((.01,.01,.8,.8), hky85 ([.25,.25,.25,.25], 1, 1))
+print(summ)
+#print(grad(Ls)(initParams))
+Lgg = grad(Lg)
+# %time print(Lgg(initParams))
+# %time print(Lgg((indelParams,substParams)))
+
+#ml_params = find_ml_params (Lg, initParams)
+#print(ml_params)

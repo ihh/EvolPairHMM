@@ -23,6 +23,7 @@ from jax import jit
 from jaxtyping import Array, Float, PyTree
 
 !pip install diffrax
+import diffrax
 from diffrax import diffeqsolve, ODETerm, Dopri5, PIDController, SaveAt
 
 !pip install jaxopt
@@ -73,28 +74,50 @@ def RK4next(t: Float,
   return T + dt*(k1 + 2*k2 + 2*k3 + k4)/6
 
 def EulerNext(t: Float,
-             T: Float[Array, "4"],
-             params: Float[Array, "4"],
-             dt: Float):
+              T: Float[Array, "4"],
+              params: Float[Array, "4"],
+              dt: Float):
   return T + dt*Tderivs(t, T, params)
 
 # calculate transition matrix by numerical integration
 # The states are M(0), I(1), D(2)
-def Ftransitions (t: Float,
-                  params: Float[Array, "4"]):
+def Ftransitions_diffrax (t: Float,
+                          params: Float[Array, "4"],
+                          /,
+                          rtol = 1e-3,
+                          atol = 1e-6,
+                          **kwargs):
   lam,mu,x,y = params
   term = ODETerm(Tderivs)
   solver = Dopri5()
-  stepsize_controller = PIDController(rtol=1e-5, atol=1e-5)
+  stepsize_controller = PIDController (rtol, atol)
   T0 = jnp.array([1,0,0,0])
-  dt0_rel = .01
-  dt0 = jnp.maximum (dt0_rel / jnp.maximum (lam, mu), dt0_rel)
-  sol = diffeqsolve (term, solver, 0, t, dt0, T0, args=params,
+  sol = diffeqsolve (term, solver, 0, t, None, T0, args=params,
                      stepsize_controller=stepsize_controller,
-                     )
+                     **kwargs)
   T1 = sol.ys[-1]
   t1 = sol.ts[-1]
   return Ftransitions_from_counts (t1, T1, params)
+
+Tderivs_jit = jax.jit(Tderivs)
+def Ftransitions_RK4 (t, params, steps=10, dt0=0.01):
+  lam,mu,x,y = params
+  def RK4body (T, t_dt):
+    t, dt = t_dt
+    k1 = Tderivs(t, T, params)
+    k2 = Tderivs(t+dt/2, T + dt*k1/2, params)
+    k3 = Tderivs(t+dt/2, T + dt*k2/2, params)
+    k4 = Tderivs(t+dt, T + dt*k3, params)
+    return T + dt*(k1 + 2*k2 + 2*k3 + k4)/6, None
+  T0 = jnp.array([1.,0.,0.,0.])
+  dt0_abs = jnp.minimum (t/steps, dt0 / jnp.minimum(1.,1./jnp.maximum(lam,mu)))
+  ts = jnp.geomspace (dt0_abs, t, num=steps)
+  ts_with_0 = jnp.concatenate ([jnp.array([0]), ts])
+  dts = jnp.ediff1d (ts_with_0)
+  T1, _ = jax.lax.scan (RK4body, T0, (ts_with_0[0:-1],dts))
+  return Ftransitions_from_counts (t, T1, params)
+
+Ftransitions = jax.jit(Ftransitions_RK4)
 
 # Numerical calculation of time derivatives using matrix inversion
 # An alternative, more general method of finding the ODEs that should work for more complex models
@@ -208,7 +231,6 @@ def Ftransitions_3x3 (t: Float,
   t1 = sol.ts[-1]
   return Ftransitions_from_counts_3x3 (t1, T1, params)
 
-# TKF91 special case
 def Ftransitions_TKF91 (t: Float,
                         lam: Float,
                         mu: Float):
@@ -221,6 +243,7 @@ def Ftransitions_TKF91 (t: Float,
                     [(1-b)*a,b,(1-b)*(1-a)],
                     [(1-g)*a,g,(1-g)*(1-a)]])
 
+# substitution matrix helpers
 def get_eqm (submat):
   large_t = 1 / jnp.min(jnp.abs(submat)[jnp.nonzero(submat,size=1)])
   return jnp.matmul (expm (submat * large_t), jnp.ones (submat.shape[0]))
@@ -232,10 +255,17 @@ def normalize_rate_matrix (mx):
   mx_rowsums = mx_no_diag @ jnp.ones_like (mx_diag)
   return mx_no_diag - jnp.diag (mx_rowsums)
 
-def hky85 (eqm, ti, tv):
-  idx = range(4)
-  raw = [[eqm[j] * (ti if i & 1 == j & 1 else tv) for j in idx] for i in idx]
-  return normalize_rate_matrix (jnp.array (raw))
+# helpers to calculate finite-time parameters from rate parameters
+def calc_submat_pi (t, substRateMatrix):
+  Q = normalize_rate_matrix (substRateMatrix)
+  pi = get_eqm (Q)
+  submat = expm (Q * t)
+  return submat, pi
+
+def calc_transmat_submat_pi (t, indelParams, substRateMatrix):
+  transmat = Ftransitions (t, indelParams)
+  submat, pi = calc_submat_pi (t, substRateMatrix)
+  return transmat, submat, pi
 
 def dsq(str,alph):
   return jnp.array ([alph.index(c) for c in list(str)])
@@ -244,6 +274,21 @@ def onehot(str,alph):
   R = range(len(alph))
   char2onehot = {alph[i]: [1. if j==i else 0. for j in R] for i in R}
   return jnp.array ([char2onehot[c] for c in list(str)])
+
+def hky85 (eqm, ti, tv):
+  idx = range(4)
+  raw = [[eqm[j] * (ti if i & 1 == j & 1 else tv) for j in idx] for i in idx]
+  return normalize_rate_matrix (jnp.array (raw))
+
+# null model sequence (log) probability
+def null_model_prob_1hot (seq_1hot, pi):
+  return jnp.sum (jnp.dot (seq_1hot, jnp.log(pi)))
+
+def null_model_prob (dsq, pi):
+  return null_model_prob (jax.nn.one_hot(dsq, pi.shape[0]), pi)
+
+def dummy_null_model (seq, pi):
+  return 0.
 
 # impure (but legible) reference implementation of Forward algorithm
 # x is the ancestor, its index is i
@@ -277,16 +322,6 @@ def forward_impure_1hot (x, y, transmat, submat, pi):
                      F[xs-1,ys-1,1] + logsumexp(jnp.array ([f,h])),
                      F[xs-1,ys-1,2] + logsumexp(jnp.array ([p,r]))]))
 
-# null model sequence (log) probability
-def null_model_prob_1hot (seq_1hot, pi):
-  return jnp.sum (jnp.dot (seq_1hot, jnp.log(pi)))
-
-def null_model_prob (dsq, pi):
-  return null_model_prob (jax.nn.one_hot(dsq, pi.shape[0]), pi)
-
-def dummy_null_model (seq, pi):
-  return 0.
-
 # impure (but legible) reference implementation of Forward algorithm
 # x is the ancestor, its index is i
 # y is the descendant, its index is j
@@ -318,13 +353,6 @@ def forward_impure (x, y, transmat, submat, pi):
   return logsumexp (jnp.array ([F[xs-1,ys-1,0] + logsumexp(jnp.array ([a,c])),
                      F[xs-1,ys-1,1] + logsumexp(jnp.array ([f,h])),
                      F[xs-1,ys-1,2] + logsumexp(jnp.array ([p,r]))]))
-
-def calc_transmat_submat_pi (t, indelParams, substRateMatrix):
-  transmat = Ftransitions (t, indelParams)
-  Q = normalize_rate_matrix (substRateMatrix)
-  pi = get_eqm (Q)
-  submat = expm (Q * t)
-  return transmat, submat, pi
 
 def forward_wrap (forwardFunc):
   def wrapped (x, y, t, indelParams, substRateMatrix, null=dummy_null_model):
@@ -511,26 +539,34 @@ def summarize_alignment (xstr, ystr, alph):
       if not is_gap(yc):
         ni = ni + 1
   inc (gapCount, nd, ni)
-  return dict2array(subCount), dict2array(gapCount)
+  return dict2array(gapCount), dict2array(subCount)
 
-def alignment_likelihood (alignmentSummary, t, indelParams, substRateMatrix, conditional=True):
-  subCounts, gapCounts = alignmentSummary
-  transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix)
-  log_pi = jnp.log(pi)
-  def sub_loglike (x_y_count):
-    x, y, count = x_y_count
-    return count * (jnp.log(submat[x][y]) + jnp.where (conditional, -log_pi[y], log_pi[x]))
-  def gap_loglike (i_j_count):
+def gap_loglike (gapCounts, t, indelParams):
+  transmat = Ftransitions (t, indelParams)
+  def ij_ll (i_j_count):
     i, j, count = i_j_count
     return count * gap_prob (i, j, transmat)
-  return sum ([sub_loglike(c) for c in subCounts]) + sum ([gap_loglike(c) for c in gapCounts])
+  return sum ([ij_ll(c) for c in gapCounts])
+
+def sub_loglike (subCounts, t, substRateMatrix, conditional=True):
+  submat, pi = calc_submat_pi (t, substRateMatrix)
+  log_pi = jnp.log(pi)
+  def xy_ll (x_y_count):
+    x, y, count = x_y_count
+    return count * (jnp.log(submat[x][y]) + jnp.where (conditional, -log_pi[y], log_pi[x]))
+  return sum ([xy_ll(c) for c in subCounts])
+
+def alignment_likelihood (alignmentSummary, t, indelParams, substRateMatrix, conditional=True):
+  gapCounts, subCounts = alignmentSummary
+  return gap_loglike(gapCounts,t,indelParams) + sub_loglike(subCounts,t,substRateMatrix,conditional)
+
 
 # workaround for lack of geometric distribution in older jax.random
 def geometric (prng, p):
   return int(jnp.ceil(jnp.log(jax.random.uniform(prng)) / jnp.log1p(-p)))
 
 # this is a weird mix of jax, numpy, and basic Python because I gave up on making it differentiable halfway through writing it :-\
-def simulate (rngSeed, initLen, t, indelParams, substRateMatrix):
+def simulate (rngSeed, initLen, t, indelParams, substRateMatrix, verbose=False):
   Q = normalize_rate_matrix (substRateMatrix)
   log_pi = jnp.log (get_eqm (Q))
   log_submat = jnp.log (expm (Q * t))
@@ -560,10 +596,12 @@ def simulate (rngSeed, initLen, t, indelParams, substRateMatrix):
     if t > 0:
       if isInsert:
         seq = jnp.insert(seq,pos,insertion,0)
-#        print("inserting ",insertSeq," before position ",pos)
+        if verbose:
+          print("inserting ",insertSeq," before position ",pos," (t=",t,")")
       else:
         seq = jnp.delete(seq,slice(pos,pos+jnp.minimum(seqLen,evtLen)),0)
-#        print("deleting ",evtLen," from position ",pos)
+        if verbose:
+          print("deleting ",evtLen," from position ",pos," (t=",t,")")
     rngKey = nextKey
   nextAncPos = 0
   align = []
@@ -618,6 +656,7 @@ def projected_likelihood (likelihood):
 
 # Run solver
 def find_ml_params (likelihood, initParams):
-  solver = jaxopt.LBFGS (projected_likelihood (likelihood), verbose=True)
+  solver = jaxopt.BFGS (projected_likelihood (likelihood), verbose=True)
   result = solver.run (unproject_params (initParams))
   return project_params (result.params)
+
