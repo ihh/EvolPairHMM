@@ -225,11 +225,12 @@ def get_eqm (submat):
   large_t = 1 / jnp.min(jnp.abs(submat)[jnp.nonzero(submat,size=1)])
   return jnp.matmul (expm (submat * large_t), jnp.ones (submat.shape[0]))
 
-def normalize_rate_matrix(mx):
-  idx = range(mx.shape[0])
-  def normrow(mx,i):
-    return [mx[i,j] - (jnp.sum(mx[i,:]) if i==j else 0) for j in idx]
-  return jnp.array ([normrow(mx,i) for i in idx])
+def normalize_rate_matrix (mx):
+  mx_abs = jnp.abs (mx)
+  mx_diag = jnp.diagonal (mx_abs)
+  mx_no_diag = mx_abs - jnp.diag (mx_diag)
+  mx_rowsums = mx_no_diag @ jnp.ones_like (mx_diag)
+  return mx_no_diag - jnp.diag (mx_rowsums)
 
 def hky85 (eqm, ti, tv):
   idx = range(4)
@@ -599,7 +600,7 @@ def project_params (params_prime):
   indelParams_prime, substRateMatrix_prime = params_prime
   lam_prime, mu_prime, x_prime, y_prime = indelParams_prime
   indelParams = jnp.abs(lam_prime), jnp.abs(mu_prime), 1 - jnp.exp(-jnp.abs(x_prime)), 1 - jnp.exp(-jnp.abs(y_prime))
-  substRateMatrix = jnp.abs (substRateMatrix_prime)
+  substRateMatrix = normalize_rate_matrix (substRateMatrix_prime)
   params = indelParams, substRateMatrix
   return params
 
