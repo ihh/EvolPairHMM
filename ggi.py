@@ -26,8 +26,7 @@ from jaxtyping import Array, Float, PyTree
 from diffrax import diffeqsolve, ODETerm, Dopri5, PIDController, SaveAt
 
 !pip install jaxopt
-from jaxopt import ProjectedGradient
-from jaxopt.projection import projection_non_negative
+import jaxopt
 
 # helper to calculate SI and SD
 def SID (t: Float,
