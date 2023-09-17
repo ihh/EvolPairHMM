@@ -78,12 +78,15 @@ T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
   \mu \frac{(1-g) (b (1-r-h q)+c g q)}{(1-g y) (f (1-r)+h p)}
 \end{eqnarray*}
 
+with $T_{MM}(0)=1$ and $T_{MI}(0)=T_{IM}(0)=T_{DI}(0)=0$.
+
 The $T_{ij}(t)$ may be approximated by Runge-Kutta methods,
 e.g. Dormand-Prince. % \cite{DormandPrince1980}
 
 The substitution matrix for the M state of the Pair HMM is
 the matrix exponential $\exp(Qt)$, for which a Pad\'{e} approximant
 or other power series expansion can be used. % \cite{MolerVanLoan2003}
+
 
 \subsection{Exactly-solved special case (TKF91)}
 

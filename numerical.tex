@@ -443,11 +443,33 @@ T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
   \mu \frac{(1-g) (b (1-r-h q)+c g q)}{(1-g y) (f (1-r)+h p)}
 \end{eqnarray*}
 
+with $T_{MM}(0)=1$ and $T_{MI}(0)=T_{IM}(0)=T_{DI}(0)=0$.
+
 The substitution matrix $E_M(x,y)$ for the match state is
 the matrix exponential $\exp({\bf Q}t)_{xy}$, for which a Pad\'{e} approximant
 or other power series expansion can be used in order to remain automatically differentiable under frameworks like PyTorch or Jax. % \cite{MolerVanLoan2003}
 For the insert states the emission weights are $E_I(\epsilon,y)=\pi_y$,
 and for the delete states $E_D(x,\epsilon)=1$.
+
+\subsubsection{Trying to rewrite and solve the ODEs}
+
+Rewriting the ODEs with $A \equiv T_{MM}, B \equiv T_{MI}, F \equiv T_{IM}, Q \equiv T_{DI}$
+yields
+\begin{eqnarray*}
+  \frac{dA}{dt} & = & \frac{\mu  (y-1) B F}{1 -y (1+B+Q)-(1-y) e^{\frac{\lambda  t}{1-x}}} - (\lambda +\mu ) A \\
+  \frac{dB}{dt} & = & \frac{\mu  (B+Q) B}{1 -y (1+B+Q)-(1-y) e^{\frac{\lambda  t}{1-x}}} + \lambda (1-B) \\
+  \frac{dF}{dt} & = & \frac{\mu  (B+Q) F}{1 -y (1+B+Q)-(1-y) e^{\frac{\lambda  t}{1-x}}} + \lambda A \\
+  \frac{dQ}{dt} & = & \frac{\mu  (B+Q) \left(1-e^{\frac{\lambda  t}{1-x}}+Q\right)}{1 -y (1+B+Q)-(1-y) e^{\frac{\lambda  t}{1-x}}}
+\end{eqnarray*}
+
+but this is problematic because the common denominator is undefined at $t=0$.
+Can we rewrite these in terms of $a,b,f,q$ and resolve this problem?
+
+Need to rewrite $c,g,h,p,r$ in terms of $a,b,f,q$ (and $\lambda,\mu,x,y,t$).
+
+Then use Mathematica e.g.
+
+{\tt FullSimplify[D[i2m[T]/SI, T] /. {i2m[T] -> f SI, i2m'[T] -> Di2m}] }
 
 \subsection{TKF91 as exactly-solved special case of GGI model}
 
