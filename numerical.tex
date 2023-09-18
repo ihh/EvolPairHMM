@@ -394,7 +394,127 @@ T_{MM} & T_{MI} & 1-T_{MM}-T_{MI} \\
 T_{IM}/S_I & (S_I-T_{MI}-T_{DI})/S_I & (T_{MI}+T_{DI}-T_{IM})/S_I \\
 (1-T_{MM}-T_{IM})/S_D & T_{DI}/S_D & (S_D+T_{MM}+T_{IM}-T_{DI}-1)/S_D 
 \end{pmatrix}
+\\
+& = &
+\begin{pmatrix}
+a & b & 1 - a - b \\
+f & (S_I - b - q S_D) / S_I & (b + q S_D - f S_I) / S_I \\
+(1 - a - f S_I) / S_D & q & (S_D + a + f S_I - q S_D - 1) / S_D
+\end{pmatrix}
+\\
+\begin{pmatrix}
+T_{MM} & T_{MI} & T_{MD} \\
+T_{IM} & T_{II} & T_{ID} \\
+T_{DM} & T_{DI} & T_{DD} 
+\end{pmatrix}
+& = &
+\begin{pmatrix}
+T_{MM} & T_{MI} & 1-T_{MM}-T_{MI} \\
+T_{IM} & S_I-T_{MI}-T_{DI} & T_{MI}+T_{DI}-T_{IM} \\
+1-T_{MM}-T_{IM} & T_{DI} & S_D+T_{MM}+T_{IM}-T_{DI}-1
+\end{pmatrix}
+\\
+& = &
+\begin{pmatrix}
+a & b & 1-a-b \\
+f S_I & S_I - b - q S_D & b + q S_D - f S_I \\
+1 - a - f S_I & q S_D & S_D + a + f S_I - q S_D - 1
+\end{pmatrix}
 \end{eqnarray*}
+
+A cleaner parameterization (insertion/deletion-symmetric, all initially zero) is in terms of $b,c,h,q$
+\begin{eqnarray*}
+\begin{pmatrix}
+a & b & c \\
+f & g & h \\
+p & q & r 
+\end{pmatrix}
+& = &
+\begin{pmatrix}
+  1-T_{MI}-T_{MD} & T_{MI} & T_{MD} \\
+(T_{MI}+T_{DI}-T_{ID})/S_I & (S_I-T_{MI}-T_{DI})/S_I & T_{ID}/S_I \\
+(T_{MD}+T_{ID}-T_{DI})/S_D & T_{DI}/S_D & (S_D-T_{MD}-T_{ID})/S_D 
+\end{pmatrix}
+\\
+& = &
+\begin{pmatrix}
+1-b-c & b & c \\
+(b + q S_D - h S_I) / S_I & (S_I - b - q S_D) / S_I & h \\
+(c + h S_I - q S_D) / S_D & q & (S_D - c - h S_I) / S_D
+\end{pmatrix}
+\\
+\begin{pmatrix}
+T_{MM} & T_{MI} & T_{MD} \\
+T_{IM} & T_{II} & T_{ID} \\
+T_{DM} & T_{DI} & T_{DD} 
+\end{pmatrix}
+& = &
+\begin{pmatrix}
+1-b-c & b & c \\
+b + q S_D - h S_I & S_I - b - q S_D & h S_I \\
+c + h S_I - q S_D & q S_D & S_D - c - h S_I
+\end{pmatrix}
+\end{eqnarray*}
+
+
+
+Another parameterization (insertion/deletion-symmetric, interpretable) in terms of $b,c,g,r$
+\begin{eqnarray*}
+\begin{pmatrix}
+a & b & c \\
+f & g & h \\
+p & q & r 
+\end{pmatrix}
+& = &
+\begin{pmatrix}
+  1-T_{MI}-T_{MD} & T_{MI} & T_{MD} \\
+(T_{MD}+T_{DD}-T_{II}+S_I-S_D)/S_I & T_{II}/S_I & (S_D-T_{DD}-T_{MD})/S_I \\
+(T_{MI}+T_{II}-T_{DD}+S_D-S_I)/S_D & (S_I-T_{II}-T_{MI})/S_D & T_{DD}/S_D 
+\end{pmatrix}
+\\
+& = &
+\begin{pmatrix}
+1-b-c & b & c \\
+(c + r S_D - g S_I + S_I - S_D) / S_I & g & (S_D - r S_D - c)/S_I \\
+(b + g S_I - r S_D + S_D - S_I) / S_D & (S_I - g S_I - b)/S_D & r
+\end{pmatrix}
+\\
+\begin{pmatrix}
+T_{MM} & T_{MI} & T_{MD} \\
+T_{IM} & T_{II} & T_{ID} \\
+T_{DM} & T_{DI} & T_{DD} 
+\end{pmatrix}
+& = &
+\begin{pmatrix}
+1-b-c & b & c \\
+c + r S_D - g S_I + S_I - S_D & g S_I & S_D - r S_D - c \\
+b + g S_I - r S_D + S_D - S_I & S_I - g S_I - b & r S_D
+\end{pmatrix}
+\end{eqnarray*}
+
+This yields ODEs
+\begin{eqnarray*}
+  \frac{db}{dt} & = &
+  -\frac{b (g-1) \mu }{g y-1}-b \lambda +\lambda
+  \\
+  \frac{dc}{dt} & = &
+-\frac{b \mu  (y-1) (c+(r-1) S_D+S_I)}{S_I (g y-1)}-c (\lambda +\mu )+\mu
+  \\
+  \frac{dg}{dt} & = &
+  \frac{b \lambda }{S_I}-\frac{(g-1) g \mu }{g y-1}+\frac{\lambda  (S_I+x)}{S_I-S_I x}
+  \\
+  \frac{dr}{dt} & = &
+  \mu \left(
+  \frac{b (y-1) (c+(r-1) S_D+S_I)}
+       {S_D S_I (g y-1)}
++
+  \frac{c g (y-1)^2-S_D (r (g - 1) (y - 1) + g + y - 2)- (g-1) S_I (y-1)-y(g y - 1)}
+       {S_D (y-1) (g y-1)}
+       \right)
+\end{eqnarray*}
+
+
+
 
 \subsection{Composite machine $\mathbb{FG}$ for GGI model}
 
@@ -428,7 +548,7 @@ Derived in \cite{Holmes2020}.
 \begin{eqnarray*}
 S_I(t) & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
 S_D(t) & = & \exp\left(\frac{\mu t}{1-y}\right)-1 \\
-T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
+ T_{ij}(0) & = & \mbox{1 if $i=j=M$, 0 otherwise}
 \\
   \frac{d}{dt} T_{MM}(t) & = &
   \mu \frac{b f (1-y)}{1 - g y}-(\lambda +\mu )a
