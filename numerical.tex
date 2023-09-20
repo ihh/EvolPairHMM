@@ -573,23 +573,27 @@ and for the delete states $E_D(x,\epsilon)=1$.
 
 \subsubsection{Trying to rewrite and solve the ODEs}
 
-Rewriting the ODEs with $A \equiv T_{MM}, B \equiv T_{MI}, F \equiv T_{IM}, Q \equiv T_{DI}$
+Rewriting the ODEs with $A \equiv T_{MM}, B \equiv T_{MI}, F \equiv T_{IM}, Q \equiv T_{DI}, S \equiv S_I$
 yields
 \begin{eqnarray*}
-  \frac{dA}{dt} & = & \frac{\mu  (y-1) B F}{1 -y (1+B+Q)-(1-y) e^{\frac{\lambda  t}{1-x}}} - (\lambda +\mu ) A \\
-  \frac{dB}{dt} & = & \frac{\mu  (B+Q) B}{1 -y (1+B+Q)-(1-y) e^{\frac{\lambda  t}{1-x}}} + \lambda (1-B) \\
-  \frac{dF}{dt} & = & \frac{\mu  (B+Q) F}{1 -y (1+B+Q)-(1-y) e^{\frac{\lambda  t}{1-x}}} + \lambda A \\
-  \frac{dQ}{dt} & = & \frac{\mu  (B+Q) \left(1-e^{\frac{\lambda  t}{1-x}}+Q\right)}{1 -y (1+B+Q)-(1-y) e^{\frac{\lambda  t}{1-x}}}
+  \frac{dA}{dt} & = & \frac{\mu  (y-1) B F}{y(S-B-Q) - S} - (\lambda +\mu ) A \\
+  \frac{dB}{dt} & = & \frac{\mu  (B+Q) B}{y(S-B-Q) - S} + \lambda (1-B) \\
+  \frac{dF}{dt} & = & \frac{\mu  (B+Q) F}{y(S-B-Q) - S} + \lambda A \\
+  \frac{dQ}{dt} & = & \frac{\mu  (B+Q) (Q-S)}{y(S-B-Q) - S} \\
+  S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1
 \end{eqnarray*}
 
 but this is problematic because the common denominator is undefined at $t=0$.
 Can we rewrite these in terms of $a,b,f,q$ and resolve this problem?
+No, that wouldn't help because $a',b',f',q'$ will involve $A',B',F',Q'$ so the undefined quantities will remain.
 
-Need to rewrite $c,g,h,p,r$ in terms of $a,b,f,q$ (and $\lambda,\mu,x,y,t$).
+Observation: note that $S-B-Q=G$ (in the denominator). Note also that $B+Q=S-G$. Maybe $G$ is a better choice of variable than $F$? What is the ODE for $G$?
 
-Then use Mathematica e.g.
+Another idea: $y(S-B-Q)-S=yG-S$. Note that $\lim_{t \to 0} G(t) = S(t)-1$.
 
-{\tt FullSimplify[D[i2m[T]/SI, T] /. {i2m[T] -> f SI, i2m'[T] -> Di2m}] }
+Can we set $S(t)$ equal to something plus $\epsilon$ and take the limit as $\epsilon \to 0$?
+
+More broadly: these formulae for the derivatives may be undefined at $t=0$, but the derivatives themselves clearly are not, as can be seen by taking limits like this.
 
 \subsection{TKF91 as exactly-solved special case of GGI model}
 
