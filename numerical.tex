@@ -571,10 +571,9 @@ or other power series expansion can be used in order to remain automatically dif
 For the insert states the emission weights are $E_I(\epsilon,y)=\pi_y$,
 and for the delete states $E_D(x,\epsilon)=1$.
 
-\subsubsection{A simpler form for the ODEs}
+\subsubsection{A simpler form for the GGI ODEs}
 
-Rewriting the ODEs with $A \equiv T_{MM}, B \equiv T_{MI}, F \equiv T_{IM}, Q \equiv T_{DI}, S \equiv S_I$
-yields
+Rewrite the GGI ODEs with $A \equiv T_{MM}, B \equiv T_{MI}, F \equiv T_{IM}, Q \equiv T_{DI}, S \equiv S_I$:
 \begin{eqnarray*}
   \frac{dA}{dt} & = & \frac{\mu (1-y) B F}{S - y(S-B-Q)} - (\lambda +\mu ) A \\
   \frac{dB}{dt} & = & -\frac{\mu (B+Q) B}{S - y(S-B-Q)} + \lambda (1-B) \\
@@ -625,16 +624,24 @@ As $t \to \infty$ we have $S \simeq \exp\left(\frac{\lambda t}{1-x}\right)$ and 
 What else can we say about the asymptotic behavior of these counts as time gets large?
 (This could be useful in modeling them numerically, if we can't find algebraic solutions to the ODEs.)
 
-Suppose there is an asymptotic solution where $B \to \phi$ and $Q \to \kappa S$ for some constants $0<\phi,\kappa<1$, so $B \ll Q < S$ and $S-B-Q \simeq S-Q = (1-\kappa)S$.
-Then $B' \simeq -\frac{\mu \kappa \phi}{1 - y(1 - \kappa)} + \lambda (1 - \phi) = 0$
-and $Q' \simeq \frac{\mu(1-\kappa)}{1 - y(1 - \kappa)} Q$.
-But we know $Q' = \frac{\lambda}{1-x}Q$ and so $\frac{\lambda}{1-x} = \frac{\mu(1-\kappa)}{1 - y(1 - \kappa)}$.
-{\bf TODO: Solve these?}
-
+%Suppose there is an asymptotic solution where $B \to \phi$ and $Q \to \kappa S$ for some constants $0<\phi,\kappa<1$, so $B \ll Q < S$ and $S-B-Q \simeq S-Q = (1-\kappa)S$.
+%Then $B' \simeq -\frac{\mu \kappa \phi}{1 - y(1 - \kappa)} + \lambda (1 - \phi) = 0$
+%and $Q' \simeq \frac{\mu(1-\kappa)}{1 - y(1 - \kappa)} Q$.
+%But we know $Q' = \frac{\lambda}{1-x}Q$ and so $\frac{\lambda}{1-x} = \frac{\mu(1-\kappa)}{1 - y(1 - \kappa)}$.
+%{\bf TODO: Solve these?}
 
 Note that $A=a$, $B=b$, $F=fS$, and $Q=qD$.
 This gives closed-form solutions for the counts in the special case of TKF91 (see below).
 % As expected, these closed-form TKF counts satisfy the ODEs.
+
+A problem with numerically integrating these ODEs is that $S$ gets very large and overflows.
+We could obtain ODEs directly for the probabilities $a,b,f,q$
+by using $a'=A$, $b'=B$, $f'=(F/S)'=F'/S-fS'/S$, $q'=(Q/D)'=Q'/D-qD'/D$
+and making the above substitutions to express $(A,B,F,Q)$ in terms of $(a,b,f,q,S,D)$.
+These probability ODEs might be expected to be more stable than the ODEs for the counts (since $(a,b,f,q)$ are all between 0 and 1).
+We still have a constraint $a+b \leq 1$ that involves both $a$ and $b$,
+but following TKF91 we could transform $a \to (1-b)\alpha$ so that $(\alpha,b,f,q)$ have independent bounding constraints
+(this seems a bit messy though, and might not be necessary).
 
 \subsection{TKF91 as exactly-solved special case of GGI model}
 
