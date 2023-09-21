@@ -636,7 +636,7 @@ This gives closed-form solutions for the counts in the special case of TKF91 (se
 
 A problem with numerically integrating these ODEs is that $S$ gets very large and overflows.
 We could obtain ODEs directly for the probabilities $a,b,f,q$
-by using $a'=A$, $b'=B$, $f'=(F/S)'=F'/S-fS'/S$, $q'=(Q/D)'=Q'/D-qD'/D$
+by using $a'=A$, $b'=B$, $f'=(F/S)'=(F'-fS')/S$, $q'=(Q/D)'=(Q'-qD')/D$
 and making the above substitutions to express $(A,B,F,Q)$ in terms of $(a,b,f,q,S,D)$.
 These probability ODEs might be expected to be more stable than the ODEs for the counts (since $(a,b,f,q)$ are all between 0 and 1).
 We still have a constraint $a+b \leq 1$ that involves both $a$ and $b$,
