@@ -646,11 +646,13 @@ and making the above substitutions to express $(A,B,F,Q)$ in terms of $(a,b,f,q,
   S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
   D & = & \exp\left(\frac{\mu t}{1-y}\right)-1
 \end{eqnarray*}
-with $a(0)=1$, $b(0)=f(0)=q(0)=0$,
-$a'(0)=-\lambda-\mu$, $b'(0)=\lambda$, $f'(0)=1-x$, and $q'(0)=0$.
+with $a(0)=1$, $b(0)=q(0)=0$, $f(0)=1-x$,
+$a'(0)=-\lambda-\mu$, $b'(0)=\lambda$, $f'(0)=1-x$, and $q'(0)=0$.   % That f'(0)=1-x is weird but apparently correct.
 
 These probability ODEs might be expected to be more stable than the ODEs for the counts (since $(a,b,f,q)$ are all between 0 and 1).
 Maybe it would be simpler to work with $(A,B,F,q)$ since it's really only $Q$ that explodes (the others are all bounded by $[0,1]$ already, and $f'$ is more complicated than $F'$).
+Then we should multiply numerators and denominators by $1/S$ and/or $1/D$ for stability, perhaps also rename $\{S,D\} \to \{L,M\}$
+or even set $L=S+1$ and $M=D+1$ and use those instead.
 
 We also have a constraint $a+b \leq 1$ that involves both $a$ and $b$,
 but following TKF91 we could transform $a \to (1-b)\alpha$ so that $(\alpha,b,f,q)$ have independent bounding constraints

@@ -55,7 +55,8 @@ def integrateCounts (t, params, /, step = None, rtol = None, atol = None, **kwar
   return [(0., y0)] + list (zip (sol.ts, sol.ys))
 
 # parse args
-parser = argparse.ArgumentParser(description='Compute GGI counts by numerical integration')
+parser = argparse.ArgumentParser(description='Compute GGI counts by numerical integration',
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--lambda', metavar='float', dest='lam', type=float, default=1.,
                     help='insertion rate')
 parser.add_argument('--mu', metavar='float', type=float, default=1.,
