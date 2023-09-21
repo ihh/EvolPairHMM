@@ -22,13 +22,13 @@ def insertions (t, lam, x):
 # calculate derivatives of (logA,B,F,Q)
 def derivs (t, counts, params):
   lam,mu,x,y = params
-  logA,B,F,Q = counts
-  A = jnp.exp (logA)
+  A,B,F,Q = counts
+  #A = jnp.exp (logA)
   S = insertions (t, lam, x)
   denom = S - y * (S - B - Q)
   num = mu * (B + Q)
   return jnp.where (t > 0.,
-                    jnp.array (((mu*B*F*(1.-y)/(A*denom) - (lam+mu),
+                    jnp.array (((mu*B*F*(1.-y)/denom - (lam+mu)*A,
                                  -B*num/denom + lam*(1-B),
                                  -F*num/denom + lam*A,
                                  (S-Q)*num/denom))),
@@ -36,7 +36,7 @@ def derivs (t, counts, params):
 
 
 def initCounts():
-    return jnp.array ((0., 0., 0., 0.))
+    return jnp.array ((1., 0., 0., 0.))
     
 # calculate counts (logA,B,F,Q) by numerical integration with diffrax
 def integrateCounts_diffrax (t, params, /, step = None, rtol = None, atol = None, **kwargs):
@@ -112,14 +112,15 @@ if args.tderivs:
 print (*labels)
 
 for t, countsTransform in result:
-    (logA,B,F,Q) = countsTransform
-    A = jnp.exp(logA)
-    counts = [A,B,F,Q]
+#    (logA,B,F,Q) = countsTransform
+ #   A = jnp.exp(logA)
+ #   counts = [A,B,F,Q]
+    counts = countsTransform
     if t <= args.t:
         if args.tderivs:
-            (dlogAdt,dBdt,dFdt,dQdt) = tuple(derivs(t,counts,params))
-            dAdt = dlogAdt * A
-            d = [dAdt,dBdt,dFdt,dQdt]
+            d = tuple(derivs(t,counts,params))
+#            dAdt = dlogAdt * A
+#            d = [dAdt,dBdt,dFdt,dQdt]
         else:
             d = []
         print(t,insertions(t,args.lam,args.x),*counts,*d)
