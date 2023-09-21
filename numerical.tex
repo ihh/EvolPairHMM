@@ -637,9 +637,23 @@ This gives closed-form solutions for the counts in the special case of TKF91 (se
 A problem with numerically integrating these ODEs is that $S$ gets very large and overflows.
 We could obtain ODEs directly for the probabilities $a,b,f,q$
 by using $a'=A$, $b'=B$, $f'=(F/S)'=(F'-fS')/S$, $q'=(Q/D)'=(Q'-qD')/D$
-and making the above substitutions to express $(A,B,F,Q)$ in terms of $(a,b,f,q,S,D)$.
+and making the above substitutions to express $(A,B,F,Q)$ in terms of $(a,b,f,q,S,D)$
+\begin{eqnarray*}
+  \frac{da}{dt} & = & \frac{\mu (1-y) b f S}{S - y(S-b-q D)} - (\lambda +\mu ) a \\
+  \frac{db}{dt} & = & -\frac{\mu (b+q D) b}{S - y(S-b-q D)} + \lambda (1-b) \\
+  \frac{df}{dt} & = & \frac{1}{S} \left( -\frac{\mu (b+q D) f S}{S - y(S-b-q D)} + \lambda a - \frac{f \lambda(S+1)}{1-x} \right) \\
+  \frac{dq}{dt} & = & \frac{1}{D} \left( \frac{\mu (b+q D) (S-q D)}{S - y(S-b-q D)} - \frac{q \lambda(D+1)}{1-y} \right) \\
+  S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
+  D & = & \exp\left(\frac{\mu t}{1-y}\right)-1
+\end{eqnarray*}
+with $a(0)=1$, $b(0)=f(0)=q(0)=0$,
+$a'(0)=-\lambda-\mu$, $b'(0)=\lambda$, $f'(0)=1-x$, and $q'(0)=0$.
+
 These probability ODEs might be expected to be more stable than the ODEs for the counts (since $(a,b,f,q)$ are all between 0 and 1).
-We still have a constraint $a+b \leq 1$ that involves both $a$ and $b$,
+Or maybe they don't buy us much that just working with $P$ instead of $Q$ (since $A,B,F,P$ are all bounded in the range $[0,1]$),
+and multiplying through by $1/(1+S)$ and $1/(1+D)$ for stability, would have. Hmmm.
+
+We also have a constraint $a+b \leq 1$ that involves both $a$ and $b$,
 but following TKF91 we could transform $a \to (1-b)\alpha$ so that $(\alpha,b,f,q)$ have independent bounding constraints
 (this seems a bit messy though, and might not be necessary).
 
