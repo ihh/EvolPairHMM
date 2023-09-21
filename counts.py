@@ -17,19 +17,18 @@ import argparse
 
 # calculate SI
 def insertions (t, lam, x):
-    return jnp.exp (lam * t / (1. - x)) - 1
+    return jnp.exp (lam * t / (1. - x)) - 1.
 
-# calculate derivatives of (logA,B,F,Q)
+# calculate derivatives of (A,B,F,Q)
 def derivs (t, counts, params):
   lam,mu,x,y = params
   A,B,F,Q = counts
-  #A = jnp.exp (logA)
   S = insertions (t, lam, x)
   denom = S - y * (S - B - Q)
   num = mu * (B + Q)
   return jnp.where (t > 0.,
                     jnp.array (((mu*B*F*(1.-y)/denom - (lam+mu)*A,
-                                 -B*num/denom + lam*(1-B),
+                                 -B*num/denom + lam*(1.-B),
                                  -F*num/denom + lam*A,
                                  (S-Q)*num/denom))),
                     jnp.array ((-lam-mu,lam,lam,0.)))
@@ -38,8 +37,8 @@ def derivs (t, counts, params):
 def initCounts():
     return jnp.array ((1., 0., 0., 0.))
     
-# calculate counts (logA,B,F,Q) by numerical integration with diffrax
-def integrateCounts_diffrax (t, params, /, step = None, rtol = None, atol = None, **kwargs):
+# calculate counts (A,B,F,Q) by numerical integration
+def integrateCounts (t, params, /, step = None, rtol = None, atol = None, **kwargs):
   term = ODETerm(derivs)
   solver = Dopri5()
   if step is None and rtol is None and atol is None:
@@ -54,30 +53,6 @@ def integrateCounts_diffrax (t, params, /, step = None, rtol = None, atol = None
                      saveat = SaveAt(steps=True),
                      **kwargs)
   return [(0., y0)] + list (zip (sol.ts, sol.ys))
-
-# calculate counts (logA,B,F,Q) by numerical integration with handrolled RK4
-def RK4 (t, params, y0, derivs, steps=10, dt0=0.01):
-  def RK4body (y, t_dt):
-    t, dt = t_dt
-    k1 = derivs(t, y, params)
-    k2 = derivs(t+dt/2, y + dt*k1/2, params)
-    k3 = derivs(t+dt/2, y + dt*k2/2, params)
-    k4 = derivs(t+dt, y + dt*k3, params)
-    return y + dt*(k1 + 2*k2 + 2*k3 + k4)/6, None
-  ts = jnp.geomspace (dt0, t, num=steps)
-  ts_with_0 = jnp.concatenate ([jnp.array([0]), ts])
-  dts = jnp.ediff1d (ts_with_0)
-  y1, _ = jax.lax.scan (RK4body, y0, (ts_with_0[0:-1],dts))
-  return y1
-
-# this is super inefficient, it recalculates the whole range at every step
-def integrateCounts_RK4 (t, params, /, step = None, rtol = None, atol = None, **kwargs):
-  if step is None:
-      raise Exception ("please specify step")
-  ts = (jnp.arange((t+1)/step) + 1.) * step
-  y0 = initCounts()
-  ys = list (map (lambda t: RK4(t,params,y0,derivs), ts))
-  return [(0., y0)] + list (zip (ts, ys))
 
 # parse args
 parser = argparse.ArgumentParser(description='Compute GGI counts by numerical integration')
@@ -103,7 +78,7 @@ args = parser.parse_args()
 
 # do integration
 params = (args.lam, args.mu, args.x, args.y)
-result = integrateCounts_diffrax (args.t, params, step=args.step, rtol=args.rtol, atol=args.atol)
+result = integrateCounts (args.t, params, step=args.step, rtol=args.rtol, atol=args.atol)
 
 vars = "A B F Q".split()
 labels = "t S".split() + vars
@@ -111,16 +86,10 @@ if args.tderivs:
     labels += list (map (lambda v: "d" + v + "/dt", vars))
 print (*labels)
 
-for t, countsTransform in result:
-#    (logA,B,F,Q) = countsTransform
- #   A = jnp.exp(logA)
- #   counts = [A,B,F,Q]
-    counts = countsTransform
+for t, counts in result:
     if t <= args.t:
         if args.tderivs:
             d = tuple(derivs(t,counts,params))
-#            dAdt = dlogAdt * A
-#            d = [dAdt,dBdt,dFdt,dQdt]
         else:
             d = []
         print(t,insertions(t,args.lam,args.x),*counts,*d)
