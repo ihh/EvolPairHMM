@@ -585,7 +585,7 @@ yields
 with $A(0)=1$, $B(0)=F(0)=Q(0)=0$,
 $A'(0)=-\lambda-\mu$, $B'(0)=F'(0)=\lambda$, and $Q'(0)=0$.
 
-Note that the common denominator is undefined at $t=0$.
+Note that the denominator vanishes at $t=0$, so these formulae are undefined there.
 However, in the limit $t \to 0$, the counts are obtainable to first order in $t$ by inspection of $\mathbb{G}(\delta t)$,
 %\begin{eqnarray*}
 %  A(\delta t) & = & 1 - (\lambda+\mu) \delta t + o(\delta t) \\
@@ -618,11 +618,11 @@ It is straightforward to use L'H\^{o}pital's rule to verify that these first-ord
 
 All these quantities represent expected counts and are nonnegative.
 Further, for $t>0$ (and assuming $\lambda,\mu > 0$), we know that
-$A+B<1$, $A+F<1$, $B+Q<S$, and $Q<D-(1-A-F)$
+$A < \exp(-\mu t)$, $A+B<1$, $A+F<1$, $B+Q<S$, and $Q<D-(1-A-F)$
 where $D \equiv S_D = \exp\left(\frac{\mu t}{1-y}\right) - 1$.
 
-As $t \to \infty$ we have $S \simeq \exp\left(\frac{\lambda t}{1-x}\right)$ and (because ancestral residues are inevitably deleted) $A \to 0$ and $F \to 0$.
-Open question: what else can we say about the asymptotic behavior of these counts as time gets large?
+As $t \to \infty$ we have $S \simeq \exp\left(\frac{\lambda t}{1-x}\right)$ and (because ancestral residues are inevitably deleted) $A \to 0$.
+What else can we say about the asymptotic behavior of these counts as time gets large?
 (This could be useful in modeling them numerically, if we can't find algebraic solutions to the ODEs.)
 
 Suppose there is an asymptotic solution where $B \to \phi$ and $Q \to \kappa S$ for some constants $0<\phi,\kappa<1$, so $B \ll Q < S$ and $S-B-Q \simeq S-Q = (1-\kappa)S$.
