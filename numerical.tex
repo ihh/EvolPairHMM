@@ -595,7 +595,7 @@ However, in the limit $t \to 0$, the counts are obtainable to first order in $t$
 %  S(\delta t) & = & \frac{\lambda}{1-x} \delta t + o(\delta t)
 %\end{eqnarray*}
 yielding the expressions for the derivatives at the boundary.
-It is straightforward to use L'H\^{o}pital's rule to verify that these first-order approximations satisfy the ODEs near $t=0$.
+It is straightforward to use L'H\^{o}pital's rule to verify that these first-order approximations satisfy the ODEs as $t \to 0$.
 %First we need to rewrite all the ODEs as rational functions
 %\begin{eqnarray*}
 %  \frac{dA}{dt} & = & \frac{\mu (y-1) B F - (\lambda +\mu ) A \left( y(S-B-Q) - S \right)}{y(S-B-Q) - S} \\
@@ -618,11 +618,16 @@ It is straightforward to use L'H\^{o}pital's rule to verify that these first-ord
 
 All these quantities represent expected counts and are nonnegative.
 Further, for $t>0$ (and assuming $\lambda,\mu > 0$), we have
-$A+B<1$, $B+Q<S$, and $A+F < \exp\left(\frac{\mu t}{1-x}\right) - 1$.
+$A+B<1$, $B+Q<S$, and $A+F < D$
+where $D \equiv S_D = \exp\left(\frac{\mu t}{1-x}\right) - 1$.
 
 As $t \to \infty$ we have $A \to 0$ and $F \ll Q$.
 Open question: what else can we say about these counts as time gets large?
 (This could be useful in modeling the limiting behavior numerically, if we can't find algebraic solutions to the ODEs.)
+
+Note that $A=a$, $B=b$, $F=fS$, and $Q=qD$.
+This gives closed-form solutions for the counts in the special case of TKF91 (see below).
+% As expected, these closed-form TKF counts satisfy the ODEs.
 
 \subsection{TKF91 as exactly-solved special case of GGI model}
 
