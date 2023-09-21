@@ -650,12 +650,12 @@ with $a(0)=1$, $b(0)=f(0)=q(0)=0$,
 $a'(0)=-\lambda-\mu$, $b'(0)=\lambda$, $f'(0)=1-x$, and $q'(0)=0$.
 
 These probability ODEs might be expected to be more stable than the ODEs for the counts (since $(a,b,f,q)$ are all between 0 and 1).
-Or maybe they don't buy us much that just working with $P$ instead of $Q$ (since $A,B,F,P$ are all bounded in the range $[0,1]$),
-and multiplying through by $1/(1+S)$ and $1/(1+D)$ for stability, would have. Hmmm.
+Maybe it would be simpler to work with $(A,B,F,q)$ since it's really only $Q$ that explodes (the others are all bounded by $[0,1]$ already, and $f'$ is more complicated than $F'$).
 
 We also have a constraint $a+b \leq 1$ that involves both $a$ and $b$,
 but following TKF91 we could transform $a \to (1-b)\alpha$ so that $(\alpha,b,f,q)$ have independent bounding constraints
 (this seems a bit messy though, and might not be necessary).
+
 
 \subsection{TKF91 as exactly-solved special case of GGI model}
 
