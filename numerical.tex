@@ -652,7 +652,7 @@ $a'(0)=-\lambda-\mu$, $b'(0)=\lambda$, $f'(0)=1-x$, and $q'(0)=0$.   % That f'(0
 These probability ODEs might be expected to be more stable than the ODEs for the counts (since $(a,b,f,q)$ are all between 0 and 1).
 Maybe it would be simpler to work with $(A,B,F,q)$ since it's really only $Q$ that explodes (the others are all bounded by $[0,1]$ already, and $f'$ is more complicated than $F'$).
 Then we should multiply numerators and denominators by $1/S$ and/or $1/D$ for stability,
-or even set $L=1/S$ and $M=1/D$ and use those instead of $S$ and $D$.
+or even set $L=1/(S+1)$ and $M=1/(D+1)$ and use those instead of $S$ and $D$.
 
 Thus
 \begin{eqnarray*}
@@ -662,6 +662,16 @@ Thus
   \frac{dq}{dt} & = & \frac{1}{D} \left( \frac{\mu (b+q D) (S-q D)}{S - y(S-b-q D)} - \frac{q \lambda(D+1)}{1-y} \right) \\
   S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
   D & = & \exp\left(\frac{\mu t}{1-y}\right)-1
+\end{eqnarray*}
+
+Or
+\begin{eqnarray*}
+  \frac{da}{dt} & = & \frac{\mu (1-y) b F L M}{M(1-L) - y(M(1-L-bL)-qL(1-M))} - (\lambda +\mu ) a \\
+  \frac{db}{dt} & = & -\frac{\mu (bM+q(1-M)) b L}{M(1-L) - y(M(1-L-bL)-qL(1-M))} + \lambda (1-b) \\
+  \frac{dF}{dt} & = & -\frac{\mu (bM+q(1-M)) F L}{M(1-L) - y(M(1-L-bL)-qL(1-M))} + \lambda a \\
+  \frac{dq}{dt} & = & \frac{1}{1-M} \left( \frac{\mu (bM+q(1-M)) (M(1-L)-qL(1-M))}{M(1-L) - y(M(1-L-bL)-qL(1-M))} - \frac{q}{1-y} \right) \\
+  L & = & \exp\left(-\frac{\lambda t}{1-x}\right) \\
+  M & = & \exp\left(-\frac{\mu t}{1-y}\right)
 \end{eqnarray*}
 
 
