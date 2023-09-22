@@ -666,10 +666,10 @@ Thus
 
 Or
 \begin{eqnarray*}
-  \frac{da}{dt} & = & \frac{\mu (1-y) b F L M}{M(1-L) - y(M(1-L-bL)-qL(1-M))} - (\lambda +\mu ) a \\
-  \frac{db}{dt} & = & -\frac{\mu (bM+q(1-M)) b L}{M(1-L) - y(M(1-L-bL)-qL(1-M))} + \lambda (1-b) \\
-  \frac{dF}{dt} & = & -\frac{\mu (bM+q(1-M)) F L}{M(1-L) - y(M(1-L-bL)-qL(1-M))} + \lambda a \\
-  \frac{dq}{dt} & = & \frac{1}{1-M} \left( \frac{\mu (bM+q(1-M)) (M(1-L)-qL(1-M))}{M(1-L) - y(M(1-L-bL)-qL(1-M))} - \frac{q}{1-y} \right) \\
+  \frac{da}{dt} & = & \frac{\mu (1-y) b F L M}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} - (\lambda +\mu ) a \\
+  \frac{db}{dt} & = & -\frac{\mu (bM+q(1-M)) b L}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} + \lambda (1-b) \\
+  \frac{dF}{dt} & = & -\frac{\mu (bM+q(1-M)) F L}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} + \lambda a \\
+  \frac{dq}{dt} & = & \frac{1}{1-M} \left( \frac{\mu (bM+q(1-M)) (M(1-L)-qL(1-M))}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} - \frac{q}{1-y} \right) \\
   L & = & \exp\left(-\frac{\lambda t}{1-x}\right) \\
   M & = & \exp\left(-\frac{\mu t}{1-y}\right)
 \end{eqnarray*}
