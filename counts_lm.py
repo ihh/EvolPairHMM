@@ -15,9 +15,12 @@ from diffrax import diffeqsolve, ODETerm, Dopri5, PIDController, ConstantStepSiz
 
 import argparse
 
-# calculate SI, SD
+# calculate L, M
+def lm (t, rate, prob):
+  return jnp.exp (-rate * t / (1. - prob))
+
 def indels (t, rate, prob):
-    return jnp.exp (rate * t / (1. - prob)) - 1.
+  return 1. / lm(t,rate,prob) - 1.
 
 def insertions (t, args):
   return indels(t,args.lam,args.x)
@@ -25,25 +28,26 @@ def insertions (t, args):
 def deletions (t, args):
   return indels(t,args.mu,args.y)
 
-# calculate derivatives of (a,b,u,v)
+# calculate derivatives of (a,b,u,q)
 def derivs (t, counts, params):
   lam,mu,x,y = params
-  a,b,u,v = counts
-  S = indels (t, lam, x)
-  denom = S - y * (S - b - v)
-  num = mu * (b + v)
+  a,b,u,q = counts
+  L = lm (t, lam, x)
+  M = lm (t, mu, y)
+  denom = M*(1.-y) + L*q*y + L*M*(y*(1.+b-q)-1.)
+  num = mu * (b*M + q*(1.-M))
   return jnp.where (t > 0.,
-                    jnp.array (((mu*b*u*(1.-y)/denom - (lam+mu)*a,
-                                 -b*num/denom + lam*(1.-b),
-                                 -u*num/denom + lam*a,
-                                 (S-v)*num/denom))),
+                    jnp.array (((mu*b*u*L*M*(1.-y)/denom - (lam+mu)*a,
+                                 -b*num*L/denom + lam*(1.-b),
+                                 -u*num*L/denom + lam*a,
+                                 ((M*(1.-L)-q*L*(1.-M))*num/denom - q*lam/(1.-y))/(1.-M)))),
                     jnp.array ((-lam-mu,lam,lam,0.)))
 
 
-def initCounts():
+def initCounts(params):
     return jnp.array ((1., 0., 0., 0.))
     
-# calculate counts (a,b,u,v) by numerical integration
+# calculate counts (a,b,u,q) by numerical integration
 def integrateCounts (t, params, /, step = None, rtol = None, atol = None, **kwargs):
   term = ODETerm(derivs)
   solver = Dopri5()
@@ -53,7 +57,7 @@ def integrateCounts (t, params, /, step = None, rtol = None, atol = None, **kwar
       stepsize_controller = ConstantStepSize()
   else:
       stepsize_controller = PIDController (rtol, atol)
-  y0 = initCounts()
+  y0 = initCounts(params)
   sol = diffeqsolve (term, solver, 0., t, step, y0, args=params,
                      stepsize_controller=stepsize_controller,
                      saveat = SaveAt(steps=True),
@@ -87,7 +91,7 @@ args = parser.parse_args()
 params = (args.lam, args.mu, args.x, args.y)
 result = integrateCounts (args.t, params, step=args.step, rtol=args.rtol, atol=args.atol)
 
-vars = "a b u v".split()
+vars = "a b u q".split()
 labels = "t S D".split() + vars
 if args.tderivs:
     labels += list (map (lambda v: "d" + v + "/dt", vars))

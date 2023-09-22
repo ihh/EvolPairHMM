@@ -573,112 +573,128 @@ and for the delete states $E_D(x,\epsilon)=1$.
 
 \subsubsection{A simpler form for the GGI ODEs}
 
-Rewrite the GGI ODEs with $A \equiv T_{MM}, B \equiv T_{MI}, F \equiv T_{IM}, Q \equiv T_{DI}, S \equiv S_I$:
+Rewrite the GGI ODEs with $a \equiv T_{MM}, b \equiv T_{MI}, u \equiv T_{IM}, v \equiv T_{DI}, S \equiv S_I$:
 \begin{eqnarray*}
-  \frac{dA}{dt} & = & \frac{\mu (1-y) B F}{S - y(S-B-Q)} - (\lambda +\mu ) A \\
-  \frac{dB}{dt} & = & -\frac{\mu (B+Q) B}{S - y(S-B-Q)} + \lambda (1-B) \\
-  \frac{dF}{dt} & = & -\frac{\mu (B+Q) F}{S - y(S-B-Q)} + \lambda A \\
-  \frac{dQ}{dt} & = & \frac{\mu (B+Q) (S-Q)}{S - y(S-B-Q)} \\
+  \frac{da}{dt} & = & \frac{\mu (1-y) b u}{S - y(S-b-v)} - (\lambda +\mu ) a \\
+  \frac{db}{dt} & = & -\frac{\mu (b+v) b}{S - y(S-b-v)} + \lambda (1-b) \\
+  \frac{du}{dt} & = & -\frac{\mu (b+v) u}{S - y(S-b-v)} + \lambda a \\
+  \frac{dv}{dt} & = & \frac{\mu (b+v) (S-v)}{S - y(S-b-v)} \\
   S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1
 \end{eqnarray*}
-with $A(0)=1$, $B(0)=F(0)=Q(0)=0$,
-$A'(0)=-\lambda-\mu$, $B'(0)=F'(0)=\lambda$, and $Q'(0)=0$.
+with $a(0)=1$, $b(0)=u(0)=v(0)=0$,
+$a'(0)=-\lambda-\mu$, $b'(0)=u'(0)=\lambda$, and $v'(0)=0$.
 
 Note that the denominator vanishes at $t=0$, so these formulae are undefined there.
 However, in the limit $t \to 0$, the counts are obtainable to first order in $t$ by inspection of $\mathbb{G}(\delta t)$,
 %\begin{eqnarray*}
-%  A(\delta t) & = & 1 - (\lambda+\mu) \delta t + o(\delta t) \\
-%  B(\delta t) & = & \lambda \delta t + o(\delta t) \\
-%  F(\delta t) & = & \lambda \delta t + o(\delta t) \\
-%  Q(\delta t) & = & o(\delta t) \\
+%  a(\delta t) & = & 1 - (\lambda+\mu) \delta t + o(\delta t) \\
+%  b(\delta t) & = & \lambda \delta t + o(\delta t) \\
+%  u(\delta t) & = & \lambda \delta t + o(\delta t) \\
+%  v(\delta t) & = & o(\delta t) \\
 %  S(\delta t) & = & \frac{\lambda}{1-x} \delta t + o(\delta t)
 %\end{eqnarray*}
 yielding the expressions for the derivatives at the boundary.
 It is straightforward to use L'H\^{o}pital's rule to verify that these first-order approximations satisfy the ODEs as $t \to 0$.
 %First we need to rewrite all the ODEs as rational functions
 %\begin{eqnarray*}
-%  \frac{dA}{dt} & = & \frac{\mu (y-1) B F - (\lambda +\mu ) A \left( y(S-B-Q) - S \right)}{y(S-B-Q) - S} \\
-%  \frac{dB}{dt} & = & \frac{\mu (B+Q) B + \lambda (1-B) \left( y(S-B-Q) - S \right)}{y(S-B-Q) - S} \\
-%  \frac{dF}{dt} & = & \frac{\mu (B+Q) F + \lambda A \left( y(S-B-Q) - S \right)}{y(S-B-Q) - S} \\
-%  \frac{dQ}{dt} & = & \frac{\mu (B+Q) (Q-S)}{y(S-B-Q) - S}
+%  \frac{da}{dt} & = & \frac{\mu (y-1) b u - (\lambda +\mu ) a \left( y(S-b-v) - S \right)}{y(S-b-v) - S} \\
+%  \frac{db}{dt} & = & \frac{\mu (b+v) b + \lambda (1-b) \left( y(S-b-v) - S \right)}{y(S-b-v) - S} \\
+%  \frac{du}{dt} & = & \frac{\mu (b+v) u + \lambda a \left( y(S-b-v) - S \right)}{y(S-b-v) - S} \\
+%  \frac{dv}{dt} & = & \frac{\mu (b+v) (v-S)}{y(S-b-v) - S}
 %\end{eqnarray*}
 %Then use $\lim_{t\to0} f(t)/g(t) = f'(0)/g'(0)$:
 %\begin{eqnarray*}
-%  A'(0) & = & \frac{\mu (y-1) (B' F + F' B) - (\lambda +\mu ) \left( A' \left( y(S-B-Q) - S \right) + A \left( y(S'-B'-Q') - S' \right) \right)}{y(S'-B'-Q') - S'} \\
-%  B'(0) & = & \frac{\mu \left((B'+Q') B + (B+Q) B' \right) + \lambda \left( -B' \left( y(S-B-Q) - S \right) + (1-B) \left( y(S'-B'-Q') - S' \right) \right)}{y(S'-B'-Q') - S'} \\
-%  F'(0) & = & \frac{\mu \left((B'+Q') F + (B+Q) F' \right) + \lambda \left( A' \left( y(S-B-Q) - S \right) + A \left( y(S'-B'-Q') - S' \right) \right)}{y(S'-B'-Q') - S'} \\
-%  Q'(0) & = & \frac{\mu \left( (B'+Q') (Q-S) + (B+Q) (Q'-S') \right)}{y'(S'-B'-Q') - S'}
+%  a'(0) & = & \frac{\mu (y-1) (b' u + u' b) - (\lambda +\mu ) \left( a' \left( y(S-b-v) - S \right) + a \left( y(S'-b'-v') - S' \right) \right)}{y(S'-b'-v') - S'} \\
+%  b'(0) & = & \frac{\mu \left((b'+v') b + (b+v) b' \right) + \lambda \left( -b' \left( y(S-b-v) - S \right) + (1-b) \left( y(S'-b'-v') - S' \right) \right)}{y(S'-b'-v') - S'} \\
+%  u'(0) & = & \frac{\mu \left((b'+v') u + (b+v) u' \right) + \lambda \left( a' \left( y(S-b-v) - S \right) + a \left( y(S'-b'-v') - S' \right) \right)}{y(S'-b'-v') - S'} \\
+%  v'(0) & = & \frac{\mu \left( (b'+v') (v-S) + (b+v) (v'-S') \right)}{y'(S'-b'-v') - S'}
 %\end{eqnarray*}
 %
 % etc.
 
-% Observation: note that $S-B-Q=G$ (in the denominator). Note also that $B+Q=S-G$. Maybe $G$ is a better choice of variable than $F$? What is the ODE for $G$?
-% (Answer: it does not seem to be possible to express $G'$ in a form that does not depend on $B$, so it is presumably no easier to solve than $F$.)
+% Observation: note that $S-b-v=G$ (in the denominator). Note also that $b+v=S-G$. Maybe $G$ is a better choice of variable than $u$? What is the ODE for $G$?
+% (Answer: it does not seem to be possible to express $G'$ in a form that does not depend on $b$, so it is presumably no easier to solve than $u$.)
 
-All these quantities represent expected counts and are nonnegative.
+The variables $(a,b,u,v)$ represent expected counts and are nonnegative always.
 Further, for $t>0$ (and assuming $\lambda,\mu > 0$), we know that
-$A < \exp(-\mu t)$, $A+B<1$, $A+F<1$, $B+Q<S$, and $Q<D-(1-A-F)$
+$a < \exp(-\mu t)$, $a+b<1$, $a+u<1$, $b+v<S$, and $v<D-(1-a-u)$
 where $D \equiv S_D = \exp\left(\frac{\mu t}{1-y}\right) - 1$.
 
-As $t \to \infty$ we have $S \simeq \exp\left(\frac{\lambda t}{1-x}\right)$ and (because ancestral residues are inevitably deleted) $A \to 0$.
-What else can we say about the asymptotic behavior of these counts as time gets large?
-(This could be useful in modeling them numerically, if we can't find algebraic solutions to the ODEs.)
+As $t \to \infty$ we have $S \simeq \exp\left(\frac{\lambda t}{1-x}\right)$ and (because ancestral residues are inevitably deleted) $a \to 0$.
+\textcolor{red}{What else can we say about the asymptotic behavior of these counts as time gets large?
+(This could be useful in modeling them numerically, if we can't find algebraic solutions to the ODEs.)}
 
-%Suppose there is an asymptotic solution where $B \to \phi$ and $Q \to \kappa S$ for some constants $0<\phi,\kappa<1$, so $B \ll Q < S$ and $S-B-Q \simeq S-Q = (1-\kappa)S$.
-%Then $B' \simeq -\frac{\mu \kappa \phi}{1 - y(1 - \kappa)} + \lambda (1 - \phi) = 0$
-%and $Q' \simeq \frac{\mu(1-\kappa)}{1 - y(1 - \kappa)} Q$.
-%But we know $Q' = \frac{\lambda}{1-x}Q$ and so $\frac{\lambda}{1-x} = \frac{\mu(1-\kappa)}{1 - y(1 - \kappa)}$.
-%{\bf TODO: Solve these?}
+A problem with numerically integrating these ODEs is that $S$, $D$, and $v$ get very large and overflow.
+We can stabilize them by transforming to variables $(a,b,u,q,L,M)$ where $L=1/(S+1)$, $M=1/(D+1)$, $q=v/D$, and $q'=(v/D)'=(v'-qD')/D$.
+Then
 
-Note that $A=a$, $B=b$, $F=fS$, and $Q=qD$.
-This gives closed-form solutions for the counts in the special case of TKF91 (see below).
-% As expected, these closed-form TKF counts satisfy the ODEs.
+% We could obtain ODEs directly for the probabilities $a,b,f,q$
+% by using $f'=(u/S)'=(u'-fS')/S$, $q'=(v/D)'=(v'-qD')/D$
+% and making the above substitutions to express $(a,b,u,v)$ in terms of $(a,b,f,q,S,D)$
+% \begin{eqnarray*}
+%   \frac{da}{dt} & = & \frac{\mu (1-y) b f S}{S - y(S-b-q D)} - (\lambda +\mu ) a \\
+%   \frac{db}{dt} & = & -\frac{\mu (b+q D) b}{S - y(S-b-q D)} + \lambda (1-b) \\
+%   \frac{df}{dt} & = & \frac{1}{S} \left( -\frac{\mu (b+q D) f S}{S - y(S-b-q D)} + \lambda a - \frac{f \lambda(S+1)}{1-x} \right) \\
+%   \frac{dq}{dt} & = & \frac{1}{D} \left( \frac{\mu (b+q D) (S-q D)}{S - y(S-b-q D)} - \frac{q \lambda(D+1)}{1-y} \right) \\
+%   S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
+%   D & = & \exp\left(\frac{\mu t}{1-y}\right)-1
+% \end{eqnarray*}
+% with $a(0)=1$, $b(0)=q(0)=0$, $f(0)=1-x$,
+% $a'(0)=-\lambda-\mu$, $b'(0)=\lambda$, $f'(0)=1-x$, and $q'(0)=0$.   % That f'(0)=1-x is weird but apparently correct.
+% 
+% These probability ODEs might be expected to be more stable than the ODEs for the counts (since $(a,b,f,q)$ are all between 0 and 1).
+% Maybe it would be simpler to work with $(a,b,u,q)$ since it's really only $v$ that explodes (the others are all bounded by $[0,1]$ already, and $f'$ is more complicated than $u'$).
+% Then we should multiply numerators and denominators by $1/S$ and/or $1/D$ for stability,
+% or even set $L=1/(S+1)$ and $M=1/(D+1)$ and use those instead of $S$ and $D$.
+% 
+% Thus
+% \begin{eqnarray*}
+%   \frac{da}{dt} & = & \frac{\mu (1-y) b u}{S - y(S-b-q D)} - (\lambda +\mu ) a \\
+%   \frac{db}{dt} & = & -\frac{\mu (b+q D) b}{S - y(S-b-q D)} + \lambda (1-b) \\
+%   \frac{du}{dt} & = & -\frac{\mu (b+q D) u}{S - y(S-b-q D)} + \lambda a \\
+%   \frac{dq}{dt} & = & \frac{1}{D} \left( \frac{\mu (b+q D) (S-q D)}{S - y(S-b-q D)} - \frac{q \lambda(D+1)}{1-y} \right) \\
+%   S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
+%   D & = & \exp\left(\frac{\mu t}{1-y}\right)-1
+% \end{eqnarray*}
+% 
+% Or
 
-A problem with numerically integrating these ODEs is that $S$ gets very large and overflows.
-We could obtain ODEs directly for the probabilities $a,b,f,q$
-by using $a'=A$, $b'=B$, $f'=(F/S)'=(F'-fS')/S$, $q'=(Q/D)'=(Q'-qD')/D$
-and making the above substitutions to express $(A,B,F,Q)$ in terms of $(a,b,f,q,S,D)$
 \begin{eqnarray*}
-  \frac{da}{dt} & = & \frac{\mu (1-y) b f S}{S - y(S-b-q D)} - (\lambda +\mu ) a \\
-  \frac{db}{dt} & = & -\frac{\mu (b+q D) b}{S - y(S-b-q D)} + \lambda (1-b) \\
-  \frac{df}{dt} & = & \frac{1}{S} \left( -\frac{\mu (b+q D) f S}{S - y(S-b-q D)} + \lambda a - \frac{f \lambda(S+1)}{1-x} \right) \\
-  \frac{dq}{dt} & = & \frac{1}{D} \left( \frac{\mu (b+q D) (S-q D)}{S - y(S-b-q D)} - \frac{q \lambda(D+1)}{1-y} \right) \\
-  S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
-  D & = & \exp\left(\frac{\mu t}{1-y}\right)-1
-\end{eqnarray*}
-with $a(0)=1$, $b(0)=q(0)=0$, $f(0)=1-x$,
-$a'(0)=-\lambda-\mu$, $b'(0)=\lambda$, $f'(0)=1-x$, and $q'(0)=0$.   % That f'(0)=1-x is weird but apparently correct.
-
-These probability ODEs might be expected to be more stable than the ODEs for the counts (since $(a,b,f,q)$ are all between 0 and 1).
-Maybe it would be simpler to work with $(A,B,F,q)$ since it's really only $Q$ that explodes (the others are all bounded by $[0,1]$ already, and $f'$ is more complicated than $F'$).
-Then we should multiply numerators and denominators by $1/S$ and/or $1/D$ for stability,
-or even set $L=1/(S+1)$ and $M=1/(D+1)$ and use those instead of $S$ and $D$.
-
-Thus
-\begin{eqnarray*}
-  \frac{da}{dt} & = & \frac{\mu (1-y) b F}{S - y(S-b-q D)} - (\lambda +\mu ) a \\
-  \frac{db}{dt} & = & -\frac{\mu (b+q D) b}{S - y(S-b-q D)} + \lambda (1-b) \\
-  \frac{dF}{dt} & = & -\frac{\mu (b+q D) F}{S - y(S-b-q D)} + \lambda a \\
-  \frac{dq}{dt} & = & \frac{1}{D} \left( \frac{\mu (b+q D) (S-q D)}{S - y(S-b-q D)} - \frac{q \lambda(D+1)}{1-y} \right) \\
-  S & = & \exp\left(\frac{\lambda t}{1-x}\right)-1 \\
-  D & = & \exp\left(\frac{\mu t}{1-y}\right)-1
-\end{eqnarray*}
-
-Or
-\begin{eqnarray*}
-  \frac{da}{dt} & = & \frac{\mu (1-y) b F L M}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} - (\lambda +\mu ) a \\
+  \frac{da}{dt} & = & \frac{\mu (1-y) b u L M}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} - (\lambda +\mu ) a \\
   \frac{db}{dt} & = & -\frac{\mu (bM+q(1-M)) b L}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} + \lambda (1-b) \\
-  \frac{dF}{dt} & = & -\frac{\mu (bM+q(1-M)) F L}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} + \lambda a \\
-  \frac{dq}{dt} & = & \frac{1}{1-M} \left( \frac{\mu (bM+q(1-M)) (M(1-L)-qL(1-M))}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} - \frac{q}{1-y} \right) \\
+  \frac{du}{dt} & = & -\frac{\mu (bM+q(1-M)) u L}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} + \lambda a \\
+  \frac{dq}{dt} & = & \frac{1}{1-M} \left( \frac{\mu (bM+q(1-M)) (M(1-L)-qL(1-M))}{M (1 - y) + L q y + L M (y (1 + b - q) - 1)} - \frac{q \lambda}{1-y} \right) \\
   L & = & \exp\left(-\frac{\lambda t}{1-x}\right) \\
   M & = & \exp\left(-\frac{\mu t}{1-y}\right)
 \end{eqnarray*}
+with $a(0)=1$, $b(0)=u(0)=q(0)=0$,
+$a'(0)=-\lambda-\mu$, $b'(0)=u'(0)=\lambda$, and $q'(0)=0$.
 
+\textcolor{red}{There may be a lesson here for the general case: it is more stable to solve numerically in probability space, not count space.}
 
-%We also have a constraint $a+b \leq 1$ that involves both $a$ and $b$,
-%but following TKF91 we could transform $a \to (1-b)\alpha$ so that $(\alpha,b,f,q)$ have independent bounding constraints
-%(this seems a bit messy though, and might not be necessary).
+Note the relationship between the variables in these ODEs and the transition probabilities of $\mathbb{F}(t)$:
+\begin{eqnarray*}
+\begin{pmatrix}
+a & b & c \\
+f & g & h \\
+p & q & r 
+\end{pmatrix}
+& = &
+\begin{pmatrix}
+a & b & 1-a-b \\
+u/S & (S-b-v)/S & (b+v-u)/S \\
+(1-a-u)/D & v/D & (D+a+u-v-1)/D 
+\end{pmatrix}
+\\
+& = &
+\begin{pmatrix}
+a & b & 1-a-b \\
+\frac{L}{1-L} u & 1 - \frac{L}{1-L} \left( b + \frac{1-M}{M} q \right) & \frac{L}{1-L} (b + \frac{1-M}{M} q - u) \\
+\frac{M}{1-M} (1 - a - u) & q & 1 - q -  \frac{M}{1-M} \left( 1 - a - u \right)
+\end{pmatrix}
+\end{eqnarray*}
 
+Conversely, $u=fS$ and $v=qD$, which gives closed-form solutions in the special case of TKF91 (see below).
 
 
 
@@ -705,6 +721,15 @@ $\beta = \frac{\lambda \left( \exp(-\lambda t) - \exp(-\mu t) \right)}{\mu \exp(
 and
 $\gamma = 1 - \frac{\mu \beta}{\lambda (1 - \alpha)}$.
 
+In terms of our ODE variables $(a,b,u,v)$
+\begin{eqnarray*}
+  a & = & \frac{\mu - \lambda}{\mu L - \lambda M} LM \\
+  b & = & \frac{\lambda}{\mu L - \lambda M} (L - M) \\
+  u & = & \frac{\mu - \lambda}{\mu L - \lambda M} M(1-L) \\
+  v & = & \frac{\mu - \lambda}{\mu L - \lambda M} - 1
+\end{eqnarray*}
+with $L=\exp(-\lambda t)$ and $M=\exp(-\mu t)$.
+\textcolor{red}{This does suggest trial solutions, including perhaps a simpler form for the $(b,v)$ subsystem.}
 
 
 \subsection{GGI model transition likelihood}
