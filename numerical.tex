@@ -621,11 +621,9 @@ $a < \exp(-\mu t)$, $a+b<1$, $a+u<1$, $b+v<S$, and $v<D-(1-a-u)$
 where $D \equiv S_D = \exp\left(\frac{\mu t}{1-y}\right) - 1$.
 
 As $t \to \infty$ we have $S \simeq \exp\left(\frac{\lambda t}{1-x}\right)$ and (because ancestral residues are inevitably deleted) $a \to 0$.
-\textcolor{red}{What else can we say about the asymptotic behavior of these counts as time gets large?
-(This could be useful in modeling them numerically, if we can't find algebraic solutions to the ODEs.)}
-
-A problem with numerically integrating these ODEs is that $S$, $D$, and $v$ get very large and overflow.
-We can stabilize them by transforming to variables $(a,b,u,q,L,M)$ where $L=1/(S+1)$, $M=1/(D+1)$, $q=v/D$, and $q'=(v/D)'=(v'-qD')/D$.
+Note that $S$ and $D$ (and possibly $v$) also grow exponentially. This is a problem for numerical integration: it leads to overflow.
+We can stabilize the ODEs by transforming to variables $(a,b,u,q,L,M)$ where $L=1/(S+1)$, $M=1/(D+1)$, $q=v/D$, and $q'=(v/D)'=(v'-qD')/D$
+with $0 \leq q,L,M \leq 1$.
 Then
 
 % We could obtain ODEs directly for the probabilities $a,b,f,q$
@@ -670,7 +668,25 @@ Then
 with $a(0)=1$, $b(0)=u(0)=q(0)=0$,
 $a'(0)=-\lambda-\mu$, $b'(0)=u'(0)=\lambda$, and $q'(0)=0$.
 
-\textcolor{red}{Analyzing the $t\to\infty$ limit: consider separately the cases $\lambda<\mu$ (so $L \gg M$), $\lambda>\mu$ (so $L \ll M$), and $\lambda=\mu$ (so $L=M$). It looks like in each of these cases $q'<0$ at large $t$, so $q \to 0$. Then can consider the different cases for $b'$. Finally $a' \to 0$ but very slowly.}
+Conjecture: we can simulate these stably until $L,M$ underflow (test!)
+
+In the asymptotic $t \to \infty$ limit we first recall that $a \to 0$ and
+thus the second term of $u'$ vanishes, leaving only the negative first term, so $u \to 0$ also.
+We then handle separately the following three cases
+\begin{description}
+\item[$\frac{\lambda}{1-x} < \frac{\mu}{1-y}$]
+  Deletions eventually dominate insertions in size, and $L \gg M$.
+  We can drop terms in $M$, so $q' \to -(\mu+\frac{\lambda}{1-y})q < 0$ and thus $q \to 0$.
+  Also $b' \to \lambda - b (\lambda + \mu / y)$ which implies $b$ has a steady state at $b \simeq \lambda / (\lambda + \mu / y)$.
+\item[$\frac{\lambda}{1-x} > \frac{\mu}{1-y}$]
+  Insertions eventually dominate deletions in size, and $L \ll M$.
+  We can drop terms in $L$, so $q' \to q (\mu-\lambda)/(1-y)$.
+  If $\mu > \lambda$ (so deletions also dominate in rate), then $q \to 1$; if $\mu < \lambda$, then $q \to 0$.
+  \textcolor{red}{Finish this section. What happens to $b$ in these cases? What happens if $\mu = \lambda$, do we need higher-order expansions in $t$?}
+\item[$\frac{\lambda}{1-x} = \frac{\mu}{1-y}$]
+  In this case the model is time-reversible, and $L = M$.
+  \textcolor{red}{Finish this section.}
+\end{description}
 
 Note the relationship between the variables in these ODEs and the transition probabilities of $\mathbb{F}(t)$:
 \begin{eqnarray*}
@@ -729,7 +745,6 @@ In terms of our ODE variables $(a,b,u,v)$
   v & = & \frac{\mu - \lambda}{\mu L - \lambda M} - 1
 \end{eqnarray*}
 with $L=\exp(-\lambda t)$ and $M=\exp(-\mu t)$.
-\textcolor{red}{This does suggest trial solutions, including perhaps a simpler form for the $(b,v)$ subsystem.}
 
 
 \subsection{GGI model transition likelihood}
