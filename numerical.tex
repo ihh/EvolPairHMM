@@ -668,7 +668,7 @@ Then
 with $a(0)=1$, $b(0)=u(0)=q(0)=0$,
 $a'(0)=-\lambda-\mu$, $b'(0)=u'(0)=\lambda$, and $q'(0)=0$.
 
-Conjecture: we can simulate these stably until $L,M$ underflow (test!)
+\textcolor{red}{Conjecture: we can simulate these stably until $L,M$ underflow (test!)}
 
 In the asymptotic $t \to \infty$ limit we first recall that $a \to 0$ and
 thus the second term of $u'$ vanishes, leaving only the negative first term, so $u \to 0$ also.
@@ -687,6 +687,7 @@ We then handle separately the following three cases
   In this case the model is time-reversible, and $L = M$.
   \textcolor{red}{Finish this section.}
 \end{description}
+\textcolor{red}{Do we even need to consider all this in detail if $a,u \to 0$? The probability of anything being conserved is vanishingly small, so we can just approximate everything with one big gap. Maybe the effort is better spent in considering when this transition effectively happens. Is it effectively when $L,M$ underflow?}
 
 Note the relationship between the variables in these ODEs and the transition probabilities of $\mathbb{F}(t)$:
 \begin{eqnarray*}
