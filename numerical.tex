@@ -668,26 +668,38 @@ Then
 with $a(0)=1$, $b(0)=u(0)=q(0)=0$,
 $a'(0)=-\lambda-\mu$, $b'(0)=u'(0)=\lambda$, and $q'(0)=0$.
 
-\textcolor{red}{Conjecture: we can simulate these stably until $L,M$ underflow (test!)}
+Although it is possible to analyze the asymptotic behavior of these ODEs as $t$ gets large,
+in general for large enough $t$ we do not need to bother with the Pair HMM at all, since any alignment signal will be undetectable.
+At what value of $t$ does this occur? A heuristic argument is as follows:
+for an alphabet of size $A$, neglecting the effect of substitutions,
+we will no longer be able to detect the correct alignment when $(S_I+1)(S_D+1) > \kappa A^{1/(1-a)}$ where the exponent is the mean length of a run of matches
+and $\kappa>1$ is some precautionary constant factor (e.g. $\kappa=2$).
+An upper bound for $a$ is $\exp(-\mu t)$, so the maximum time $T$ to which we should simulate is $T = \lim_{n \to \infty} T_n$ where
+\[
+T_{n+1} = \frac{1}{\frac{\lambda}{1-x} + \frac{\mu}{1-y}} \log \left( 1 + \kappa A^{1/\left( 1 - e^{-\mu T_n} \right)} \right)
+\]
+which we can initialize with the even cruder estimate $T_0 = \max \left( \frac{1-x}{\lambda}, \frac{1-y}{\mu} \right) \log( 1 + A )$ which corresponds to $\max\left(S_I(T_0),S_D(T_0)\right)=A$.
+This converges reasonably quickly ($n \sim 10$).
 
-In the asymptotic $t \to \infty$ limit we first recall that $a \to 0$ and
-thus the second term of $u'$ vanishes, leaving only the negative first term, so $u \to 0$ also.
-We then handle separately the following three cases
-\begin{description}
-\item[$\frac{\lambda}{1-x} < \frac{\mu}{1-y}$]
-  Deletions eventually dominate insertions in size, and $L \gg M$.
-  We can drop terms in $M$, so $q' \to -(\mu+\frac{\lambda}{1-y})q < 0$ and thus $q \to 0$.
-  Also $b' \to \lambda - b (\lambda + \mu / y)$ which implies $b$ has a steady state at $b \simeq \lambda / (\lambda + \mu / y)$.
-\item[$\frac{\lambda}{1-x} > \frac{\mu}{1-y}$]
-  Insertions eventually dominate deletions in size, and $L \ll M$.
-  We can drop terms in $L$, so $q' \to q (\mu-\lambda)/(1-y)$.
-  If $\mu > \lambda$ (so deletions also dominate in rate), then $q \to 1$; if $\mu < \lambda$, then $q \to 0$.
-  \textcolor{red}{Finish this section. What happens to $b$ in these cases? What happens if $\mu = \lambda$, do we need higher-order expansions in $t$?}
-\item[$\frac{\lambda}{1-x} = \frac{\mu}{1-y}$]
-  In this case the model is time-reversible, and $L = M$.
-  \textcolor{red}{Finish this section.}
-\end{description}
-\textcolor{red}{Do we even need to consider all this in detail if $a,u \to 0$? The probability of anything being conserved is vanishingly small, so we can just approximate everything with one big gap. Maybe the effort is better spent in considering when this transition effectively happens. Is it effectively when $L,M$ underflow?}
+% In the asymptotic $t \to \infty$ limit we first recall that $a \to 0$ and
+% thus the second term of $u'$ vanishes, leaving only the negative first term, so $u \to 0$ also.
+% We then handle separately the following three cases
+% \begin{description}
+% \item[$\frac{\lambda}{1-x} < \frac{\mu}{1-y}$]
+%   Deletions eventually dominate insertions in size, and $L \gg M$.
+%   We can drop terms in $M$, so $q' \to -(\mu+\frac{\lambda}{1-y})q < 0$ and thus $q \to 0$.
+%   Also $b' \to \lambda - b (\lambda + \mu / y)$ which implies $b$ has a steady state at $b \simeq \lambda / (\lambda + \mu / y)$.
+% \item[$\frac{\lambda}{1-x} > \frac{\mu}{1-y}$]
+%   Insertions eventually dominate deletions in size, and $L \ll M$.
+%   We can drop terms in $L$, so $q' \to q (\mu-\lambda)/(1-y)$.
+%   If $\mu > \lambda$ (so deletions also dominate in rate), then $q \to 1$; if $\mu < \lambda$, then $q \to 0$.
+%   \textcolor{red}{Finish this section. What happens to $b$ in these cases? What happens if $\mu = \lambda$, do we need higher-order expansions in $t$?}
+% \item[$\frac{\lambda}{1-x} = \frac{\mu}{1-y}$]
+%   In this case the model is time-reversible, and $L = M$.
+%   \textcolor{red}{Finish this section.}
+% \end{description}
+% \textcolor{red}{Do we even need to consider all this in detail if $a,u \to 0$? The probability of anything being conserved is vanishingly small, so we can just approximate everything with one big gap. Maybe the effort is better spent in considering when this transition effectively happens. Is it effectively when $L,M$ underflow?}
+
 
 Note the relationship between the variables in these ODEs and the transition probabilities of $\mathbb{F}(t)$:
 \begin{eqnarray*}
