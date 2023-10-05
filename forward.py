@@ -3,7 +3,7 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 
-from jax import grad, vmap
+from jax import grad, value_and_grad
 from jax.scipy.special import logsumexp, gammaln
 from jax.scipy.linalg import expm
 
@@ -63,8 +63,10 @@ def alignmentIsProbablyUndetectable (t, indelParams, alphabetSize):
     expectedMatchRunLength = 1. / (1. - jnp.exp(-mu*t))
     expectedInsertions = indels(t,lam,x)
     expectedDeletions = indels(t,mu,y)
-    kappa = 2
-    return t > 0 and (expectedInsertions * expectedDeletions) > kappa * (alphabetSize ** expectedMatchRunLength)
+    kappa = 2.
+    return jnp.where (t > 0.,
+                      (expectedInsertions * expectedDeletions) > kappa * (alphabetSize ** expectedMatchRunLength),
+                      False)
 
 # convert counts (a,b,u,q) to transition matrix ((a,b,c),(f,g,h),(p,q,r))
 def smallTimeTransitionMatrix (t, indelParams, /, **kwargs):
@@ -190,20 +192,20 @@ def hky85 (eqm, ti, tv):
 # parse args
 parser = argparse.ArgumentParser(description='Compute logP(descendant|ancestor) under GGI/HKY85 model',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--ins-rate', metavar='float', dest='lam', type=float, default=1.,
+parser.add_argument('--ins-rate', metavar='float', dest='lam', type=float, default=.1,
                     help='insertion rate')
-parser.add_argument('--del-rate', metavar='float', dest='mu', type=float, default=1.,
+parser.add_argument('--del-rate', metavar='float', dest='mu', type=float, default=.1,
                     help='deletion rate')
 parser.add_argument('--ins-extend', metavar='float', dest='x', type=float, default=.9,
                     help='insertion extension probability')
 parser.add_argument('--del-extend', metavar='float', dest='y', type=float, default=.9,
                     help='deletion extension probability')
-parser.add_argument('--time', metavar='float', dest='t', type=float, default=0.1,
+parser.add_argument('--time', metavar='float', dest='t', type=float, nargs='*', default=[0.1],
                     help='evolutionary time parameter')
 parser.add_argument('--transition', metavar='float', type=float, default=1.,
-                    help='rate of transition substitutions')
+                    help='relative rate of transition substitutions')
 parser.add_argument('--transversion', metavar='float', type=float, default=1.,
-                    help='rate of transversion substitutions')
+                    help='relative rate of transversion substitutions')
 parser.add_argument('--gc', metavar='float', type=float, default=.5,
                     help='GC content at equilibrium')
 parser.add_argument('--ancestor', metavar='string', type=str, required=True,
@@ -216,17 +218,18 @@ parser.add_argument('--rtol', metavar='float', type=float, default=1e-3,
                     help='relative tolerance for variable-step numerical integration')
 parser.add_argument('--atol', metavar='float', type=float, default=1e-6,
                     help='absolute tolerance for variable-step numerical integration')
-parser.add_argument('--tderivs', action='store_true', help='show derivatives w.r.t. time')
 
 args = parser.parse_args()
 
 # do integration
 indelParams = (args.lam, args.mu, args.x, args.y)
 substRateMatrix = hky85 ([(1-args.gc)/2, args.gc/2, args.gc/2, (1-args.gc)/2], args.transition, args.transversion)
-t = args.t
 ancestor = one_hot_dna (args.ancestor)
 descendant = one_hot_dna (args.descendant)
 
-result = forward_1hot (ancestor, descendant, t, indelParams, substRateMatrix, step=args.step, rtol=args.rtol, atol=args.atol)
+@jax.jit
+def logLikelihood(t):
+    return forward_1hot (ancestor, descendant, t, indelParams, substRateMatrix, step=args.step, rtol=args.rtol, atol=args.atol)
 
-print(result)
+for t in args.t:
+    print (t, logLikelihood (t))
