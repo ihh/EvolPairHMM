@@ -143,8 +143,8 @@ def get_eqm (submat):
   A = submat.shape[0]
   return jnp.matmul (jnp.ones (A) / A, expm (submat * large_t))
 
-# normalize a substitution rate matrix to have one expected substitution per unit of time
-def normalize_rate_matrix (mx):
+# normalize a substitution rate matrix so that row sums are zero
+def zero_rate_matrix_row_sums (mx):
   mx_abs = jnp.abs (mx)
   mx_diag = jnp.diagonal (mx_abs)
   mx_no_diag = mx_abs - jnp.diag (mx_diag)
@@ -153,7 +153,7 @@ def normalize_rate_matrix (mx):
 
 # calculate submat=exp(Q*t) and pi=equilibrium distribution of Q
 def calc_submat_pi (t, substRateMatrix):
-  Q = normalize_rate_matrix (substRateMatrix)
+  Q = zero_rate_matrix_row_sums (substRateMatrix)
   pi = get_eqm (Q)
   submat = expm (Q * t)
   return submat, pi
@@ -163,6 +163,16 @@ def calc_transmat_submat_pi (t, indelParams, substRateMatrix, /, **kwargs):
   submat, pi = calc_submat_pi (t, substRateMatrix)
   transmat = transitionMatrix (t, indelParams, pi.shape[0], **kwargs)
   return transmat, submat, pi
+
+# expected substitution rate at equilibrium
+def expected_rate_at_eqm (submat):
+  submat = zero_rate_matrix_row_sums (submat)
+  eqm = get_eqm (submat)
+  return -jnp.diagonal(submat) @ eqm
+
+# normalize rate matrix so expected substitution rate at equilibrium is 1
+def normalize_rate_matrix (submat):
+  return submat / expected_rate_at_eqm (submat)
 
 # safe log wrappers (in the sense that they don't create NaN errors when taking gradients at 0)
 def safe_log (x):
@@ -243,10 +253,10 @@ def forward_1hot_wrap (x, y, t, indelParams, substRateMatrix, /, debug=False, **
 
 # Helpers to convert a DNA string to a one-hot encoded array, check its validity etc
 dna_alphabet = "acgt"
-gap_alph = ".+"
+gap_alphabet = ".+"
 
 def is_gap (c):
-  return gap_alph.find(c) >= 0
+  return gap_alphabet.find(c) >= 0
 
 def one_hot_dna (str):
   return jax.nn.one_hot ([dna_alphabet.find(x) for x in str.lower()], 4)
@@ -335,7 +345,7 @@ def alignment_loglike (alignmentSummary, t, indelParams, substRateMatrix, **kwar
 def hky85 (eqm, ti, tv):
   idx = range(4)
   raw = [[eqm[j] * (ti if i & 1 == j & 1 else tv) for j in idx] for i in idx]
-  return normalize_rate_matrix (jnp.array (raw))
+  return zero_rate_matrix_row_sums (jnp.array (raw))
 
 
 # parse args
@@ -357,6 +367,8 @@ parser.add_argument('--transversion', metavar='float', type=float, default=1.,
                     help='relative rate of transversion substitutions')
 parser.add_argument('--gc', metavar='float', type=float, default=.5,
                     help='GC content at equilibrium')
+parser.add_argument('--normal', action='store_true',
+                    help='constrain rate matrix so expected substitution rate at equilibrium is 1')
 parser.add_argument('--ancestor', metavar='string', type=str, required=True,
                     help='ancestral DNA sequence')
 parser.add_argument('--descendant', metavar='string', type=str, required=True,
@@ -394,6 +406,8 @@ def llArgs(params):
   indelParams = (params["lambda"], params["mu"], params["x"], params["y"])
   gc, ti, tv = params["gc"], params["ti"], params["tv"]
   substRateMatrix = hky85 ([(1-gc)/2, gc/2, gc/2, (1-gc)/2], ti, tv)
+  if args.normal:
+    substRateMatrix = normalize_rate_matrix (substRateMatrix)
   return params["t"], indelParams, substRateMatrix
   
 def logLikelihood_unaligned(params):
