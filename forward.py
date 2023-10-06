@@ -360,7 +360,7 @@ parser.add_argument('--ins-extend', metavar='float', dest='x', type=float, defau
 parser.add_argument('--del-extend', metavar='float', dest='y', type=float, default=.9,
                     help='deletion extension probability (y)')
 parser.add_argument('--time', metavar='float', dest='t', type=float, nargs='*', default=[0.1],
-                    help='evolutionary time parameter (t)')
+                    help='evolutionary time parameter (t). You can specify more than one')
 parser.add_argument('--transition', metavar='float', type=float, default=1.,
                     help='rate of transition substitutions (ti)')
 parser.add_argument('--transversion', metavar='float', type=float, default=1.,
