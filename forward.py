@@ -362,9 +362,9 @@ parser.add_argument('--del-extend', metavar='float', dest='y', type=float, defau
 parser.add_argument('--time', metavar='float', dest='t', type=float, nargs='*', default=[0.1],
                     help='evolutionary time parameter')
 parser.add_argument('--transition', metavar='float', type=float, default=1.,
-                    help='relative rate of transition substitutions')
+                    help='absolute rate of transition substitutions')
 parser.add_argument('--transversion', metavar='float', type=float, default=1.,
-                    help='relative rate of transversion substitutions')
+                    help='absolute rate of transversion substitutions')
 parser.add_argument('--gc', metavar='float', type=float, default=.5,
                     help='GC content at equilibrium')
 parser.add_argument('--normal', action='store_true',
