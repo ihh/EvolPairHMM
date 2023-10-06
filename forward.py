@@ -139,8 +139,9 @@ def transitionMatrix (t, indelParams, /, alphabetSize=20, **kwargs):
 # get equilibrium of substitution rate matrix by finding an "effectively infinite" time value, multiplying by that, and exponentiating
 # this is ugly, but it works...
 def get_eqm (submat):
-  large_t = 1 / jnp.min(jnp.abs(submat)[jnp.nonzero(submat,size=1)])
-  return jnp.matmul (expm (submat * large_t), jnp.ones (submat.shape[0]))
+  large_t = 10. / jnp.min(jnp.abs(submat)[jnp.nonzero(submat,size=1)])
+  A = submat.shape[0]
+  return jnp.matmul (jnp.ones (A) / A, expm (submat * large_t))
 
 # normalize a substitution rate matrix to have one expected substitution per unit of time
 def normalize_rate_matrix (mx):
@@ -178,15 +179,15 @@ log = safe_log
 
 # function to remove -infinity with -1e38 (an icky compromise, to avoid rewriting too much of jax.numpy)
 def remove_neginfs (x):
-  return jnp.where (x is -jnp.inf, min_float32, x)
+  return jnp.where (x > -jnp.inf, x, min_float32)
 
 # pure, but inefficient, jax implementation of Forward algorithm
 # x is the ancestor, laid out horizontally (i.e. each row compares all of x to a single site of y)
 # y is the descendant, laid out vertically (i.e. each column compares all of y to a single site of x)
 # The states are M(0), I(1), D(2)
-def forward_1hot (x, y, transmat, submat, pi, /, **kwargs):
+def forward_1hot (x, y, transmat, submat, pi, /, debug=False, **kwargs):
   [[a,b,c],[f,g,h],[p,q,r]] = log (transmat)  # perform calculations in log-space
-  lsm = remove_neginfs (log (submat) - log (pi))  # replacing -infinity with -1e38 is a compromise, but avoids having to rewrite jnp.matmul to catch 0*infinity
+  lsm = remove_neginfs (log(submat))  # replacing -infinity with -1e38 is a compromise, but avoids having to rewrite jnp.matmul to catch 0*infinity
   def fillCell (cellCarry, col):
     M_src_cell, D_src_cell, yc = cellCarry
     I_src_cell, xc = col[0:3], col[3:]
@@ -227,14 +228,18 @@ def forward_1hot (x, y, transmat, submat, pi, /, **kwargs):
                                             (firstRow,x),
                                             y)
   lastRow = lastRowCarry[0]
+  if debug:
+    print("Substitution matrix:\n",lsm)
+    print("Transition matrix:\n",jnp.array ([[a,b,c],[f,g,h],[p,q,r]]))
+    print("DP matrix:\n",jnp.concatenate([jnp.array([firstRow]),_restOfRows]))
   return logsumexp (jnp.array ([lastRow[-1,0] + logsumexp(jnp.array ([a,c])),
                                 lastRow[-1,1] + logsumexp(jnp.array ([f,h])),
                                 lastRow[-1,2] + logsumexp(jnp.array ([p,r]))]))
 
 # wrapper that computes the finite-time probabilities before calling forward_1hot
-def forward_1hot_wrap (x, y, t, indelParams, substRateMatrix, /, **kwargs):
+def forward_1hot_wrap (x, y, t, indelParams, substRateMatrix, /, debug=False, **kwargs):
   transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix, **kwargs)
-  return forward_1hot (x, y, transmat, submat, pi, **kwargs)
+  return forward_1hot (x, y, transmat, submat, pi, debug=debug, **kwargs)
 
 # null model sequence (log) probability
 def null_model_prob_1hot (seq_1hot, pi):
@@ -283,6 +288,8 @@ parser.add_argument('--atol', metavar='float', type=float, default=1e-6,
                     help='absolute tolerance for variable-step numerical integration')
 parser.add_argument('--derivs', action='store_true',
                     help='show derivatives of log-likelihood')
+parser.add_argument('--debug', action='store_true',
+                    help='print DP matrix and scoring parameters')
 
 args = parser.parse_args()
 
@@ -300,21 +307,29 @@ diffraxArgs = { "step": args.step,
                 "rtol": args.rtol,
                 "atol": args.atol }
 
-@jax.jit
-def logLikelihood(params):
+def llArgs(params):
   indelParams = (params["lambda"], params["mu"], params["x"], params["y"])
   gc, ti, tv = params["gc"], params["ti"], params["tv"]
   substRateMatrix = hky85 ([(1-gc)/2, gc/2, gc/2, (1-gc)/2], ti, tv)
-  return forward_1hot_wrap (ancestor, descendant, params["t"], indelParams, substRateMatrix, **diffraxArgs)
+  return ancestor, descendant, params["t"], indelParams, substRateMatrix
+  
+def logLikelihood(params):
+  return forward_1hot_wrap (*llArgs(params), **diffraxArgs)
 
+def logLikelihood_debug(params):
+  return forward_1hot_wrap (*llArgs(params), debug=True, **diffraxArgs)
+
+ll = jax.jit (logLikelihood)
 ll_grad = jax.jit (value_and_grad (logLikelihood))
 
 for t in args.t:
   params["t"] = t
+  if args.debug:
+    logLikelihood_debug (params)
   if args.derivs:
     logLike, derivs = ll_grad (params)
     print (f"t={t} L={logLike} "
            + " ".join(f"dL/d({x})={derivs[x]}" for x in ["t","lambda","mu","x","y","gc","ti","tv"]))
   else:
-    logLike = logLikelihood (params)
+    logLike = ll (params)
     print (f"t={t} L={logLike}")
