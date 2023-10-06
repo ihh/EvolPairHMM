@@ -352,21 +352,21 @@ def hky85 (eqm, ti, tv):
 parser = argparse.ArgumentParser(description='Compute logP(descendant|ancestor) under GGI/HKY85 model',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--ins-rate', metavar='float', dest='lam', type=float, default=.1,
-                    help='insertion rate')
+                    help='insertion rate (lambda)')
 parser.add_argument('--del-rate', metavar='float', dest='mu', type=float, default=.1,
-                    help='deletion rate')
+                    help='deletion rate (mu)')
 parser.add_argument('--ins-extend', metavar='float', dest='x', type=float, default=.9,
-                    help='insertion extension probability')
+                    help='insertion extension probability (x)')
 parser.add_argument('--del-extend', metavar='float', dest='y', type=float, default=.9,
-                    help='deletion extension probability')
+                    help='deletion extension probability (y)')
 parser.add_argument('--time', metavar='float', dest='t', type=float, nargs='*', default=[0.1],
-                    help='evolutionary time parameter')
+                    help='evolutionary time parameter (t)')
 parser.add_argument('--transition', metavar='float', type=float, default=1.,
-                    help='absolute rate of transition substitutions')
+                    help='rate of transition substitutions (ti)')
 parser.add_argument('--transversion', metavar='float', type=float, default=1.,
-                    help='absolute rate of transversion substitutions')
+                    help='rate of transversion substitutions (tv)')
 parser.add_argument('--gc', metavar='float', type=float, default=.5,
-                    help='GC content at equilibrium')
+                    help='GC content at equilibrium (gc)')
 parser.add_argument('--normal', action='store_true',
                     help='constrain rate matrix so expected substitution rate at equilibrium is 1')
 parser.add_argument('--ancestor', metavar='string', type=str, required=True,
