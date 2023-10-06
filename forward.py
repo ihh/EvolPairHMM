@@ -57,6 +57,24 @@ def integrateCounts (t, indelParams, /, step = None, rtol = None, atol = None, *
                      **kwargs)
   return sol.ys[-1]
 
+# Runge-Kutte (RK4) implementation, independent of diffrax
+def integrateCounts_RK4 (t, indelParams, /, steps=10, dt0=0.01):
+  lam,mu,x,y = indelParams
+  def RK4body (y, t_dt):
+    t, dt = t_dt
+    k1 = derivs(t, y, indelParams)
+    k2 = derivs(t+dt/2, y + dt*k1/2, indelParams)
+    k3 = derivs(t+dt/2, y + dt*k2/2, indelParams)
+    k4 = derivs(t+dt, y + dt*k3, indelParams)
+    return y + dt*(k1 + 2*k2 + 2*k3 + k4)/6, None
+  y0 = jnp.array([1.,0.,0.,0.])
+  dt0_abs = jnp.minimum (t/steps, dt0 / jnp.minimum(1.,1./jnp.maximum(lam,mu)))
+  ts = jnp.geomspace (dt0_abs, t, num=steps)
+  ts_with_0 = jnp.concatenate ([jnp.array([0]), ts])
+  dts = jnp.ediff1d (ts_with_0)
+  y1, _ = jax.lax.scan (RK4body, y0, (ts_with_0[0:-1],dts))
+  return y1
+
 # test whether time is past threshold of alignment signal being undetectable
 def alignmentIsProbablyUndetectable (t, indelParams, alphabetSize):
     lam,mu,x,y = indelParams
@@ -65,13 +83,14 @@ def alignmentIsProbablyUndetectable (t, indelParams, alphabetSize):
     expectedDeletions = indels(t,mu,y)
     kappa = 2.
     return jnp.where (t > 0.,
-                      (expectedInsertions * expectedDeletions) > kappa * (alphabetSize ** expectedMatchRunLength),
+                      ((expectedInsertions + 1) * (expectedDeletions + 1)) > kappa * (alphabetSize ** expectedMatchRunLength),
                       False)
 
 # convert counts (a,b,u,q) to transition matrix ((a,b,c),(f,g,h),(p,q,r))
 def smallTimeTransitionMatrix (t, indelParams, /, **kwargs):
     lam,mu,x,y = indelParams
     a,b,u,q = integrateCounts(t,indelParams,**kwargs)
+#    a,b,u,q = integrateCounts_RK4(t,indelParams)
     L = lm(t,lam,x)
     M = lm(t,mu,y)
     return jnp.array ([[a,b,1-a-b],
