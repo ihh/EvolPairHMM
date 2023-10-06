@@ -241,14 +241,95 @@ def forward_1hot_wrap (x, y, t, indelParams, substRateMatrix, /, debug=False, **
   transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix, **kwargs)
   return forward_1hot (x, y, transmat, submat, pi, debug=debug, **kwargs)
 
-# null model sequence (log) probability
-def null_model_prob_1hot (seq_1hot, pi):
-  return jnp.sum (jnp.dot (seq_1hot, log(pi)))
-
-# convert a DNA string to a one-hot encoded array
+# Helpers to convert a DNA string to a one-hot encoded array, check its validity etc
 dna_alphabet = "acgt"
+gap_alph = ".+"
+
+def is_gap (c):
+  return gap_alph.find(c) >= 0
+
 def one_hot_dna (str):
-    return jax.nn.one_hot ([dna_alphabet.index(x) for x in str.lower()], 4)
+  return jax.nn.one_hot ([dna_alphabet.find(x) for x in str.lower()], 4)
+
+def assert_valid_str (str, alph):
+  assert jnp.min (jnp.array ([alph.find(x) for x in str.lower()])) >= 0, f"String '{str}' does not match alphabet '{alph}'"
+
+def assert_valid_dna (str):
+  return assert_valid_str (str, dna_alphabet)
+
+def assert_valid_aligned_dna (str):
+  return assert_valid_str (str, dna_alphabet + gap_alphabet)
+
+# Now some functions for computing the alignment-conditioned probabilities
+# Binomial coefficient using gamma functions
+def log_binom (x, y):
+  return gammaln(x+1) - gammaln(y+1) - gammaln(x-y+1)
+
+# Calculate the (log of the) probability of seeing a particular size of gap
+def gap_prob (nDeletions, nInsertions, transmat):
+  [[a,b,c],[f,g,h],[p,q,r]] = transmat
+  log = jnp.log
+  def Ck (k : int):
+    logbinom = log_binom(jnp.where(nDeletions>k,nDeletions-1,k),k-1) + log_binom(jnp.where(nInsertions>k,nInsertions-1,k),k-1) # guard against out-of-range errors
+    log_arg = b*(nInsertions-k)*(r*f*k + h*p*(nDeletions-k)) + c*(nDeletions-k)*(g*p*k + q*f*(nInsertions-k)) # guard against log(0)
+    return jnp.exp (k * log(h*q/(g*r)) + logbinom - 2*log(k) + log(jnp.where(log_arg>0,log_arg,1)))
+  return jnp.where (nDeletions == 0,
+                    jnp.where (nInsertions == 0,
+                               log(a),
+                               log(b) + (nInsertions - 1)*log(g) + log(f)),
+                    jnp.where (nInsertions == 0,
+                               log(c) + (nDeletions - 1)*log(r) + log(p),
+                               (nDeletions - 1)*log(g) + (nInsertions-1)*log(r)
+                               + log (b*h*p + c*q*f + sum ([jnp.where ((k<nInsertions or k<nDeletions) and k<=nInsertions and k<=nDeletions,
+                                                                       Ck(k),
+                                                                       0) for k in range(1,nDeletions+nInsertions)]))))
+
+# Convert a pair of strings, representing an alignment, into a data structure that summarizes the number of gaps and substitutions of each size/type
+def summarize_alignment (xstr, ystr, alph):
+  if len(xstr) != len(ystr):
+    raise Exception ("Alignment strings must have same length")
+  ni = nd = 0
+  subCount = {}
+  gapCount = {}
+  def inc (dict, x, y):
+    if x >= 0 and y >= 0:
+      key = str(x) + " " + str(y)
+      dict[key] = dict[key] + 1 if key in dict else 1
+  def dict2array (dict):
+    return [[int(s) for s in key.split()] + [dict[key]] for key in dict.keys()]
+  for i in range(len(xstr)):
+    xc,yc = xstr[i], ystr[i]
+    if not is_gap(xc) and not is_gap(yc):
+      inc (subCount, alph.index(xc), alph.index(yc))
+      inc (gapCount, nd, ni)
+      ni = nd = 0
+    else:
+      if not is_gap(xc):
+        nd = nd + 1
+      if not is_gap(yc):
+        ni = ni + 1
+  inc (gapCount, nd, ni)
+  return dict2array(gapCount), dict2array(subCount)
+
+# Log-likelihoods for the alignment-conditioned case
+def gap_loglike (gapCounts, t, indelParams, alphabetSize, **kwargs):
+  transmat = transitionMatrix (t, indelParams, alphabetSize, **kwargs)
+  def ij_ll (i_j_count):
+    i, j, count = i_j_count
+    return count * gap_prob (i, j, transmat)
+  return sum ([ij_ll(c) for c in gapCounts])
+
+def sub_loglike (subCounts, t, substRateMatrix):
+  submat, pi = calc_submat_pi (t, substRateMatrix)
+  log_pi = log(pi)
+  def xy_ll (x_y_count):
+    x, y, count = x_y_count
+    return count * log(submat[x][y])
+  return sum ([xy_ll(c) for c in subCounts])
+
+def alignment_loglike (alignmentSummary, t, indelParams, substRateMatrix, **kwargs):
+  gapCounts, subCounts = alignmentSummary
+  return gap_loglike(gapCounts,t,indelParams,substRateMatrix.shape[0],**kwargs) + sub_loglike(subCounts,t,substRateMatrix)
 
 # The Hasegawa-Kishino-Yano (1985) substitution rate matrix
 def hky85 (eqm, ti, tv):
@@ -280,6 +361,8 @@ parser.add_argument('--ancestor', metavar='string', type=str, required=True,
                     help='ancestral DNA sequence')
 parser.add_argument('--descendant', metavar='string', type=str, required=True,
                     help='descendant DNA sequence')
+parser.add_argument('--aligned', action='store_true',
+                    help='treat ancestor and descendant as aligned; do not sum over alignments')
 parser.add_argument('--step', metavar='float', type=float, default=None,
                     help='time step for fixed-step numerical integration')
 parser.add_argument('--rtol', metavar='float', type=float, default=1e-3,
@@ -311,21 +394,34 @@ def llArgs(params):
   indelParams = (params["lambda"], params["mu"], params["x"], params["y"])
   gc, ti, tv = params["gc"], params["ti"], params["tv"]
   substRateMatrix = hky85 ([(1-gc)/2, gc/2, gc/2, (1-gc)/2], ti, tv)
-  return ancestor, descendant, params["t"], indelParams, substRateMatrix
+  return params["t"], indelParams, substRateMatrix
   
-def logLikelihood(params):
-  return forward_1hot_wrap (*llArgs(params), **diffraxArgs)
+def logLikelihood_unaligned(params):
+  return forward_1hot_wrap (ancestor, descendant, *llArgs(params), **diffraxArgs)
 
-def logLikelihood_debug(params):
-  return forward_1hot_wrap (*llArgs(params), debug=True, **diffraxArgs)
+def logLikelihood_aligned(params):
+  return alignment_loglike (summary, *llArgs(params), **diffraxArgs)
 
-ll = jax.jit (logLikelihood)
-ll_grad = jax.jit (value_and_grad (logLikelihood))
+def debug_print_matrix(params):
+  forward_1hot_wrap (ancestor, descendant, *llArgs(params), debug=True, **diffraxArgs)
+
+if args.aligned:
+  assert_valid_aligned_dna (args.ancestor)
+  assert_valid_aligned_dna (args.descendant)
+  summary = summarize_alignment (args.ancestor.lower(), args.descendant.lower(), dna_alphabet)
+  ll = logLikelihood_aligned
+else:
+  assert_valid_dna (args.ancestor)
+  assert_valid_dna (args.descendant)
+  ll = logLikelihood_unaligned
+  
+ll = jax.jit (ll)
+ll_grad = jax.jit (value_and_grad (ll))
 
 for t in args.t:
   params["t"] = t
   if args.debug:
-    logLikelihood_debug (params)
+    debug_print_matrix (params)
   if args.derivs:
     logLike, derivs = ll_grad (params)
     print (f"t={t} L={logLike} "
