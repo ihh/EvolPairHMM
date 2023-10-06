@@ -1,10 +1,8 @@
-import numpy as np
-
 import jax
 import jax.numpy as jnp
 
 from jax import grad, value_and_grad
-from jax.scipy.special import logsumexp, gammaln
+from jax.scipy.special import gammaln, logsumexp
 from jax.scipy.linalg import expm
 
 from functools import partial
@@ -15,6 +13,13 @@ from diffrax import diffeqsolve, ODETerm, Dopri5, PIDController, ConstantStepSiz
 
 import argparse
 
+# We hate NaNs
+from jax.config import config
+config.update("jax_debug_nans", True)
+
+# We replace zeroes and infinities with small numbers sometimes
+min_float32 = jnp.finfo('float32').min
+smallest_float32 = jnp.finfo('float32').smallest_normal
 
 # calculate L, M
 def lm (t, rate, prob):
@@ -29,13 +34,15 @@ def derivs (t, counts, indelParams):
   a,b,u,q = counts
   L = lm (t, lam, x)
   M = lm (t, mu, y)
-  denom = M*(1.-y) + L*q*y + L*M*(y*(1.+b-q)-1.)
   num = mu * (b*M + q*(1.-M))
-  return jnp.where (t > 0.,
+  unsafe_denom = M*(1.-y) + L*q*y + L*M*(y*(1.+b-q)-1.)
+  denom = jnp.where (unsafe_denom > 0., unsafe_denom, 1.)   # avoid NaN gradient at zero
+  one_minus_m = jnp.where (M < 1., 1. - M, smallest_float32)   # avoid NaN gradient at zero
+  return jnp.where (unsafe_denom > 0.,
                     jnp.array (((mu*b*u*L*M*(1.-y)/denom - (lam+mu)*a,
                                  -b*num*L/denom + lam*(1.-b),
                                  -u*num*L/denom + lam*a,
-                                 ((M*(1.-L)-q*L*(1.-M))*num/denom - q*lam/(1.-y))/(1.-M)))),
+                                 ((M*(1.-L)-q*L*(1.-M))*num/denom - q*lam/(1.-y))/one_minus_m))),
                     jnp.array ((-lam-mu,lam,lam,0.)))
 
 # calculate counts (a,b,u,q) by numerical integration
@@ -57,8 +64,10 @@ def integrateCounts (t, indelParams, /, step = None, rtol = None, atol = None, *
                      **kwargs)
   return sol.ys[-1]
 
-# Runge-Kutte (RK4) implementation, independent of diffrax
-def integrateCounts_RK4 (t, indelParams, /, steps=10, dt0=0.01):
+# Runge-Kutte (RK4) numerical integration routine
+# This is retained solely to have a simpler routine independent of diffrax, if needed for debugging
+# Currently we just use integrateCounts instead, so this function is never called
+def integrateCounts_RK4 (t, indelParams, /, steps=10, dt0=None):
   lam,mu,x,y = indelParams
   def RK4body (y, t_dt):
     t, dt = t_dt
@@ -67,12 +76,13 @@ def integrateCounts_RK4 (t, indelParams, /, steps=10, dt0=0.01):
     k3 = derivs(t+dt/2, y + dt*k2/2, indelParams)
     k4 = derivs(t+dt, y + dt*k3, indelParams)
     return y + dt*(k1 + 2*k2 + 2*k3 + k4)/6, None
-  y0 = jnp.array([1.,0.,0.,0.])
-  dt0_abs = jnp.minimum (t/steps, dt0 / jnp.minimum(1.,1./jnp.maximum(lam,mu)))
-  ts = jnp.geomspace (dt0_abs, t, num=steps)
+  y0 = initCounts (indelParams)
+  if dt0 is None:
+    dt0 = 0.1 / jnp.maximum (lam, mu)
+  ts = jnp.geomspace (dt0, t, num=steps)
   ts_with_0 = jnp.concatenate ([jnp.array([0]), ts])
   dts = jnp.ediff1d (ts_with_0)
-  y1, _ = jax.lax.scan (RK4body, y0, (ts_with_0[0:-1],dts))
+  y1, _ = jax.lax.scan (RK4body, y0, (ts_with_0[:-1],dts))
   return y1
 
 # test whether time is past threshold of alignment signal being undetectable
@@ -86,16 +96,26 @@ def alignmentIsProbablyUndetectable (t, indelParams, alphabetSize):
                       ((expectedInsertions + 1) * (expectedDeletions + 1)) > kappa * (alphabetSize ** expectedMatchRunLength),
                       False)
 
+# initial transition matrix
+def zeroTimeTransitionMatrix (indelParams):
+  lam,mu,x,y = indelParams
+  return jnp.array ([[1.,0.,0.],
+                     [1.-x,x,0.],
+                     [1.-y,0.,y]])
+
 # convert counts (a,b,u,q) to transition matrix ((a,b,c),(f,g,h),(p,q,r))
 def smallTimeTransitionMatrix (t, indelParams, /, **kwargs):
     lam,mu,x,y = indelParams
     a,b,u,q = integrateCounts(t,indelParams,**kwargs)
-#    a,b,u,q = integrateCounts_RK4(t,indelParams)
+# To use the non-diffrax version, comment out the previous line and uncomment the following one:
+#    a,b,u,q = integrateCounts_RK4(t,indelParams,dt0=.1/jnp.maximum(lam,mu))
     L = lm(t,lam,x)
     M = lm(t,mu,y)
+    one_minus_L = jnp.where (L < 1., 1. - L, smallest_float32)   # avoid NaN gradient at zero
+    one_minus_M = jnp.where (M < 1., 1. - M, smallest_float32)   # avoid NaN gradient at zero
     return jnp.array ([[a,b,1-a-b],
-                      [u*L/(1-L),1-(b+q*(1-M)/M)*L/(1-L),(b+q*(1-M)/M-u)*L/(1-L)],
-                       [(1-a-u)*M/(1-M),q,1-q-(1-a-u)*M/(1-M)]])
+                      [u*L/one_minus_L,1-(b+q*(1-M)/M)*L/one_minus_L,(b+q*(1-M)/M-u)*L/one_minus_L],
+                       [(1-a-u)*M/one_minus_M,q,1-q-(1-a-u)*M/one_minus_M]])
 
 # get limiting transition matrix for large times
 def largeTimeTransitionMatrix (t, indelParams):
@@ -109,10 +129,12 @@ def largeTimeTransitionMatrix (t, indelParams):
 # get transition matrix for any given time
 def transitionMatrix (t, indelParams, /, alphabetSize=20, **kwargs):
     lam,mu,x,y = indelParams
-    return jnp.where (alignmentIsProbablyUndetectable(t,indelParams,alphabetSize),
-                      largeTimeTransitionMatrix(t,indelParams),
-                      smallTimeTransitionMatrix(t,indelParams,**kwargs))
-
+    return jnp.where (t > 0.,
+                      jnp.where (alignmentIsProbablyUndetectable(t,indelParams,alphabetSize),
+                                 largeTimeTransitionMatrix(t,indelParams),
+                                 smallTimeTransitionMatrix(t,indelParams,**kwargs)),
+                      zeroTimeTransitionMatrix(indelParams))
+  
 # get equilibrium of substitution rate matrix by finding an "effectively infinite" time value, multiplying by that, and exponentiating
 # this is ugly, but it works...
 def get_eqm (submat):
@@ -140,14 +162,30 @@ def calc_transmat_submat_pi (t, indelParams, substRateMatrix, /, **kwargs):
   transmat = transitionMatrix (t, indelParams, pi.shape[0], **kwargs)
   return transmat, submat, pi
 
+# safe log wrappers (in the sense that they don't create NaN errors when taking gradients at 0)
+def safe_log (x):
+  return jnp.where (x > 0., jnp.log (jnp.where (x > 0., x, min_float32)), -jnp.inf)
+
+def safe_logsumexp(a):
+  c = jnp.max(a)
+  safe = c > min_float32
+  a = jnp.where(safe, a, jnp.array([0]))
+  return jnp.where (safe, jnp.log(jnp.sum(jnp.exp(a))), -jnp.inf)
+
+logsumexp = safe_logsumexp
+log = safe_log
+
+# function to remove -infinity with -1e38 (an icky compromise, to avoid rewriting too much of jax.numpy)
+def remove_neginfs (x):
+  return jnp.where (x is -jnp.inf, min_float32, x)
+
 # pure, but inefficient, jax implementation of Forward algorithm
 # x is the ancestor, laid out horizontally (i.e. each row compares all of x to a single site of y)
 # y is the descendant, laid out vertically (i.e. each column compares all of y to a single site of x)
 # The states are M(0), I(1), D(2)
-def forward_1hot (x, y, t, indelParams, substRateMatrix, /, **kwargs):
-  transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix, **kwargs)
-  [[a,b,c],[f,g,h],[p,q,r]] = jnp.log (transmat)  # work in log-space
-  lsm = jnp.log (submat) - jnp.log (pi)
+def forward_1hot (x, y, transmat, submat, pi, /, **kwargs):
+  [[a,b,c],[f,g,h],[p,q,r]] = log (transmat)  # perform calculations in log-space
+  lsm = remove_neginfs (log (submat) - log (pi))  # replacing -infinity with -1e38 is a compromise, but avoids having to rewrite jnp.matmul to catch 0*infinity
   def fillCell (cellCarry, col):
     M_src_cell, D_src_cell, yc = cellCarry
     I_src_cell, xc = col[0:3], col[3:]
@@ -164,22 +202,22 @@ def forward_1hot (x, y, t, indelParams, substRateMatrix, /, **kwargs):
     return (I_src_cell, cell, yc), cell
   def fillRow (rowCarry, yc):
     prevRow, x = rowCarry
-    firstCellInRow = jnp.array([-np.Infinity,
+    firstCellInRow = jnp.array([-jnp.inf,
                                 logsumexp (jnp.array ([prevRow[0,0] + b,
                                                       prevRow[0,1] + g])),
-                                -np.Infinity])
+                                -jnp.inf])
     _finalCellCarry, restOfRow = jax.lax.scan (fillCell,
                                                (prevRow[0], firstCellInRow, yc),
                                                jnp.concatenate ([prevRow[1:], x], 1))
     row = jnp.concatenate ([jnp.array ([firstCellInRow]), restOfRow])
     return (row, x), row
   def fillFirstRow (prevCell, _xc):
-    cell = jnp.array ([-np.Infinity,
-                       -np.Infinity,
+    cell = jnp.array ([-jnp.inf,
+                       -jnp.inf,
                        logsumexp (jnp.array ([prevCell[0] + c,
                                               prevCell[2] + r]))])
     return cell, cell
-  firstCell = jnp.array ([0,-np.Infinity,-np.Infinity])
+  firstCell = jnp.array ([0,-jnp.inf,-jnp.inf])
   _lastCellInFirstRow, restOfFirstRow = jax.lax.scan (fillFirstRow,
                                                       firstCell,
                                                       x)
@@ -187,19 +225,24 @@ def forward_1hot (x, y, t, indelParams, substRateMatrix, /, **kwargs):
   lastRowCarry, _restOfRows = jax.lax.scan (fillRow,
                                             (firstRow,x),
                                             y)
-  # jax.debug.print(jnp.concatenate([jnp.array([firstRow]),_restOfRows]))
   lastRow = lastRowCarry[0]
   return logsumexp (jnp.array ([lastRow[-1,0] + logsumexp(jnp.array ([a,c])),
                                 lastRow[-1,1] + logsumexp(jnp.array ([f,h])),
                                 lastRow[-1,2] + logsumexp(jnp.array ([p,r]))]))
 
+# wrapper that computes the finite-time probabilities before calling forward_1hot
+def forward_1hot_wrap (x, y, t, indelParams, substRateMatrix, /, **kwargs):
+  transmat, submat, pi = calc_transmat_submat_pi (t, indelParams, substRateMatrix, **kwargs)
+  return forward_1hot (x, y, transmat, submat, pi, **kwargs)
+
 # null model sequence (log) probability
 def null_model_prob_1hot (seq_1hot, pi):
-  return jnp.sum (jnp.dot (seq_1hot, jnp.log(pi)))
+  return jnp.sum (jnp.dot (seq_1hot, log(pi)))
 
 # convert a DNA string to a one-hot encoded array
+dna_alphabet = "acgt"
 def one_hot_dna (str):
-    return jax.nn.one_hot (["acgt".index(x) for x in str.lower()], 4)
+    return jax.nn.one_hot ([dna_alphabet.index(x) for x in str.lower()], 4)
 
 # The Hasegawa-Kishino-Yano (1985) substitution rate matrix
 def hky85 (eqm, ti, tv):
@@ -237,18 +280,40 @@ parser.add_argument('--rtol', metavar='float', type=float, default=1e-3,
                     help='relative tolerance for variable-step numerical integration')
 parser.add_argument('--atol', metavar='float', type=float, default=1e-6,
                     help='absolute tolerance for variable-step numerical integration')
+parser.add_argument('--derivs', action='store_true',
+                    help='show derivatives of log-likelihood')
 
 args = parser.parse_args()
 
 # do integration
-indelParams = (args.lam, args.mu, args.x, args.y)
-substRateMatrix = hky85 ([(1-args.gc)/2, args.gc/2, args.gc/2, (1-args.gc)/2], args.transition, args.transversion)
+params = { "lambda": args.lam,
+           "mu": args.mu,
+           "x": args.x,
+           "y": args.y,
+           "gc": args.gc,
+           "ti": args.transition,
+           "tv": args.transversion }
 ancestor = one_hot_dna (args.ancestor)
 descendant = one_hot_dna (args.descendant)
+diffraxArgs = { "step": args.step,
+                "rtol": args.rtol,
+                "atol": args.atol }
 
 @jax.jit
-def logLikelihood(t):
-    return forward_1hot (ancestor, descendant, t, indelParams, substRateMatrix, step=args.step, rtol=args.rtol, atol=args.atol)
+def logLikelihood(params):
+  indelParams = (params["lambda"], params["mu"], params["x"], params["y"])
+  gc, ti, tv = params["gc"], params["ti"], params["tv"]
+  substRateMatrix = hky85 ([(1-gc)/2, gc/2, gc/2, (1-gc)/2], ti, tv)
+  return forward_1hot_wrap (ancestor, descendant, params["t"], indelParams, substRateMatrix, **diffraxArgs)
+
+ll_grad = jax.jit (value_and_grad (logLikelihood))
 
 for t in args.t:
-    print (t, logLikelihood (t))
+  params["t"] = t
+  if args.derivs:
+    logLike, derivs = ll_grad (params)
+    print (f"t={t} L={logLike} "
+           + " ".join(f"dL/d({x})={derivs[x]}" for x in ["t","lambda","mu","x","y","gc","ti","tv"]))
+  else:
+    logLike = logLikelihood (params)
+    print (f"t={t} L={logLike}")
