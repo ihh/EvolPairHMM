@@ -419,16 +419,18 @@ def logLikelihood_aligned(params):
 def debug_print_matrix(params):
   forward_1hot_wrap (ancestor, descendant, *llArgs(params), debug=True, **diffraxArgs)
 
-if args.aligned:
+if args.aligned or args.debug:
   assert_valid_aligned_dna (args.ancestor)
   assert_valid_aligned_dna (args.descendant)
+
+if args.aligned:
   summary = summarize_alignment (args.ancestor.lower(), args.descendant.lower(), dna_alphabet)
   ll = logLikelihood_aligned
 else:
   assert_valid_dna (args.ancestor)
   assert_valid_dna (args.descendant)
   ll = logLikelihood_unaligned
-  
+
 ll = jax.jit (ll)
 ll_grad = jax.jit (value_and_grad (ll))
 
