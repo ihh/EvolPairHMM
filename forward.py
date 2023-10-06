@@ -376,11 +376,11 @@ parser.add_argument('--descendant', metavar='string', type=str, required=True,
 parser.add_argument('--aligned', action='store_true',
                     help='treat ancestor and descendant as aligned; do not sum over alignments')
 parser.add_argument('--step', metavar='float', type=float, default=None,
-                    help='time step for fixed-step numerical integration')
+                    help='time step for fixed-step numerical integration of GGI ODEs')
 parser.add_argument('--rtol', metavar='float', type=float, default=1e-3,
-                    help='relative tolerance for variable-step numerical integration')
+                    help='relative tolerance for variable-step numerical integration of GGI ODEs')
 parser.add_argument('--atol', metavar='float', type=float, default=1e-6,
-                    help='absolute tolerance for variable-step numerical integration')
+                    help='absolute tolerance for variable-step numerical integration of GGI ODEs')
 parser.add_argument('--derivs', action='store_true',
                     help='show derivatives of log-likelihood')
 parser.add_argument('--debug', action='store_true',
