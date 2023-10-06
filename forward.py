@@ -18,6 +18,7 @@ from jax.config import config
 config.update("jax_debug_nans", True)
 
 # We replace zeroes and infinities with small numbers sometimes
+# It's sinful but that's life for you
 min_float32 = jnp.finfo('float32').min
 smallest_float32 = jnp.finfo('float32').smallest_normal
 
