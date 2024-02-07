@@ -1,5 +1,6 @@
 import jax
 import jax.numpy as jnp
+from jax.scipy.special import logsumexp
 
 # Implements the Forward algorithm for an HMM as a scan (both generic and associative).
 # Inputs:
@@ -21,6 +22,21 @@ def hmm_forward(params, obs):
     u = jnp.einsum('ij,jn->nij', t, jnp.take(e, obs, axis=1))
     return start @ jax.lax.associative_scan (jnp.matmul, u)[-1] @ end
 
+# Another associative scan, but in log space
+def hmm_forward_log(params, obs):
+    t, e, start, end = params
+    logu = jnp.log (jnp.einsum('ij,jn->nij', t, jnp.take(e, obs, axis=1)))
+    logu_prod = jax.lax.associative_scan (log_matmul, logu)[-1]
+    return log_matmul (log_matmul (jnp.log(start)[None,:], logu_prod), jnp.log(end)[:,None])[0,0]
+
+# Log space matrix product via https://stackoverflow.com/a/74409968
+# Equivalent of jnp.log (jnp.einsum('...ij,...jk->...ik', jnp.exp(A), jnp.exp(B)))
+def log_matmul(A,B):
+    assert A.ndim == B.ndim
+    Astack = jnp.einsum ('k...ij->...ikj', jnp.stack([A]*B.shape[-1]))
+    Bstack = jnp.einsum ('i...jk->...ikj', jnp.stack([B]*A.shape[-2]))
+    return logsumexp(Astack+Bstack, axis=-1)
+
 # Finally a reference implementation using a loop
 def hmm_forward_ref(params, obs):
     t, e, start, end = params
@@ -35,3 +51,4 @@ obs = jnp.array([0, 1, 0, 1, 1, 0])
 print("Loop:",hmm_forward_ref(params, obs))
 print("Scan:",hmm_forward_scan(params, obs))
 print("Assoc:",hmm_forward(params, obs))
+print("LogAssoc:",jnp.exp(hmm_forward_log(params, obs)))
