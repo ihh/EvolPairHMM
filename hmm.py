@@ -19,9 +19,7 @@ def hmm_forward_scan(params, obs):
 def hmm_forward(params, obs):
     t, e, start, end = params
     u = jnp.einsum('ij,jn->nij', t, jnp.take(e, obs, axis=1))
-    def associative_scan_fn(a, b):
-        return jnp.matmul (b, a)
-    return start @ jax.lax.associative_scan (associative_scan_fn, u)[-1] @ end
+    return start @ jax.lax.associative_scan (jnp.matmul, u)[-1] @ end
 
 # Finally a reference implementation using a loop
 def hmm_forward_ref(params, obs):
@@ -33,7 +31,7 @@ def hmm_forward_ref(params, obs):
 
 # Test the implementations
 params = (jnp.array([[0.9, 0.1], [0.2, 0.8]]), jnp.array([[0.7, 0.3], [0.4, 0.6]]), jnp.array([0.55, 0.45]), jnp.array([0.52, 0.48]))
-obs = jnp.array([0, 1, 0, 1, 0])
+obs = jnp.array([0, 1, 0, 1, 1, 0])
 print("Loop:",hmm_forward_ref(params, obs))
 print("Scan:",hmm_forward_scan(params, obs))
 print("Assoc:",hmm_forward(params, obs))
