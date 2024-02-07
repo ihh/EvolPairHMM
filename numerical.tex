@@ -620,6 +620,8 @@ Further, for $t>0$ (and assuming $\lambda,\mu > 0$), we know that
 $a < \exp(-\mu t)$, $a+b<1$, $a+u<1$, $b+v<S$, and $v<D-(1-a-u)$
 where $D \equiv S_D = \exp\left(\frac{\mu t}{1-y}\right) - 1$.
 
+\subsubsection{A more stable form for the GGI ODEs}
+
 As $t \to \infty$ we have $S \simeq \exp\left(\frac{\lambda t}{1-x}\right)$ and (because ancestral residues are inevitably deleted) $a \to 0$.
 Note that $S$ and $D$ (and possibly $v$) also grow exponentially. This is a problem for numerical integration: it leads to overflow.
 We can stabilize the ODEs by transforming to variables $(a,b,u,q,L,M)$ where $L=1/(S+1)$, $M=1/(D+1)$, $q=v/D$, and $q'=(v/D)'=(v'-qD')/D$
