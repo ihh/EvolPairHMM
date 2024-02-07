@@ -33,6 +33,8 @@ def hmm_forward_log(params, obs):
 # Equivalent of jnp.log (jnp.einsum('...ij,...jk->...ik', jnp.exp(A), jnp.exp(B)))
 def log_matmul(A,B):
     assert A.ndim == B.ndim
+    assert A.ndim >= 2
+    assert A.shape[0:-2] == B.shape[0:-2]
     Astack = jnp.einsum ('k...ij->...ikj', jnp.stack([A]*B.shape[-1]))
     Bstack = jnp.einsum ('i...jk->...ikj', jnp.stack([B]*A.shape[-2]))
     return logsumexp(Astack+Bstack, axis=-1)
