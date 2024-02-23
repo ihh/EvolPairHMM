@@ -51,6 +51,7 @@ def sample_dirichlet_ref (alpha):
     return gammas / numpy.sum(gammas)
 
 # Test the implementation by discretizing probability space and comparing counts
+# It is presumably possible to get a more accurate estimate of the K-L divergence analytically, but I haven't tried
 parser = argparse.ArgumentParser (formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("--bins", type=int, default=10, help="Number of bins for discretization")
 parser.add_argument("--seed", type=int, default=42, help="Random seed")
@@ -58,6 +59,7 @@ parser.add_argument("--dims", type=int, default=3, help="Number of dimensions fo
 parser.add_argument("--max_count", type=int, default=5, help="Maximum alpha for each dimension")
 parser.add_argument("--samples", type=int, default=10000, help="Number of samples to generate")
 parser.add_argument("--pseudocount", type=float, default=1e-5, help="Pseudocount for estimating K-L divergence")
+parser.add_argument("--verbose", action="store_true", help="Print samples and bins")
 args = parser.parse_args()
 
 n_samples = args.samples
@@ -66,6 +68,7 @@ seed = args.seed
 bins = args.bins
 max_count = args.max_count
 pseudocount = args.pseudocount
+verbose = args.verbose
 
 keys = jax.random.split (jax.random.PRNGKey(seed), n_samples)
 random.seed(seed)
@@ -75,22 +78,24 @@ print ("alpha:", alpha)
 
 jax_samples = [sample_dirichlet (key, jnp.array(alpha)) for key in keys]
 python_samples = [sample_dirichlet_ref(alpha) for _ in range(n_samples)]
-# print ("JAX:", jax_samples[:5])
-# print ("Python:", python_samples[:5])
+if verbose:
+    print ("JAX:", jax_samples[:5])
+    print ("Python:", python_samples[:5])
 
 jax_bins = jnp.histogramdd(jnp.array(jax_samples), bins=bins, range=[(0,1)]*dims)[0]
 python_bins = jnp.histogramdd(jnp.array(python_samples), bins=bins, range=[(0,1)]*dims)[0]
-# print ("JAX bins:", jax_bins)
-# print ("Python bins:", python_bins)
+if verbose:
+    print ("JAX bins:", jax_bins)
+    print ("Python bins:", python_bins)
 
 kl = 0
 norm = n_samples + pseudocount * bins**dims
 for index, pc in numpy.ndenumerate(python_bins):
+    jc = jax_bins[index]
+    pp = (pc + pseudocount) / norm
+    jp = (jc + pseudocount) / norm
+    kl += pp * (jnp.log2(pp) - jnp.log2(jp))
     if pc > 0:
-        jc = jax_bins[index]
-        pp = (pc + pseudocount) / norm
-        jp = (jc + pseudocount) / norm
         print ([x/bins for x in index], f"{pp:.4f}", f"{jp:.4f}")
-        kl += pp * (jnp.log2(pp) - jnp.log2(jp))
 
 print ("Kullback-Leibler divergence:", kl, "bits")
