@@ -107,9 +107,9 @@ def zeroTimeTransitionMatrix (indelParams):
 # convert counts (a,b,u,q) to transition matrix ((a,b,c),(f,g,h),(p,q,r))
 def smallTimeTransitionMatrix (t, indelParams, /, **kwargs):
     lam,mu,x,y = indelParams
-    a,b,u,q = integrateCounts(t,indelParams,**kwargs)
+#    a,b,u,q = integrateCounts(t,indelParams,**kwargs)
 # To use the non-diffrax version, comment out the previous line and uncomment the following one:
-#    a,b,u,q = integrateCounts_RK4(t,indelParams,dt0=.1/jnp.maximum(lam,mu))
+    a,b,u,q = integrateCounts_RK4(t,indelParams,dt0=.1/jnp.maximum(lam,mu))
     L = lm(t,lam,x)
     M = lm(t,mu,y)
     one_minus_L = jnp.where (L < 1., 1. - L, smallest_float32)   # avoid NaN gradient at zero
