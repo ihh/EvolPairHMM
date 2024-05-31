@@ -8,11 +8,11 @@ finite-inf.math: f.json finite-inf.json
 	./json2matrix.js -m f.json -s 0..2 -p '$$F=' | perl -pe 's/alpha/α/g;s/beta/β/g' >$@
 	./json2matrix.js -m finite-inf.json -s 0..14 -p '$$FG=' | perl -pe 's/alpha/α/g;s/beta/β/g' >>$@
 	echo 'matStates$$FG = {1}' >>$@
-	echo 'ins1States$$FG = {2,6,7,12}' >>$@
-	echo 'ins2States$$FG = {3,8,11,13}' >>$@
-	echo 'del1States$$FG = {4}' >>$@
-	echo 'del2States$$FG = {5}' >>$@
-	echo 'nullStates$$FG = {9,10,14,15}' >>$@
+	echo 'ins1States$$FG = {4,6,8,10}' >>$@
+	echo 'ins2States$$FG = {5,7,9,11}' >>$@
+	echo 'del1States$$FG = {2}' >>$@
+	echo 'del2States$$FG = {3}' >>$@
+	echo 'nullStates$$FG = {12,13,14,15}' >>$@
 
 finite-inf.tex: finite-inf.json
 	./json2matrix.js -m finite-inf.json -s 0..14 -t >$@
