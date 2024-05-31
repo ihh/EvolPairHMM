@@ -11,6 +11,7 @@ const opt = getopt.create([
   ['z' , 'zerocols=STRING'  , 'comma-separated list of matrix columns to zero out'],
   ['e' , 'eliminate=STRING' , 'comma-separated list of states to eliminate'],
   ['p' , 'prefix=STRING'    , 'text to prefix matrix with'],
+  ['y' , 'types'            , 'output state type sets'],
   ['t' , 'tex'              , 'output LaTex instead of Mathematica'],
   ['h' , 'help'             , 'display this help message']
 ])              // create Getopt instance
@@ -23,9 +24,39 @@ if (!opt.options.machine)
 const parseStateList = (s) => s.replaceAll(/(\d+)\.\.(\d+)/g,(_m,s,e)=>Array.from({length:parseInt(e)+1-parseInt(s)}).map((_,n)=>n+parseInt(s)).join(',')).split(',').map((s)=>parseInt(s))
 
 const machine = JSON.parse (fs.readFileSync (opt.options.machine).toString())
+
+let statesOfType = {};
+const stateType = machine.state.map ((state) => {
+  const id = state.id;
+  let type;
+  if (typeof(id) === 'string')
+    type = id;
+  else {
+    const [fState, gState] = id;
+    if (fState[0] == 'E' || gState[0] == 'E')
+      type = 'E';
+    else if (fState[0] == 'M' && gState[0] == 'M')
+      type = 'M';
+    else if (fState[0] == 'D')
+      type = fState;
+    else if (fState[0] == 'M' && (gState[0] == 'D' || gState[0] == 'I'))
+      type = gState;
+    else if (fState[0] == 'I' && gState[0] == 'D')
+      type = 'N';
+    else if (fState[0] == 'I' && gState[0] == 'M')
+      type = fState;
+    else if (fState[0] == 'I' && gState[0] == 'I')
+      type = gState;
+    else
+      throw new Error('unknown state: ' + JSON.stringify(id))
+  }
+  (statesOfType[type] = statesOfType[type] || []).push(state.n);
+  return type;
+});
+
 const states = (opt.options.states
 		? parseStateList(opt.options.states)
-		: machine.state.map((s,n)=>n))
+		: stateType.map((_s,n)=>n)).filter((n)=>stateType[n] != 'E');
 
 if (opt.options.eliminate) {
   const elimStates = parseStateList(opt.options.eliminate)
@@ -90,5 +121,13 @@ if (opt.options.tex) {
   tex = tex.replace(/dt/g, "\\Delta t")
   tex = tex.replace(/\*/g, " ")
   console.log (tex)
-} else
-  console.log ((opt.options.prefix || "") + "{" + matrix.map ((row) => "{" + row.join(",") + "}").join(",") + "}\n")
+} else {
+  const prefix = opt.options.prefix || "";
+  console.log (prefix + "{" + matrix.map ((row) => "{" + row.join(",") + "}").join(",") + "}")
+  if (opt.options.types) {
+    const types = Object.keys(statesOfType).filter((t)=>t!='E').sort();
+    types.forEach ((t) => {
+      console.log (t + prefix + "{" + statesOfType[t].map((n)=>n+1).join(',') + "}");
+    });
+  }
+}
