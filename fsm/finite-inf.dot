@@ -14,19 +14,7 @@ digraph G {
  12 [label="I2I2"];
  13 [label="I2D1"];
  14 [label="I2D2"];
- 15 [label="D1M"];
- 16 [label="D1I1"];
- 17 [label="D1I2"];
- 18 [label="D1D1"];
- 19 [label="D1D2"];
- 20 [label="D1E"];
- 21 [label="D2M"];
- 22 [label="D2I1"];
- 23 [label="D2I2"];
- 24 [label="D2D1"];
- 25 [label="D2D2"];
- 26 [label="D2E"];
- 27 [label="EE"];
+ 15 [label="EE"];
 
  0 -> 1 [color="green",taillabel="αdt"];
  0 -> 2 [color="green",taillabel="βdt"];
@@ -39,25 +27,17 @@ digraph G {
  0 -> 10 [color="green",taillabel="bd(1-2(α+β)dt)"];
  0 -> 13 [taillabel="bdαdt"];
  0 -> 14 [taillabel="bdβdt"];
- 0 -> 15 [color="red",taillabel="abc"];
- 0 -> 21 [color="red",taillabel="abd"];
- 0 -> 20 [color="red",taillabel="abc"];
- 0 -> 26 [color="red",taillabel="abd"];
- 0 -> 27 [taillabel="a"];
+ 0 -> 15 [taillabel="a"];
 
  1 -> 1 [color="green",taillabel="x"];
  1 -> 0 [color="orange",taillabel="aa(1-x)"];
  1 -> 5 [color="green",taillabel="bc(1-x)"];
  1 -> 10 [color="green",taillabel="bd(1-x)"];
- 1 -> 16 [color="red",taillabel="abc"];
- 1 -> 22 [color="red",taillabel="abd"];
 
  2 -> 2 [color="green",taillabel="y"];
  2 -> 0 [color="orange",taillabel="aa(1-y)"];
  2 -> 5 [color="green",taillabel="bc(1-y)"];
  2 -> 10 [color="green",taillabel="bd(1-y)"];
- 2 -> 17 [color="red",taillabel="abc"];
- 2 -> 23 [color="red",taillabel="abd"];
 
  3 -> 0 [color="orange",taillabel="aa(1-x)"];
  3 -> 3 [color="red",taillabel="aax"];
@@ -65,8 +45,6 @@ digraph G {
  3 -> 8 [taillabel="bcx"];
  3 -> 10 [color="green",taillabel="bd(1-x)"];
  3 -> 13 [taillabel="bdx"];
- 3 -> 18 [color="red",taillabel="abc"];
- 3 -> 24 [color="red",taillabel="abd"];
 
  4 -> 0 [color="orange",taillabel="aa(1-y)"];
  4 -> 4 [color="red",taillabel="aay"];
@@ -74,132 +52,62 @@ digraph G {
  4 -> 9 [taillabel="bcy"];
  4 -> 10 [color="green",taillabel="bd(1-y)"];
  4 -> 14 [taillabel="bdy"];
- 4 -> 19 [color="red",taillabel="abc"];
- 4 -> 25 [color="red",taillabel="abd"];
 
  5 -> 6 [color="green",taillabel="αdt"];
  5 -> 7 [color="green",taillabel="βdt"];
- 5 -> 0 [color="orange",taillabel="fa(1-2(α+β)dt)"];
- 5 -> 3 [color="red",taillabel="faαdt"];
- 5 -> 4 [color="red",taillabel="faβdt"];
+ 5 -> 0 [color="orange",taillabel="f(1-2(α+β)dt)"];
+ 5 -> 3 [color="red",taillabel="fαdt"];
+ 5 -> 4 [color="red",taillabel="fβdt"];
  5 -> 5 [color="green",taillabel="g(1-2(α+β)dt)"];
  5 -> 8 [taillabel="gαdt"];
  5 -> 9 [taillabel="gβdt"];
- 5 -> 15 [color="red",taillabel="fbc"];
- 5 -> 21 [color="red",taillabel="fbd"];
- 5 -> 20 [color="red",taillabel="fbc"];
- 5 -> 26 [color="red",taillabel="fbd"];
- 5 -> 27 [taillabel="f"];
+ 5 -> 15 [taillabel="f"];
 
  6 -> 6 [color="green",taillabel="x"];
- 6 -> 0 [color="orange",taillabel="fa(1-x)"];
+ 6 -> 0 [color="orange",taillabel="f(1-x)"];
  6 -> 5 [color="green",taillabel="g(1-x)"];
- 6 -> 16 [color="red",taillabel="fbc"];
- 6 -> 22 [color="red",taillabel="fbd"];
 
  7 -> 7 [color="green",taillabel="y"];
- 7 -> 0 [color="orange",taillabel="fa(1-y)"];
+ 7 -> 0 [color="orange",taillabel="f(1-y)"];
  7 -> 5 [color="green",taillabel="g(1-y)"];
- 7 -> 17 [color="red",taillabel="fbc"];
- 7 -> 23 [color="red",taillabel="fbd"];
 
- 8 -> 0 [color="orange",taillabel="fa(1-x)"];
- 8 -> 3 [color="red",taillabel="fax"];
+ 8 -> 0 [color="orange",taillabel="f(1-x)"];
+ 8 -> 3 [color="red",taillabel="fx"];
  8 -> 5 [color="green",taillabel="g(1-x)"];
  8 -> 8 [taillabel="gx"];
- 8 -> 18 [color="red",taillabel="fbc"];
- 8 -> 24 [color="red",taillabel="fbd"];
 
- 9 -> 0 [color="orange",taillabel="fa(1-y)"];
- 9 -> 4 [color="red",taillabel="fay"];
+ 9 -> 0 [color="orange",taillabel="f(1-y)"];
+ 9 -> 4 [color="red",taillabel="fy"];
  9 -> 5 [color="green",taillabel="g(1-y)"];
  9 -> 9 [taillabel="gy"];
- 9 -> 19 [color="red",taillabel="fbc"];
- 9 -> 25 [color="red",taillabel="fbd"];
 
  10 -> 11 [color="green",taillabel="αdt"];
  10 -> 12 [color="green",taillabel="βdt"];
- 10 -> 0 [color="orange",taillabel="pa(1-2(α+β)dt)"];
- 10 -> 3 [color="red",taillabel="paαdt"];
- 10 -> 4 [color="red",taillabel="paβdt"];
+ 10 -> 0 [color="orange",taillabel="p(1-2(α+β)dt)"];
+ 10 -> 3 [color="red",taillabel="pαdt"];
+ 10 -> 4 [color="red",taillabel="pβdt"];
  10 -> 10 [color="green",taillabel="q(1-2(α+β)dt)"];
  10 -> 13 [taillabel="qαdt"];
  10 -> 14 [taillabel="qβdt"];
- 10 -> 15 [color="red",taillabel="pbc"];
- 10 -> 21 [color="red",taillabel="pbd"];
- 10 -> 20 [color="red",taillabel="pbc"];
- 10 -> 26 [color="red",taillabel="pbd"];
- 10 -> 27 [taillabel="p"];
+ 10 -> 15 [taillabel="p"];
 
  11 -> 11 [color="green",taillabel="x"];
- 11 -> 0 [color="orange",taillabel="pa(1-x)"];
+ 11 -> 0 [color="orange",taillabel="p(1-x)"];
  11 -> 10 [color="green",taillabel="q(1-x)"];
- 11 -> 16 [color="red",taillabel="pbc"];
- 11 -> 22 [color="red",taillabel="pbd"];
 
  12 -> 12 [color="green",taillabel="y"];
- 12 -> 0 [color="orange",taillabel="pa(1-y)"];
+ 12 -> 0 [color="orange",taillabel="p(1-y)"];
  12 -> 10 [color="green",taillabel="q(1-y)"];
- 12 -> 17 [color="red",taillabel="pbc"];
- 12 -> 23 [color="red",taillabel="pbd"];
 
- 13 -> 0 [color="orange",taillabel="pa(1-x)"];
- 13 -> 3 [color="red",taillabel="pax"];
+ 13 -> 0 [color="orange",taillabel="p(1-x)"];
+ 13 -> 3 [color="red",taillabel="px"];
  13 -> 10 [color="green",taillabel="q(1-x)"];
  13 -> 13 [taillabel="qx"];
- 13 -> 18 [color="red",taillabel="pbc"];
- 13 -> 24 [color="red",taillabel="pbd"];
 
- 14 -> 0 [color="orange",taillabel="pa(1-y)"];
- 14 -> 4 [color="red",taillabel="pay"];
+ 14 -> 0 [color="orange",taillabel="p(1-y)"];
+ 14 -> 4 [color="red",taillabel="py"];
  14 -> 10 [color="green",taillabel="q(1-y)"];
  14 -> 14 [taillabel="qy"];
- 14 -> 19 [color="red",taillabel="pbc"];
- 14 -> 25 [color="red",taillabel="pbd"];
-
- 15 -> 0 [color="orange",taillabel="f(1-2(α+β)dt)"];
- 15 -> 3 [color="red",taillabel="fαdt"];
- 15 -> 4 [color="red",taillabel="fβdt"];
- 15 -> 15 [color="red",taillabel="g"];
-
- 16 -> 0 [color="orange",taillabel="f(1-x)"];
- 16 -> 16 [color="red",taillabel="g"];
-
- 17 -> 0 [color="orange",taillabel="f(1-y)"];
- 17 -> 17 [color="red",taillabel="g"];
-
- 18 -> 0 [color="orange",taillabel="f(1-x)"];
- 18 -> 3 [color="red",taillabel="fx"];
- 18 -> 18 [color="red",taillabel="g"];
-
- 19 -> 0 [color="orange",taillabel="f(1-y)"];
- 19 -> 4 [color="red",taillabel="fy"];
- 19 -> 19 [color="red",taillabel="g"];
-
- 20 -> 20 [color="red",taillabel="g"];
- 20 -> 27 [taillabel="f"];
-
- 21 -> 0 [color="orange",taillabel="p(1-2(α+β)dt)"];
- 21 -> 3 [color="red",taillabel="pαdt"];
- 21 -> 4 [color="red",taillabel="pβdt"];
- 21 -> 21 [color="red",taillabel="q"];
-
- 22 -> 0 [color="orange",taillabel="p(1-x)"];
- 22 -> 22 [color="red",taillabel="q"];
-
- 23 -> 0 [color="orange",taillabel="p(1-y)"];
- 23 -> 23 [color="red",taillabel="q"];
-
- 24 -> 0 [color="orange",taillabel="p(1-x)"];
- 24 -> 3 [color="red",taillabel="px"];
- 24 -> 24 [color="red",taillabel="q"];
-
- 25 -> 0 [color="orange",taillabel="p(1-y)"];
- 25 -> 4 [color="red",taillabel="py"];
- 25 -> 25 [color="red",taillabel="q"];
-
- 26 -> 26 [color="red",taillabel="q"];
- 26 -> 27 [taillabel="p"];
 
 
 }
