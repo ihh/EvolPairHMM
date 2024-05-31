@@ -5,8 +5,8 @@ f.json: finite.json
 	boss $< >$@
 
 finite-inf.math: f.json finite-inf.json
-	./json2matrix.js -m f.json -s 0..4 -p 't=' >$@
-	./json2matrix.js -m finite-inf.json -s 0..19,21..25 -p 't2=' >>$@
+	./json2matrix.js -m f.json -s 0..4 -p '$$F=' | perl -pe 's/alpha/α/g;s/beta/β/g' >$@
+	./json2matrix.js -m finite-inf.json -s 0..19,21..25 -p '$$FG=' | perl -pe 's/alpha/α/g;s/beta/β/g' >>$@
 
 finite-inf.tex: finite-inf.json
 	./json2matrix.js -m finite-inf.json -s 0..19,21..25 -t >$@

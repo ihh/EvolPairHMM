@@ -1,0 +1,205 @@
+digraph G {
+ 0 [label="[\"M\",\"M\"]"];
+ 1 [label="[\"M\",\"I1\"]"];
+ 2 [label="[\"M\",\"I2\"]"];
+ 3 [label="[\"M\",\"D1\"]"];
+ 4 [label="[\"M\",\"D2\"]"];
+ 5 [label="[\"I1\",\"M\"]"];
+ 6 [label="[\"I1\",\"I1\"]"];
+ 7 [label="[\"I1\",\"I2\"]"];
+ 8 [label="[\"I1\",\"D1\"]"];
+ 9 [label="[\"I1\",\"D2\"]"];
+ 10 [label="[\"I2\",\"M\"]"];
+ 11 [label="[\"I2\",\"I1\"]"];
+ 12 [label="[\"I2\",\"I2\"]"];
+ 13 [label="[\"I2\",\"D1\"]"];
+ 14 [label="[\"I2\",\"D2\"]"];
+ 15 [label="[\"D1\",{\"wait\":\"M\"}]"];
+ 16 [label="[\"D1\",{\"wait\":\"I1\"}]"];
+ 17 [label="[\"D1\",{\"wait\":\"I2\"}]"];
+ 18 [label="[\"D1\",\"D1\"]"];
+ 19 [label="[\"D1\",\"D2\"]"];
+ 20 [label="[\"D1\",\"E\"]"];
+ 21 [label="[\"D2\",{\"wait\":\"M\"}]"];
+ 22 [label="[\"D2\",{\"wait\":\"I1\"}]"];
+ 23 [label="[\"D2\",{\"wait\":\"I2\"}]"];
+ 24 [label="[\"D2\",\"D1\"]"];
+ 25 [label="[\"D2\",\"D2\"]"];
+ 26 [label="[\"D2\",\"E\"]"];
+ 27 [label="[\"E\",\"E\"]"];
+
+ 0 -> 1 [headlabel="&epsilon;/X",taillabel="alpha*dt"];
+ 0 -> 2 [headlabel="&epsilon;/X",taillabel="beta*dt"];
+ 0 -> 0 [headlabel="X/X",taillabel="a*a*(1-2*(alpha+beta)*dt)"];
+ 0 -> 3 [headlabel="X/&epsilon;",taillabel="a*a*alpha*dt"];
+ 0 -> 4 [headlabel="X/&epsilon;",taillabel="a*a*beta*dt"];
+ 0 -> 5 [headlabel="&epsilon;/X",taillabel="b*c*(1-2*(alpha+beta)*dt)"];
+ 0 -> 8 [headlabel="&epsilon;/&epsilon;",taillabel="b*c*alpha*dt"];
+ 0 -> 9 [headlabel="&epsilon;/&epsilon;",taillabel="b*c*beta*dt"];
+ 0 -> 10 [headlabel="&epsilon;/X",taillabel="b*d*(1-2*(alpha+beta)*dt)"];
+ 0 -> 13 [headlabel="&epsilon;/&epsilon;",taillabel="b*d*alpha*dt"];
+ 0 -> 14 [headlabel="&epsilon;/&epsilon;",taillabel="b*d*beta*dt"];
+ 0 -> 15 [headlabel="X/&epsilon;",taillabel="a*b*c"];
+ 0 -> 21 [headlabel="X/&epsilon;",taillabel="a*b*d"];
+ 0 -> 20 [headlabel="X/&epsilon;",taillabel="a*b*c"];
+ 0 -> 26 [headlabel="X/&epsilon;",taillabel="a*b*d"];
+ 0 -> 27 [headlabel="&epsilon;/&epsilon;",taillabel="a"];
+
+ 1 -> 1 [headlabel="&epsilon;/X",taillabel="x"];
+ 1 -> 0 [headlabel="X/X",taillabel="a*a*(1-x)"];
+ 1 -> 5 [headlabel="&epsilon;/X",taillabel="b*c*(1-x)"];
+ 1 -> 10 [headlabel="&epsilon;/X",taillabel="b*d*(1-x)"];
+ 1 -> 16 [headlabel="X/&epsilon;",taillabel="a*b*c"];
+ 1 -> 22 [headlabel="X/&epsilon;",taillabel="a*b*d"];
+
+ 2 -> 2 [headlabel="&epsilon;/X",taillabel="y"];
+ 2 -> 0 [headlabel="X/X",taillabel="a*a*(1-y)"];
+ 2 -> 5 [headlabel="&epsilon;/X",taillabel="b*c*(1-y)"];
+ 2 -> 10 [headlabel="&epsilon;/X",taillabel="b*d*(1-y)"];
+ 2 -> 17 [headlabel="X/&epsilon;",taillabel="a*b*c"];
+ 2 -> 23 [headlabel="X/&epsilon;",taillabel="a*b*d"];
+
+ 3 -> 0 [headlabel="X/X",taillabel="a*a*(1-x)"];
+ 3 -> 3 [headlabel="X/&epsilon;",taillabel="a*a*x"];
+ 3 -> 5 [headlabel="&epsilon;/X",taillabel="b*c*(1-x)"];
+ 3 -> 8 [headlabel="&epsilon;/&epsilon;",taillabel="b*c*x"];
+ 3 -> 10 [headlabel="&epsilon;/X",taillabel="b*d*(1-x)"];
+ 3 -> 13 [headlabel="&epsilon;/&epsilon;",taillabel="b*d*x"];
+ 3 -> 18 [headlabel="X/&epsilon;",taillabel="a*b*c"];
+ 3 -> 24 [headlabel="X/&epsilon;",taillabel="a*b*d"];
+
+ 4 -> 0 [headlabel="X/X",taillabel="a*a*(1-y)"];
+ 4 -> 4 [headlabel="X/&epsilon;",taillabel="a*a*y"];
+ 4 -> 5 [headlabel="&epsilon;/X",taillabel="b*c*(1-y)"];
+ 4 -> 9 [headlabel="&epsilon;/&epsilon;",taillabel="b*c*y"];
+ 4 -> 10 [headlabel="&epsilon;/X",taillabel="b*d*(1-y)"];
+ 4 -> 14 [headlabel="&epsilon;/&epsilon;",taillabel="b*d*y"];
+ 4 -> 19 [headlabel="X/&epsilon;",taillabel="a*b*c"];
+ 4 -> 25 [headlabel="X/&epsilon;",taillabel="a*b*d"];
+
+ 5 -> 6 [headlabel="&epsilon;/X",taillabel="alpha*dt"];
+ 5 -> 7 [headlabel="&epsilon;/X",taillabel="beta*dt"];
+ 5 -> 0 [headlabel="X/X",taillabel="f*a*(1-2*(alpha+beta)*dt)"];
+ 5 -> 3 [headlabel="X/&epsilon;",taillabel="f*a*alpha*dt"];
+ 5 -> 4 [headlabel="X/&epsilon;",taillabel="f*a*beta*dt"];
+ 5 -> 5 [headlabel="&epsilon;/X",taillabel="g*(1-2*(alpha+beta)*dt)"];
+ 5 -> 8 [headlabel="&epsilon;/&epsilon;",taillabel="g*alpha*dt"];
+ 5 -> 9 [headlabel="&epsilon;/&epsilon;",taillabel="g*beta*dt"];
+ 5 -> 15 [headlabel="X/&epsilon;",taillabel="f*b*c"];
+ 5 -> 21 [headlabel="X/&epsilon;",taillabel="f*b*d"];
+ 5 -> 20 [headlabel="X/&epsilon;",taillabel="f*b*c"];
+ 5 -> 26 [headlabel="X/&epsilon;",taillabel="f*b*d"];
+ 5 -> 27 [headlabel="&epsilon;/&epsilon;",taillabel="f"];
+
+ 6 -> 6 [headlabel="&epsilon;/X",taillabel="x"];
+ 6 -> 0 [headlabel="X/X",taillabel="f*a*(1-x)"];
+ 6 -> 5 [headlabel="&epsilon;/X",taillabel="g*(1-x)"];
+ 6 -> 16 [headlabel="X/&epsilon;",taillabel="f*b*c"];
+ 6 -> 22 [headlabel="X/&epsilon;",taillabel="f*b*d"];
+
+ 7 -> 7 [headlabel="&epsilon;/X",taillabel="y"];
+ 7 -> 0 [headlabel="X/X",taillabel="f*a*(1-y)"];
+ 7 -> 5 [headlabel="&epsilon;/X",taillabel="g*(1-y)"];
+ 7 -> 17 [headlabel="X/&epsilon;",taillabel="f*b*c"];
+ 7 -> 23 [headlabel="X/&epsilon;",taillabel="f*b*d"];
+
+ 8 -> 0 [headlabel="X/X",taillabel="f*a*(1-x)"];
+ 8 -> 3 [headlabel="X/&epsilon;",taillabel="f*a*x"];
+ 8 -> 5 [headlabel="&epsilon;/X",taillabel="g*(1-x)"];
+ 8 -> 8 [headlabel="&epsilon;/&epsilon;",taillabel="g*x"];
+ 8 -> 18 [headlabel="X/&epsilon;",taillabel="f*b*c"];
+ 8 -> 24 [headlabel="X/&epsilon;",taillabel="f*b*d"];
+
+ 9 -> 0 [headlabel="X/X",taillabel="f*a*(1-y)"];
+ 9 -> 4 [headlabel="X/&epsilon;",taillabel="f*a*y"];
+ 9 -> 5 [headlabel="&epsilon;/X",taillabel="g*(1-y)"];
+ 9 -> 9 [headlabel="&epsilon;/&epsilon;",taillabel="g*y"];
+ 9 -> 19 [headlabel="X/&epsilon;",taillabel="f*b*c"];
+ 9 -> 25 [headlabel="X/&epsilon;",taillabel="f*b*d"];
+
+ 10 -> 11 [headlabel="&epsilon;/X",taillabel="alpha*dt"];
+ 10 -> 12 [headlabel="&epsilon;/X",taillabel="beta*dt"];
+ 10 -> 0 [headlabel="X/X",taillabel="p*a*(1-2*(alpha+beta)*dt)"];
+ 10 -> 3 [headlabel="X/&epsilon;",taillabel="p*a*alpha*dt"];
+ 10 -> 4 [headlabel="X/&epsilon;",taillabel="p*a*beta*dt"];
+ 10 -> 10 [headlabel="&epsilon;/X",taillabel="q*(1-2*(alpha+beta)*dt)"];
+ 10 -> 13 [headlabel="&epsilon;/&epsilon;",taillabel="q*alpha*dt"];
+ 10 -> 14 [headlabel="&epsilon;/&epsilon;",taillabel="q*beta*dt"];
+ 10 -> 15 [headlabel="X/&epsilon;",taillabel="p*b*c"];
+ 10 -> 21 [headlabel="X/&epsilon;",taillabel="p*b*d"];
+ 10 -> 20 [headlabel="X/&epsilon;",taillabel="p*b*c"];
+ 10 -> 26 [headlabel="X/&epsilon;",taillabel="p*b*d"];
+ 10 -> 27 [headlabel="&epsilon;/&epsilon;",taillabel="p"];
+
+ 11 -> 11 [headlabel="&epsilon;/X",taillabel="x"];
+ 11 -> 0 [headlabel="X/X",taillabel="p*a*(1-x)"];
+ 11 -> 10 [headlabel="&epsilon;/X",taillabel="q*(1-x)"];
+ 11 -> 16 [headlabel="X/&epsilon;",taillabel="p*b*c"];
+ 11 -> 22 [headlabel="X/&epsilon;",taillabel="p*b*d"];
+
+ 12 -> 12 [headlabel="&epsilon;/X",taillabel="y"];
+ 12 -> 0 [headlabel="X/X",taillabel="p*a*(1-y)"];
+ 12 -> 10 [headlabel="&epsilon;/X",taillabel="q*(1-y)"];
+ 12 -> 17 [headlabel="X/&epsilon;",taillabel="p*b*c"];
+ 12 -> 23 [headlabel="X/&epsilon;",taillabel="p*b*d"];
+
+ 13 -> 0 [headlabel="X/X",taillabel="p*a*(1-x)"];
+ 13 -> 3 [headlabel="X/&epsilon;",taillabel="p*a*x"];
+ 13 -> 10 [headlabel="&epsilon;/X",taillabel="q*(1-x)"];
+ 13 -> 13 [headlabel="&epsilon;/&epsilon;",taillabel="q*x"];
+ 13 -> 18 [headlabel="X/&epsilon;",taillabel="p*b*c"];
+ 13 -> 24 [headlabel="X/&epsilon;",taillabel="p*b*d"];
+
+ 14 -> 0 [headlabel="X/X",taillabel="p*a*(1-y)"];
+ 14 -> 4 [headlabel="X/&epsilon;",taillabel="p*a*y"];
+ 14 -> 10 [headlabel="&epsilon;/X",taillabel="q*(1-y)"];
+ 14 -> 14 [headlabel="&epsilon;/&epsilon;",taillabel="q*y"];
+ 14 -> 19 [headlabel="X/&epsilon;",taillabel="p*b*c"];
+ 14 -> 25 [headlabel="X/&epsilon;",taillabel="p*b*d"];
+
+ 15 -> 0 [headlabel="X/X",taillabel="f*(1-2*(alpha+beta)*dt)"];
+ 15 -> 3 [headlabel="X/&epsilon;",taillabel="f*alpha*dt"];
+ 15 -> 4 [headlabel="X/&epsilon;",taillabel="f*beta*dt"];
+ 15 -> 15 [headlabel="X/&epsilon;",taillabel="g"];
+
+ 16 -> 0 [headlabel="X/X",taillabel="f*(1-x)"];
+ 16 -> 16 [headlabel="X/&epsilon;",taillabel="g"];
+
+ 17 -> 0 [headlabel="X/X",taillabel="f*(1-y)"];
+ 17 -> 17 [headlabel="X/&epsilon;",taillabel="g"];
+
+ 18 -> 0 [headlabel="X/X",taillabel="f*(1-x)"];
+ 18 -> 3 [headlabel="X/&epsilon;",taillabel="f*x"];
+ 18 -> 18 [headlabel="X/&epsilon;",taillabel="g"];
+
+ 19 -> 0 [headlabel="X/X",taillabel="f*(1-y)"];
+ 19 -> 4 [headlabel="X/&epsilon;",taillabel="f*y"];
+ 19 -> 19 [headlabel="X/&epsilon;",taillabel="g"];
+
+ 20 -> 20 [headlabel="X/&epsilon;",taillabel="g"];
+ 20 -> 27 [headlabel="&epsilon;/&epsilon;",taillabel="f"];
+
+ 21 -> 0 [headlabel="X/X",taillabel="p*(1-2*(alpha+beta)*dt)"];
+ 21 -> 3 [headlabel="X/&epsilon;",taillabel="p*alpha*dt"];
+ 21 -> 4 [headlabel="X/&epsilon;",taillabel="p*beta*dt"];
+ 21 -> 21 [headlabel="X/&epsilon;",taillabel="q"];
+
+ 22 -> 0 [headlabel="X/X",taillabel="p*(1-x)"];
+ 22 -> 22 [headlabel="X/&epsilon;",taillabel="q"];
+
+ 23 -> 0 [headlabel="X/X",taillabel="p*(1-y)"];
+ 23 -> 23 [headlabel="X/&epsilon;",taillabel="q"];
+
+ 24 -> 0 [headlabel="X/X",taillabel="p*(1-x)"];
+ 24 -> 3 [headlabel="X/&epsilon;",taillabel="p*x"];
+ 24 -> 24 [headlabel="X/&epsilon;",taillabel="q"];
+
+ 25 -> 0 [headlabel="X/X",taillabel="p*(1-y)"];
+ 25 -> 4 [headlabel="X/&epsilon;",taillabel="p*y"];
+ 25 -> 25 [headlabel="X/&epsilon;",taillabel="q"];
+
+ 26 -> 26 [headlabel="X/&epsilon;",taillabel="q"];
+ 26 -> 27 [headlabel="&epsilon;/&epsilon;",taillabel="p"];
+
+
+}
